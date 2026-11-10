@@ -310,6 +310,7 @@ function cacheDom() {
   dom.resultShare = $('#classicResultShare');
   dom.resultWeak = $('#classicResultWeak');
   dom.resultClose = $('#classicResultClose');
+  dom.resultBtn = $('#classicResultBtn');
 }
 
 /* ------------------------------------------------------------------------- */
@@ -677,6 +678,7 @@ export async function startActivityGame(params) {
   dom.question.textContent = '';
   dom.next.disabled = true;
   dom.next.hidden = false;
+  if (dom.resultBtn) dom.resultBtn.hidden = true;
   dom.end.hidden = false;
   dom.progress.style.width = '0%';
   dom.scoreValue.textContent = '000';
@@ -801,13 +803,28 @@ function hideDistanceLegend() {
 
 function syncNextFloat() {
   if (!dom.nextFloat || !dom.next) return;
-  const visible = !dom.next.disabled && !dom.next.hidden && !dom.classicScreen?.hidden && !GAME.finalShown;
+  const screenVisible = !dom.classicScreen?.hidden;
+  const resultReady = Boolean(GAME.finalShown && dom.resultOverlay.hidden && screenVisible);
+  const canAdvance = Boolean(!dom.next.disabled && !dom.next.hidden && !GAME.finalShown && screenVisible);
+  const visible = canAdvance || resultReady;
+  const label = resultReady ? 'Výsledok' : 'Ďalej';
+  const labelEl = dom.nextFloat.firstElementChild;
+  if (labelEl) labelEl.textContent = label;
+  dom.nextFloat.setAttribute('aria-label', label);
+  dom.nextFloat.classList.toggle('is-result', resultReady);
   dom.nextFloat.hidden = !visible;
   if (visible) requestAnimationFrame(positionNextFloat);
 }
 
 function positionNextFloat() {
   if (!dom.nextFloat || dom.nextFloat.hidden || !GAME.mapView) return;
+  if (GAME.finalShown) {
+    // The result action is a stable bottom action; there are no more answers
+    // to dodge, so do not move it to the top based on the last markers.
+    dom.nextFloat.classList.remove('is-top');
+    dom.nextFloat.style.top = '';
+    return;
+  }
   const points = [...GAME.marks.values()]
     .filter((mark) => mark.labelVisible)
     .map((mark) => GAME.mapView.mapToScreen(mark.x, mark.y));
@@ -1768,7 +1785,10 @@ function advanceGame() {
 
 function bindGameEvents() {
   dom.next.addEventListener('click', advanceGame);
-  dom.nextFloat?.addEventListener('click', advanceGame);
+  dom.nextFloat?.addEventListener('click', () => {
+    if (GAME.finalShown && dom.resultOverlay.hidden) openOverlay(dom.resultOverlay, dom.resultAgain);
+    else advanceGame();
+  });
   window.addEventListener('resize', () => requestAnimationFrame(positionNextFloat));
   dom.end.addEventListener('click', () => endActivity());
   dom.homeBtn?.addEventListener('click', () => endActivity());
@@ -1855,8 +1875,22 @@ export function goHome() {
 /* result dialog                                                             */
 /* ------------------------------------------------------------------------- */
 
+function syncResultReopen() {
+  if (!dom.resultBtn) return;
+  const show = Boolean(GAME.finalShown && dom.resultOverlay.hidden && !dom.classicScreen.hidden);
+  dom.resultBtn.hidden = !show;
+  syncNextFloat();
+}
+
 function bindResultEvents() {
   if (!dom.resultOverlay) return;
+  dom.resultBtn?.addEventListener('click', () => {
+    openOverlay(dom.resultOverlay, dom.resultAgain);
+  });
+  new MutationObserver(syncResultReopen).observe(dom.resultOverlay, {
+    attributes: true,
+    attributeFilter: ['hidden', 'class'],
+  });
   dom.resultAgain.addEventListener('click', () => {
     const params = { ...GAME.params };
     closeOverlay(dom.resultOverlay);
@@ -1927,6 +1961,8 @@ function showResult(result) {
     });
     dom.resultRows.append(tr);
   });
+  dom.next.hidden = true;
+  if (dom.nextFloat) dom.nextFloat.hidden = true;
   openOverlay(dom.resultOverlay, dom.resultAgain);
 }
 

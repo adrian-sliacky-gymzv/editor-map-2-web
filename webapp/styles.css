@@ -1944,6 +1944,12 @@ kbd {
   bottom: auto;
 }
 
+.map-next-float.is-result {
+  border-color: #b45309;
+  background: linear-gradient(180deg, #fbbf24, #d97706);
+  color: #451a03;
+}
+
 .map-next-float:active {
   transform: translateX(-50%) scale(0.97);
 }
@@ -1953,6 +1959,13 @@ kbd {
   stroke-width: 2;
   stroke-dasharray: 6 5;
   opacity: 0.8;
+  vector-effect: non-scaling-stroke;
+}
+
+.distance-guide-underlay {
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-width: 4.5;
+  opacity: 1;
   vector-effect: non-scaling-stroke;
 }
 

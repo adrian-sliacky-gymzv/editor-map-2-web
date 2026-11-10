@@ -1,5 +1,5 @@
-/* ============================================================
-   Editor máp 2 — complete clone additions
+﻿/* ============================================================
+   Editor mÃ¡p 2 â€” complete clone additions
    Home additions, shared map renderer, classic activities,
    setup dialogs and the full editor.
    ============================================================ */
@@ -493,6 +493,16 @@ html[data-darkreader-mode] .marker-correct .label-text {
 .classic-topbar .topbar-actions,
 .legacy-game-topbar .topbar-actions {
   margin-left: auto;
+}
+
+.result-reopen-btn {
+  border-color: #b45309;
+  background: linear-gradient(#fffdf4, #fef3c7);
+  color: #92400e;
+}
+
+.result-reopen-btn:hover:not(:disabled) {
+  background: linear-gradient(#ffffff, #fde68a);
 }
 
 .mission-hud {
@@ -2074,6 +2084,39 @@ html[data-darkreader-mode] .marker-correct .label-text {
   }
 }
 
+@media (max-width: 700px) {
+  .classic-map-viewport .map-hint,
+  .classic-map-viewport .map-tag,
+  .game-screen .map-hint,
+  .game-screen .map-tag {
+    display: none;
+  }
+
+  .classic-map-viewport .zoom-value {
+    display: none;
+  }
+
+  .classic-topbar #classicNextBtn,
+  .legacy-game-topbar #nextBtn,
+  .classic-topbar #classicResultBtn,
+  .legacy-game-topbar #gameResultBtn {
+    display: none;
+  }
+
+  .game-screen .zoom-controls {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 600px) {
+  .mission-stat-time {
+    display: none;
+  }
+}
+
 @media (max-width: 480px) {
   .classic-topbar .topbar-actions .win-btn,
   .legacy-game-topbar .topbar-actions .win-btn {
@@ -2196,5 +2239,11 @@ html[data-darkreader-mode] .marker-correct .label-text {
 
   .editor-map-viewport {
     inset: 47px 0 0 0;
+  }
+}
+
+@media (max-width: 700px) {
+  .classic-map-viewport .zoom-controls .zoom-value {
+    display: none;
   }
 }

@@ -124,6 +124,9 @@ test('mission HUDs, legend and marker callouts stay explicit', () => {
   assert.match(html, /class="mission-hud" id="gameMission"/);
   assert.match(html, /id="gameAverageValue"/);
   assert.match(html, /id="gameQuestionCounter"/);
+  assert.match(html, /id="classicResultBtn"/);
+  assert.match(html, /id="gameResultBtn"/);
+  assert.match(html, /class="win-btn result-reopen-btn"/);
   assert.match(html, /id="classicDistanceLegend"/);
   assert.match(html, /class="distance-legend-foot"/);
   assert.match(html, /id="classicDistanceValue"/);
@@ -132,6 +135,7 @@ test('mission HUDs, legend and marker callouts stay explicit', () => {
   const classic = read('js/classic-activities.js');
   assert.match(classic, /setMissionTarget\(/);
   assert.match(classic, /averageText\(/);
+  assert.match(classic, /syncResultReopen\(/);
   assert.match(classic, /labelPlacement: targetAbove \? 'above' : 'below'/);
   assert.match(classic, /labelPlacement: targetAbove \? 'below' : 'above'/);
   assert.match(classic, /dom\.distanceValue\.textContent/);
@@ -140,6 +144,8 @@ test('mission HUDs, legend and marker callouts stay explicit', () => {
   const app = read('js/app.js');
   assert.match(app, /setGameMissionTarget\(/);
   assert.match(app, /gameAverageText\(/);
+  assert.match(app, /syncLegacyResultReopen\(/);
+  assert.match(app, /LEGACY_PIN_PATH/);
 
   assert.match(html, /id="mapImg" class="map-img map-img-inline"/);
   assert.match(app, /LEGACY_MAP_SOURCES/);
@@ -159,4 +165,6 @@ test('mission HUDs, legend and marker callouts stay explicit', () => {
   assert.match(classicCss, /\.mission-hud/);
   assert.match(classicCss, /vector-effect: non-scaling-stroke/);
   assert.match(classicCss, /\.map-canvas\.is-gesturing/);
+  assert.match(classicCss, /#classicResultBtn/);
+  assert.match(classicCss, /\.mission-stat-time/);
 });

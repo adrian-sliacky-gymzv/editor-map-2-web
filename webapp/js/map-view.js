@@ -1272,9 +1272,15 @@ export class MapView {
     const scale = this.fitScale * this.zoom;
     const mapW = this.W * scale;
     const mapH = this.H * scale;
+    // At low zoom the map is smaller than the viewport. Allow it to move
+    // inside that free space so a pinch can keep the map point under the
+    // fingers instead of always zooming around the viewport centre. A
+    // controlled overscroll keeps that anchor natural near an edge, while
+    // most of the map stays visible and the home button can recentre it.
+    const factor = this.lastLayout.w <= 700 ? 0.4 : 0.2;
     return {
-      maxX: Math.max(0, (mapW - this.lastLayout.w) / 2),
-      maxY: Math.max(0, (mapH - this.lastLayout.h) / 2),
+      maxX: Math.max(Math.abs(mapW - this.lastLayout.w) / 2, this.lastLayout.w * factor),
+      maxY: Math.max(Math.abs(mapH - this.lastLayout.h) / 2, this.lastLayout.h * factor),
     };
   }
 

@@ -145,9 +145,9 @@ mapa. Kliknutím na oko meníš viditeľnosť, na pin viditeľnosť značky, na 
 
 Mapy sa ovládajú rovnako v hrách aj v editore:
 
-- **Jeden prst / ťahanie myšou** posúva mapu, keď je priblížená. Pri mierke
-  „celá mapa“ má jemný elastický odpor a po pustení sa vráti do stredu, takže
-  hneď vidíš, že aplikácia gesto zachytila, ale mapa neostane mimo výrezu.
+- **Jeden prst / ťahanie myšou** posúva mapu pri každom priblížení. Pri mierke
+  „celá mapa“ sa môže pohybovať v inom voľnom priestore výrezu, takže sa dá
+  dostať bližšie k okraju aj bez zoomu; tlačidlo **domov** ju vráti do stredu.
   Posun sa nikdy nezasekne o falošný 60 px limit.
 - **Dva prsty** plynulo približujú a zároveň posúvajú mapu. Zoom je ukotvený
   na stred medzi prstami, takže obsah pod prstami neujíde. Pinch funguje aj
@@ -164,8 +164,8 @@ Mapy sa ovládajú rovnako v hrách aj v editore:
   dotyku. Druhé dvojité ťuknutie vráti celú mapu.
 - **Koliesko myši / trackpad** zoomuje plynulo okolo kurzora; `Ctrl` + koliesko
   (pinch na trackpade) pracuje rovnako.
-- **Tlačidlá + / − / domov** a zobrazené percento sú vždy poruke. Na telefóne
-  majú 46 px a sú v jednom rade, aby neprekážali.
+- **Tlačidlá + / − / domov** sú vždy poruke. Na telefóne majú 46 px, sú
+  v jednom rade a percento sa skryje, aby nezaberalo miesto na mape.
 - **Klávesy** `+`, `−` a `0` fungujú v hre aj v editore.
 - Po pinchi, posune alebo dvojitom ťuknutí sa koncový dotyk **nikdy
   nevyhodnotí ako odpoveď**. Ťuknutie na ovládací prvok mapy tiež nikdy
@@ -177,7 +177,17 @@ Mapy sa ovládajú rovnako v hrách aj v editore:
   automaticky oddiali, ak by tip alebo správna poloha boli mimo obrazovky.
 
 Pri hrách sa po odpovedi na telefóne objaví plávajúce tlačidlo **Ďalej** nad
-ovládaním mapy, takže sa nemusíš naťahovať na hornú lištu.
+ovládaním mapy, takže sa nemusíš naťahovať na hornú lištu. Po zobrazení
+výsledku sa to isté tlačidlo zmení na zlaté **Výsledok**; na desktope je
+v hornej lište tlačidlo **Výsledok**. Výsledkovú kartu tak môžeš kedykoľvek
+zavrieť a znova otvoriť bez opustenia hry.
+
+## Mobilné rozhranie
+
+Na telefóne je zámerne len to podstatné: cieľový objekt s ikonou a typom,
+body, priemer, číslo otázky a jedna akcia. Skryté sú pomocné popisky mapy,
+štítok mapy/mierky, percento zoomu, čas v HUD a duplicitné tlačidlo **Ďalej**
+v hornej lište. Pri hre zostáva väčší priestor pre mapu a menej prekrývania.
 
 ## Klávesové skratky
 
@@ -375,6 +385,11 @@ Následný mobilný a gestový audit pridal:
   s názvom objektu aj vzdialenosťou,
 - HUD úlohy s ikonou a typom cieľa, veľkým názvom objektu, bodmi, priemerom
   kola, číslom otázky a časom; spätná väzba sa mení priamo v HUD bez skoku mapy,
+- znovuotvorenie výsledkovej karty cez tlačidlo **Výsledok** alebo zlaté
+  plávajúce tlačidlo po jej zatvorení,
+- kondenzované mobilné rozhranie bez duplicitných pomocných prvkov,
+- rovnaký moderný štýl značiek (zelený pin / červený zameriavač) v hlavných
+  aktivitách aj v rýchlej hre,
 - ostré vektorové čiary pri každom priblížení a inline SVG mapa v rýchlej hre
   namiesto nízko rozlíšeného `<img>` podkladu,
 - opravu svetlých štítkov značiek, ktoré predtým v svetlom režime splývali

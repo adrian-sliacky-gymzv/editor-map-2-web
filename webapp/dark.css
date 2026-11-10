@@ -884,6 +884,16 @@
     color: #9aadc7;
   }
 
+  .result-reopen-btn {
+    border-color: #a16207;
+    background: linear-gradient(#3b2e16, #2a2110);
+    color: #fde68a;
+  }
+
+  .result-reopen-btn:hover:not(:disabled) {
+    background: linear-gradient(#4a3a1c, #352a14);
+  }
+
   .mission-hud {
     border-color: #2f4568;
     background: linear-gradient(180deg, rgba(20, 35, 58, 0.97), rgba(12, 23, 42, 0.92));
@@ -1347,8 +1357,23 @@
     stroke: #22c55e;
   }
 
-  .map-mark[data-state="correct"] .mark-label-text {
+  .map-mark[data-state="correct"] .mark-label-text,
+  .marker-correct .label-text {
     fill: #bbf7d0;
+  }
+
+  .marker-correct .label-bg {
+    fill: #0d2a1a;
+    stroke: #22c55e;
+  }
+
+  .marker-guess .guess-label-bg {
+    fill: #35171d;
+    stroke: #ef4444;
+  }
+
+  .marker-guess .guess-label-text {
+    fill: #fecaca;
   }
 
   .map-mark[data-state="incorrect"] .mark-label-bg {

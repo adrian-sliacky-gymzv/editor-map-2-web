@@ -105,6 +105,7 @@ const dom = {
   qnum: $('#qnum'),
   questionText: $('#questionText'),
   nextBtn: $('#nextBtn'),
+  gameResultBtn: $('#gameResultBtn'),
   nextFloat: $('#gameNextFloat'),
   endBtn: $('#endBtn'),
   progressFill: $('#progressFill'),
@@ -533,13 +534,25 @@ function showScreen(name) {
 
 function syncNextFloat() {
   if (!dom.nextFloat || !dom.nextBtn) return;
-  const visible = state.screen === 'game' && !dom.nextBtn.disabled && !dom.nextBtn.hidden && !state.final;
+  const screenVisible = !dom.gameScreen.hidden;
+  const resultReady = Boolean(state.final && dom.resultOverlay.hidden && screenVisible);
+  const canAdvance = Boolean(!dom.nextBtn.disabled && !dom.nextBtn.hidden && !state.final && screenVisible);
+  const visible = canAdvance || resultReady;
+  const label = resultReady ? 'Výsledok' : 'Ďalej';
+  const labelEl = dom.nextFloat.firstElementChild;
+  if (labelEl) labelEl.textContent = label;
+  dom.nextFloat.setAttribute('aria-label', label);
+  dom.nextFloat.classList.toggle('is-result', resultReady);
   dom.nextFloat.hidden = !visible;
   if (visible) requestAnimationFrame(positionNextFloat);
 }
 
 function positionNextFloat() {
   if (!dom.nextFloat || dom.nextFloat.hidden) return;
+  if (state.final) {
+    dom.nextFloat.classList.remove('is-top');
+    return;
+  }
   const viewport = dom.mapViewport.getBoundingClientRect();
   const markers = [...dom.markers.querySelectorAll('.marker-correct, .marker-guess')]
     .map((marker) => marker.getBoundingClientRect())
@@ -714,6 +727,8 @@ function startGame(mode, options = {}) {
   resetGameMission();
   dom.gameAverageValue.textContent = '—';
   dom.gameQuestionCounter.textContent = `0/${state.gameNumQ}`;
+  dom.nextBtn.hidden = false;
+  if (dom.gameResultBtn) dom.gameResultBtn.hidden = true;
   showScreen('game');
   loadLegacyMaps();
   updateScorePanel();
@@ -971,7 +986,16 @@ function showFinal() {
   dom.resultRows.innerHTML = result.rows;
   dom.recordBadge.hidden = !record;
 
+  dom.nextBtn.hidden = true;
+  if (dom.nextFloat) dom.nextFloat.hidden = true;
   openOverlay(dom.resultOverlay, dom.playAgainBtn);
+}
+
+function syncLegacyResultReopen() {
+  if (!dom.gameResultBtn) return;
+  const show = Boolean(state.final && dom.resultOverlay.hidden && !dom.gameScreen.hidden);
+  dom.gameResultBtn.hidden = !show;
+  syncNextFloat();
 }
 
 function buildFinalText(percent, timeText) {
@@ -1132,8 +1156,9 @@ function clampView(view) {
   const viewport = dom.mapViewport.getBoundingClientRect();
   const displayWidth = state.stage.w * zoom;
   const displayHeight = state.stage.h * zoom;
-  const maxPanX = Math.max(0, (displayWidth - viewport.width) / 2);
-  const maxPanY = Math.max(0, (displayHeight - viewport.height) / 2);
+  const factor = viewport.width <= 700 ? 0.4 : 0.2;
+  const maxPanX = Math.max(Math.abs(displayWidth - viewport.width) / 2, viewport.width * factor);
+  const maxPanY = Math.max(Math.abs(displayHeight - viewport.height) / 2, viewport.height * factor);
 
   return {
     zoom,
@@ -1214,167 +1239,154 @@ function updateMarkerScale() {
 
 /* --- distance markers --------------------------------------------- */
 
-function makeRedMarker(x, y, label = 'Tvoj tip') {
+const LEGACY_PIN_PATH = '<path fill="currentColor" d="M8 0.7c-3.5 0-6.3 2.7-6.3 6.1 0 4.5 6.3 8.7 6.3 8.7s6.3-4.2 6.3-8.7C14.3 3.4 11.5 0.7 8 0.7Z"/><path d="m5.1 6.9 2 2 3.8-4.1" fill="none" stroke="#ffffff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>';
+
+function makeResultLabel(parent, { label, placement, fill, stroke, textFill, bgClass, textClass }) {
+  const group = svgElement('g', { class: 'marker-result-label' }, parent);
+  group.dataset.placement = placement;
+  const above = placement === 'above';
+  const height = 18;
+  const bgY = above ? -40 : 22;
+  const stem = svgElement('line', {
+    x1: 0,
+    y1: above ? -10 : 10,
+    x2: 0,
+    y2: above ? -22 : 22,
+    stroke,
+    'stroke-width': 1.4,
+    'stroke-dasharray': '2 2',
+    'stroke-linecap': 'round',
+    'aria-hidden': 'true',
+  }, group);
+  const bg = svgElement('rect', {
+    class: bgClass,
+    x: -30,
+    y: bgY,
+    width: 60,
+    height,
+    rx: 6,
+    fill,
+    stroke,
+    'stroke-width': 1.2,
+  }, group);
+  const text = svgElement('text', {
+    class: textClass,
+    x: 0,
+    y: bgY + height / 2,
+    fill: textFill,
+    'font-family': 'Tahoma, Arial, sans-serif',
+    'font-size': 10.5,
+    'font-weight': 700,
+    'text-anchor': 'middle',
+    'dominant-baseline': 'middle',
+  }, group);
+  text.textContent = label;
+  group._stem = stem;
+  group._bg = bg;
+  group._text = text;
+  return group;
+}
+
+function sizeResultLabel(group) {
+  const label = group.querySelector('.marker-result-label');
+  if (!label) return;
+  const text = label._text || label.querySelector('text');
+  const bg = label._bg || label.querySelector('rect');
+  const stem = label._stem || label.querySelector('line');
+  if (!text || !bg) return;
+  const width = Math.max(24, (text.getComputedTextLength?.() || text.textContent.length * 6) + 12);
+  bg.setAttribute('width', String(width));
+  // Keep the chip inside the map viewport; the stem follows sideways.
+  const rect = label.getBoundingClientRect();
+  const viewport = dom.mapViewport.getBoundingClientRect();
+  const margin = 6;
+  let dx = 0;
+  if (rect.left < viewport.left + margin) dx = viewport.left + margin - rect.left;
+  else if (rect.right > viewport.right - margin) dx = viewport.right - margin - rect.right;
+  bg.setAttribute('x', String(-width / 2 + dx));
+  text.setAttribute('x', String(dx));
+  stem?.setAttribute('x2', String(dx));
+}
+
+function makeRedMarker(x, y, label = 'Tvoj tip', placement = 'below') {
   const group = svgElement('g', { class: 'marker marker-guess' });
   group.dataset.x = x;
   group.dataset.y = y;
 
-  const target = svgElement('g', { class: 'marker-target' }, group);
-  svgElement('circle', { cx: 0, cy: 0, r: 10, fill: 'none', stroke: '#ffffff', 'stroke-width': 4 }, target);
-  svgElement('circle', { cx: 0, cy: 0, r: 10, fill: 'none', stroke: '#1b1b1b', 'stroke-width': 1.5 }, target);
-  svgElement('circle', { cx: 0, cy: 0, r: 5, fill: 'none', stroke: '#ffffff', 'stroke-width': 3.4 }, target);
-  svgElement('circle', { cx: 0, cy: 0, r: 5, fill: 'none', stroke: '#1b1b1b', 'stroke-width': 1.3 }, target);
-
+  const icon = svgElement('g', { class: 'marker-icon' }, group);
+  svgElement('circle', { cx: 0, cy: 0, r: 6.2, fill: 'none', stroke: '#ffffff', 'stroke-width': 3.4 }, icon);
+  svgElement('circle', { cx: 0, cy: 0, r: 6.2, fill: 'none', stroke: '#dc2626', 'stroke-width': 1.8 }, icon);
   const ticks = [
-    [-13, 0, -10.5, 0],
-    [10.5, 0, 13, 0],
-    [0, -13, 0, -10.5],
-    [0, 10.5, 0, 13],
+    [0, -10, 0, -7.5],
+    [0, 7.5, 0, 10],
+    [-10, 0, -7.5, 0],
+    [7.5, 0, 10, 0],
   ];
   for (const [x1, y1, x2, y2] of ticks) {
-    svgElement('line', { x1, y1, x2, y2, stroke: '#ffffff', 'stroke-width': 4, 'stroke-linecap': 'round' }, target);
-    svgElement('line', { x1, y1, x2, y2, stroke: '#1b1b1b', 'stroke-width': 1.7, 'stroke-linecap': 'round' }, target);
+    svgElement('line', { x1, y1, x2, y2, stroke: '#ffffff', 'stroke-width': 3.2, 'stroke-linecap': 'round' }, icon);
+    svgElement('line', { x1, y1, x2, y2, stroke: '#dc2626', 'stroke-width': 1.6, 'stroke-linecap': 'round' }, icon);
   }
+  svgElement('circle', { cx: 0, cy: 0, r: 1.7, fill: '#dc2626' }, icon);
 
-  svgElement('line', { x1: 0, y1: -2, x2: 0, y2: -34, stroke: '#ffffff', 'stroke-width': 4.6, 'stroke-linecap': 'round' }, group);
-  svgElement('line', { x1: 0, y1: -2, x2: 0, y2: -34, stroke: '#2a2a2a', 'stroke-width': 2.4, 'stroke-linecap': 'round' }, group);
-  svgElement(
-    'path',
-    {
-      d: 'M0 -34 C6 -35.5 13 -34 21 -30.5 C22.5 -27 22.5 -23 20.5 -19.5 C13 -21.5 6 -22 0 -20.5 Z',
-      fill: 'url(#flagRed)',
-      stroke: '#790000',
-      'stroke-width': 1.1,
-      'stroke-linejoin': 'round',
-    },
-    group
-  );
-
-  const labelText = svgElement(
-    'text',
-    {
-      class: 'guess-label-text',
-      x: 8,
-      y: 17,
-      fill: '#7f1d1d',
-      'font-family': 'Tahoma, Arial, sans-serif',
-      'font-size': 10.5,
-      'text-anchor': 'start',
-    },
-    group
-  );
-  labelText.textContent = label;
-  const width = Math.max(12, labelText.getComputedTextLength ? labelText.getComputedTextLength() : label.length * 6);
-  const plate = svgElement(
-    'rect',
-    {
-      class: 'guess-label-bg',
-      x: -3,
-      y: 6,
-      width: width + 12,
-      height: 16,
-      rx: 3,
-      fill: '#ffffff',
-      stroke: '#b91c1c',
-      'stroke-width': 1,
-    },
-    group
-  );
-  group.insertBefore(plate, labelText);
-
+  makeResultLabel(group, {
+    label,
+    placement,
+    fill: '#fef2f2',
+    stroke: '#dc2626',
+    textFill: '#991b1b',
+    bgClass: 'guess-label-bg',
+    textClass: 'guess-label-text',
+  });
   return group;
 }
 
-function makeGreenMarker(x, y, label) {
+function makeGreenMarker(x, y, label, placement = 'above') {
   const group = svgElement('g', { class: 'marker marker-correct' });
   group.dataset.x = x;
   group.dataset.y = y;
 
-  const plate = svgElement('rect', {
-    class: 'label-bg',
-    x: -10,
-    y: -11,
-    width: 80,
-    height: 22,
-    rx: 2,
-    fill: '#ffffff',
-    stroke: '#8a8f98',
-    'stroke-width': 1,
-  }, group);
+  const icon = svgElement('g', { class: 'marker-icon' }, group);
+  svgElement('circle', { cx: 0, cy: 0, r: 9.5, fill: '#ffffff', stroke: '#15803d', 'stroke-width': 1.5 }, icon);
+  const pin = svgElement('g', { transform: 'translate(-8 -8)', color: '#15803d' }, icon);
+  pin.innerHTML = LEGACY_PIN_PATH;
 
-  svgElement('line', { x1: 0, y1: -1, x2: 0, y2: -34, stroke: '#ffffff', 'stroke-width': 4.6, 'stroke-linecap': 'round' }, group);
-  svgElement('line', { x1: 0, y1: -1, x2: 0, y2: -34, stroke: '#2a2a2a', 'stroke-width': 2.4, 'stroke-linecap': 'round' }, group);
-  svgElement(
-    'path',
-    {
-      d: 'M0 -34 C6 -35.5 13 -34 21 -30.5 C22.5 -27 22.5 -23 20.5 -19.5 C13 -21.5 6 -22 0 -20.5 Z',
-      fill: 'url(#flagGreen)',
-      stroke: '#0b4f00',
-      'stroke-width': 1.1,
-      'stroke-linejoin': 'round',
-    },
-    group
-  );
-
-  svgElement('rect', { x: -6, y: -6, width: 12, height: 12, fill: '#ffffff', stroke: '#111111', 'stroke-width': 1.5 }, group);
-  svgElement('rect', { x: -2.5, y: -2.5, width: 5, height: 5, fill: '#111111' }, group);
-
-  const text = svgElement(
-    'text',
-    {
-      class: 'label-text',
-      x: 11,
-      y: 4,
-      fill: '#111111',
-      'font-family': 'Tahoma, Arial, sans-serif',
-      'font-size': 11.5,
-      'text-anchor': 'start',
-    },
-    group
-  );
-  text.textContent = label;
-
+  makeResultLabel(group, {
+    label,
+    placement,
+    fill: '#f0fdf4',
+    stroke: '#16a34a',
+    textFill: '#14532d',
+    bgClass: 'label-bg',
+    textClass: 'label-text',
+  });
   return group;
 }
 
 function drawDistanceMarkers(guess, target) {
   clearMarkers();
-  const guide = svgElement('line', {
+  svgElement('line', {
+    class: 'distance-guide-underlay',
+    x1: guess.x,
+    y1: guess.y,
+    x2: target.x,
+    y2: target.y,
+  }, dom.markers);
+  svgElement('line', {
     class: 'distance-guide',
     x1: guess.x,
     y1: guess.y,
     x2: target.x,
     y2: target.y,
-  });
-  dom.markers.appendChild(guide);
-  const green = makeGreenMarker(target.x, target.y, target.label);
+  }, dom.markers);
+  const targetAbove = target.y <= guess.y;
+  const green = makeGreenMarker(target.x, target.y, target.label, targetAbove ? 'above' : 'below');
   dom.markers.appendChild(green);
-  sizeGreenLabel(green, target);
-  const red = makeRedMarker(guess.x, guess.y, 'Tvoj tip');
+  const red = makeRedMarker(guess.x, guess.y, 'Tvoj tip', targetAbove ? 'below' : 'above');
   dom.markers.appendChild(red);
+  sizeResultLabel(green);
+  sizeResultLabel(red);
   state.markerGroups = [green, red];
   updateMarkerScale();
-}
-
-function sizeGreenLabel(group, target) {
-  const text = group.querySelector('.label-text');
-  const plate = group.querySelector('.label-bg');
-  if (!text || !plate) return;
-  const width = Math.max(
-    12,
-    text.getComputedTextLength ? text.getComputedTextLength() : target.label.length * 6.2
-  );
-  if (target.x > 800) {
-    text.setAttribute('text-anchor', 'end');
-    text.setAttribute('x', -11);
-    plate.setAttribute('x', -(width + 17));
-    plate.setAttribute('width', width + 27);
-  } else {
-    text.setAttribute('text-anchor', 'start');
-    text.setAttribute('x', 11);
-    plate.setAttribute('x', -10);
-    plate.setAttribute('width', width + 27);
-  }
 }
 
 /* --- quiz candidates ---------------------------------------------- */
@@ -1662,7 +1674,8 @@ function finishPuzzleVisual(drop, target, correct) {
 function bindGameEvents() {
   dom.nextBtn.addEventListener('click', onNext);
   dom.nextFloat?.addEventListener('click', () => {
-    if (!dom.nextBtn.disabled) dom.nextBtn.click();
+    if (state.final && dom.resultOverlay.hidden) openOverlay(dom.resultOverlay, dom.playAgainBtn);
+    else if (!dom.nextBtn.disabled) dom.nextBtn.click();
   });
   dom.endBtn.addEventListener('click', onEnd);
   if (dom.nextBtn) {
@@ -1818,7 +1831,7 @@ function onPointerMove(event) {
       state.suppressTap = true;
     }
 
-    if (state.drag.moved && state.view.zoom > 1) {
+    if (state.drag.moved) {
       state.view = clampView({
         ...state.view,
         panX: state.view.panX + dx,
@@ -2165,6 +2178,16 @@ function bindOverlayEvents() {
   dom.helpOverlay.addEventListener('click', (event) => {
     if (event.target === dom.helpOverlay) closeOverlay(dom.helpOverlay);
   });
+  dom.gameResultBtn?.addEventListener('click', () => {
+    openOverlay(dom.resultOverlay, dom.playAgainBtn);
+  });
+  new MutationObserver(syncLegacyResultReopen).observe(dom.resultOverlay, {
+    attributes: true,
+    attributeFilter: ['hidden', 'class'],
+  });
+  dom.resultOverlay.addEventListener('click', (event) => {
+    if (event.target === dom.resultOverlay) closeOverlay(dom.resultOverlay);
+  });
   dom.confirmOverlay.addEventListener('click', (event) => {
     if (event.target === dom.confirmOverlay) {
       state.confirmAction = null;
@@ -2370,7 +2393,6 @@ function bindGlobalEvents() {
       }
       if (!dom.resultOverlay.hidden) {
         closeOverlay(dom.resultOverlay);
-        finishReturn();
         return;
       }
       if (state.screen === 'game') {
