@@ -194,8 +194,38 @@ Aktuálne **31 testov, 31 passing**. Testy pokrývajú:
 - prítomnosť dát, náhľadov, modulov a pôvodnej pomoci.
 
 Lighthouse (mobilná emulácia): domovská obrazovka, nastavenie aktivity, hra,
-výsledková karta aj editor majú **100 Accessibility, 100 Best Practices,
+výsledková karta, editor aj atlas majú **100 Accessibility, 100 Best Practices,
 100 SEO a 100 Agentic Browsing**.
+
+### Stress test a QA
+
+V rámci záverečného stress testu bolo overené:
+
+- všetky 3 aktivity na všetkých mapách, ktoré im predpisuje `config.xml`,
+  vrátane korektných odpovedí, nesprávnych odpovedí, prechodu na ďalšiu otázku
+  a finálnej výsledkovej karty,
+- všetkých 8 máp v editore, prepínanie máp, strom, viditeľnosť, farby, vlastné
+  značky, kreslenie, save/open round-trip, export PNG/JPEG a tlač,
+- šírky 320, 390, 768, 1024 a 1280 px; bez horizontálneho pretečenia,
+- atlas: výber, hľadanie, filtre, tréning a návrat späť,
+- 35/35 sieťových požiadaviek s HTTP 200 a čistá konzola bez chýb.
+
+Počas testu boli opravené konkrétne problémy:
+
+- chyba `focus` pri návrate z rýchlej hry na domovskú obrazovku,
+- puzzle objekty sa teraz dostanú do popredia presne ako v origináli a po
+  odpovedi sa vrátia na pôvodnú pozíciu v poradí kreslenia,
+- počiatočný zoom label už neukazuje falošných 100 %,
+- správna slovenská pluralizácia v nastaveniach a finálnych správach
+  („3 možnosti“, „1 z 1 otázky“, „1 bod“, „1 štát“),
+- výber mapy na 320 px sa nezrúti a na telefóne je horizontálny carousel
+  s náhľadom ďalšej mapy,
+- atlasové body už nezhadzujú audit touch-targetov; prístupný výber zostáva
+  v plne klávesnicovom zozname,
+- exportný dialóg sa už nemôže zaseknúť pri rýchlom potvrdení,
+- rýchla mestská hra už pri tréningu zoznamu nezačína s ukrytým počtom
+  otázok 1,
+- dočasné editačné inputy majú stabilné `id`/`name` a čistú konzolu.
 
 ## Štruktúra
 

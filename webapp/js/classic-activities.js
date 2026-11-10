@@ -9,6 +9,7 @@
 import {
   classicData,
   childrenByTag,
+  descendantEntityNodes,
   getNumberAttr,
   groupPools,
   htmlFromConfig,
@@ -19,6 +20,8 @@ import {
   visibleLabels,
 } from './classic-data.js';
 import { MapView } from './map-view.js';
+import { practiceStats } from './practice-stats.js';
+import { FORMAT_LABELS, answerSuccess } from './practice-stats-core.js';
 import {
   $,
   announce,
@@ -115,6 +118,20 @@ const GAME = {
   puzzlePrevious: null,
   lastResult: null,
   loadToken: 0,
+  startedAtEpoch: 0,
+  sessionRecorded: false,
+  clockOffset: 0,
+  clockPausedAt: 0,
+  practiceItems: [],
+  practiceIndex: 0,
+  practiceFormat: null,
+  practiceCurrentItem: null,
+  practiceMapKey: null,
+  practiceConfig: null,
+  practiceFormatCounts: { test: 0, distance: 0, puzzle: 0 },
+  practiceErrorCount: 0,
+  entityIndex: null,
+  lastPracticeFormat: null,
 };
 
 const dom = {};
@@ -192,6 +209,7 @@ function cacheDom() {
   dom.resultSetup = $('#classicResultSetup');
   dom.resultHome = $('#classicResultHome');
   dom.resultShare = $('#classicResultShare');
+  dom.resultWeak = $('#classicResultWeak');
   dom.resultClose = $('#classicResultClose');
 }
 
@@ -361,7 +379,8 @@ function rebuildLevels(preserve = false) {
     button.className = 'seg-btn setup-level';
     button.dataset.levelIndex = String(index);
     button.setAttribute('aria-pressed', index === SETUP.levelIndex ? 'true' : 'false');
-    button.innerHTML = `<span class="seg-name">${escapeLabel(level.label)}</span><span class="seg-count">${mode.key === 'test' ? `${level.numTargets} možností` : `testLevel ≤ ${level.maxLevel}`}</span>`;
+    const targetWord = pluralSk(level.numTargets, 'možnosť', 'možnosti', 'možností');
+    button.innerHTML = `<span class="seg-name">${escapeLabel(level.label)}</span><span class="seg-count">${mode.key === 'test' ? `${level.numTargets} ${targetWord}` : `testLevel ≤ ${level.maxLevel}`}</span>`;
     button.addEventListener('click', () => {
       SETUP.levelIndex = index;
       rebuildLevels(true);
@@ -397,8 +416,9 @@ function updateSetupSummary() {
 
   const activeLevels = Math.max(0, SETUP.pools.filter((p) => p.nodes.length).length);
   const empty = SETUP.pools.filter((p) => !p.nodes.length).map((p) => p.label);
+  const targetWord = pluralSk(level.numTargets, 'možnosť', 'možnosti', 'možností');
   const targetText = mode.key === 'test'
-    ? `V každej otázke ${level.numTargets} možností.`
+    ? `V každej otázke ${level.numTargets} ${targetWord}.`
     : mode.key === 'distance'
       ? 'Skóre podľa vzdialenosti od správneho bodu.'
       : 'Tolerancia uloženia je 15 mapových jednotiek.';
@@ -526,6 +546,18 @@ export async function startActivityGame(params) {
   GAME.puzzlePrevious = null;
   GAME.lastResult = null;
   GAME.marks = [];
+  GAME.practiceItems = [];
+  GAME.practiceIndex = 0;
+  GAME.practiceFormat = null;
+  GAME.practiceCurrentItem = null;
+  GAME.practiceMapKey = null;
+  GAME.practiceConfig = null;
+  GAME.practiceFormatCounts = { test: 0, distance: 0, puzzle: 0 };
+  GAME.practiceErrorCount = 0;
+  GAME.entityIndex = null;
+  GAME.lastPracticeFormat = null;
+  GAME.startedAtEpoch = Date.now();
+  GAME.sessionRecorded = false;
 
   showClassicScreen();
   setLoading(true, 'Načítavam mapu…');
@@ -576,7 +608,11 @@ export async function startActivityGame(params) {
       GAME.mapView = null;
       return;
     }
-    requestAnimationFrame(() => GAME.mapView.layout());
+    requestAnimationFrame(() => {
+      if (!GAME.mapView) return;
+      GAME.mapView.layout();
+      dom.zoomValue.textContent = `${GAME.mapView.percent()}%`;
+    });
 
     const baseLabels = visibleLabels(mapEl, testEl, null);
     if (params.mode === 'test') {
@@ -639,18 +675,37 @@ function startClock() {
   stopClock();
   GAME.startedAt = performance.now();
   GAME.elapsedMs = 0;
+  GAME.clockOffset = 0;
+  GAME.clockPausedAt = 0;
   const tick = () => {
-    GAME.elapsedMs = performance.now() - GAME.startedAt;
+    const now = performance.now();
+    const paused = GAME.clockPausedAt ? now - GAME.clockPausedAt : 0;
+    GAME.elapsedMs = Math.max(0, now - GAME.startedAt - GAME.clockOffset - paused);
     dom.timeValue.textContent = formatClock(GAME.elapsedMs / 1000);
   };
   tick();
   GAME.clockId = setInterval(tick, 220);
 }
 
+function pauseClock() {
+  if (!GAME.clockId || GAME.clockPausedAt) return;
+  GAME.clockPausedAt = performance.now();
+}
+
+function resumeClock() {
+  if (!GAME.clockPausedAt) return;
+  GAME.clockOffset += performance.now() - GAME.clockPausedAt;
+  GAME.clockPausedAt = 0;
+}
+
 function stopClock() {
   if (GAME.clockId) clearInterval(GAME.clockId);
   GAME.clockId = null;
-  if (GAME.startedAt) GAME.elapsedMs = performance.now() - GAME.startedAt;
+  if (GAME.startedAt) {
+    const end = GAME.clockPausedAt || performance.now();
+    GAME.elapsedMs = Math.max(0, end - GAME.startedAt - GAME.clockOffset);
+  }
+  GAME.clockPausedAt = 0;
 }
 
 function timeText() {
@@ -669,6 +724,79 @@ function updateScore() {
 
 function setQuestionHtml(html) {
   dom.question.innerHTML = html;
+}
+
+/* ------------------------------------------------------------------------- */
+/* weakness tracking                                                         */
+/* ------------------------------------------------------------------------- */
+
+function attemptContext() {
+  if (GAME.mode === 'practice') {
+    return {
+      mapKey: GAME.practiceCurrentItem?.mapKey || GAME.practiceMapKey,
+      mapLabel: GAME.mapDef?.label || '',
+      testLabel: 'Tréning slabých miest',
+      source: 'practice',
+    };
+  }
+  return {
+    mapKey: GAME.params?.mapKey || GAME.mapKey,
+    mapLabel: displayMapLabel(GAME.mapEl, GAME.mapDef),
+    testLabel: GAME.testEl?.getAttribute('label') || '',
+    source: 'game',
+  };
+}
+
+function recordAttemptForNode(node, mode, correct, score, maxScore) {
+  const entity = nodeEntity(node);
+  if (!entity) return;
+  const context = attemptContext();
+  if (!context.mapKey) return;
+  practiceStats.recordAttempt({
+    mapKey: context.mapKey,
+    mapLabel: context.mapLabel,
+    entity,
+    label: nodeLabel(node),
+    markSymbol: node.getAttribute('markSymbol') || '',
+    mode,
+    correct: !!correct,
+    score,
+    maxScore,
+    testLabel: context.testLabel,
+    source: context.source,
+    at: Date.now(),
+  });
+}
+
+function recordCurrentSession() {
+  if (GAME.sessionRecorded || !GAME.answers.length) return;
+  const answers = GAME.answers;
+  let correct = 0;
+  let score = 0;
+  let maxScore = 0;
+  const maps = [];
+  for (const answer of answers) {
+    const max = Number(answer.maxPoints) || 1;
+    const points = Number(answer.points) || 0;
+    if (answerSuccess(points, max)) correct += 1;
+    score += points;
+    maxScore += max;
+    if (answer.mapLabel && !maps.includes(answer.mapLabel)) maps.push(answer.mapLabel);
+  }
+  practiceStats.recordSession({
+    startedAt: GAME.startedAtEpoch || Date.now(),
+    endedAt: Date.now(),
+    mode: GAME.mode === 'practice' ? 'practice' : GAME.mode,
+    source: GAME.mode === 'practice' ? 'practice' : 'game',
+    format: GAME.mode === 'practice' ? (GAME.practiceConfig?.format || 'mixed') : GAME.mode,
+    maps,
+    questions: GAME.numQ,
+    answered: answers.length,
+    correct,
+    score,
+    maxScore,
+  });
+  GAME.sessionRecorded = true;
 }
 
 function setQuestionNumber(number) {
@@ -789,11 +917,19 @@ function answerTestQuestion(clickedNode) {
     GAME.incorrect += 1;
     setQuestionHtml(classicData.cfg('incorrectTestAnswer'));
   }
+  recordAttemptForNode(GAME.targetNode, 'test', correct, correct ? 1 : 0, 1);
+  const context = attemptContext();
   GAME.answers.push({
     label: nodeLabel(GAME.targetNode),
     picked: nodeLabel(clickedNode),
     correct,
     points: correct ? 1 : 0,
+    maxPoints: 1,
+    mode: 'test',
+    mapKey: context.mapKey,
+    mapLabel: context.mapLabel,
+    markSymbol: GAME.targetNode.getAttribute('markSymbol') || '',
+    entity: nodeEntity(GAME.targetNode),
   });
   updateScore();
   updateProgress();
@@ -825,12 +961,14 @@ function showTestFinal() {
   // The original leaves the last question's marks and shapes on screen.
   setQuestionNumber(0);
   const percent = Math.round((GAME.correct / GAME.numQ) * 100);
-  setQuestionHtml(htmlFromConfig(classicData.cfg('testFinalScore'), {
+  let finalHtml = htmlFromConfig(classicData.cfg('testFinalScore'), {
     CORRECTQ: spaced(GAME.correct),
     TOTALQ: spaced(GAME.numQ),
     TOTALTIME: spaced(timeText()),
     PERCENT: spaced(percent),
-  }));
+  });
+  if (GAME.numQ === 1) finalHtml = finalHtml.replace(/\botázok\b/g, 'otázky');
+  setQuestionHtml(finalHtml);
   dom.next.disabled = true;
   dom.progress.style.width = '100%';
   showResult({
@@ -886,7 +1024,8 @@ function nextDistanceQuestion() {
 }
 
 function onDistanceClick(point) {
-  if (!GAME.active || GAME.answered || GAME.mode !== 'distance') return;
+  if (!GAME.active || GAME.answered) return;
+  if (GAME.mode !== 'distance' && !(GAME.mode === 'practice' && GAME.practiceFormat === 'distance')) return;
   GAME.answered = true;
   const target = GAME.targetNode;
   const targetX = getNumberAttr(target, 'markX');
@@ -896,6 +1035,12 @@ function onDistanceClick(point) {
   let score = Math.round(((maxDist - 3 * dist) / maxDist) * 100);
   if (score < 5) score = 0;
   GAME.totalScore += score;
+  const success = score >= 70;
+  if (GAME.mode === 'practice') {
+    if (success) GAME.correct += 1;
+    else GAME.incorrect += 1;
+  }
+  recordAttemptForNode(target, 'distance', success, score, 100);
 
   GAME.mapView.addMark({
     x: point.x,
@@ -915,16 +1060,22 @@ function onDistanceClick(point) {
   });
 
   const answer = distanceAnswerFor(score);
-  setQuestionHtml(answer.html.replace('SCORE', String(answer.score)));
+  setQuestionHtml(answer.html);
   const isLast = GAME.questionIndex >= GAME.numQ;
-  const suffix = isLast ? classicData.cfg('nextTestQuestion') : classicData.cfg('nextTestQuestion');
-  // The original uses nextTestQuestion / lastTestQuestion for the distance test.
-  dom.question.innerHTML += ` ${isLast ? classicData.cfg('lastTestQuestion') : suffix}`;
+  const suffix = isLast ? classicData.cfg('lastTestQuestion') : classicData.cfg('nextTestQuestion');
+  dom.question.innerHTML += ` ${suffix}`;
+  const context = attemptContext();
   GAME.answers.push({
     label: nodeLabel(target),
-    correct: score > 0,
+    correct: success,
     points: score,
+    maxPoints: 100,
+    mode: 'distance',
     distance: Math.round(dist),
+    mapKey: context.mapKey,
+    mapLabel: context.mapLabel,
+    markSymbol: target.getAttribute('markSymbol') || '',
+    entity: nodeEntity(target),
   });
   updateScore();
   updateProgress();
@@ -953,18 +1104,21 @@ function showDistanceFinal() {
   // Keep the final guess and correct position visible for review.
   setQuestionNumber(0);
   const percent = Math.round(GAME.totalScore / GAME.numQ);
-  setQuestionHtml(htmlFromConfig(classicData.cfg('distanceFinalScore'), {
+  let finalHtml = htmlFromConfig(classicData.cfg('distanceFinalScore'), {
     TOTALSCORE: spaced(GAME.totalScore),
     TOTALTIME: spaced(timeText()),
     PERCENT: spaced(percent),
-  }));
+  });
+  if (GAME.totalScore === 1) finalHtml = finalHtml.replace(/\bbodov\b/g, 'bod');
+  else if (GAME.totalScore >= 2 && GAME.totalScore <= 4) finalHtml = finalHtml.replace(/\bbodov\b/g, 'body');
+  setQuestionHtml(finalHtml);
   dom.next.disabled = true;
   dom.progress.style.width = '100%';
   showResult({
     title: 'Traf sa! — výsledok',
     percent,
     primaryValue: `${GAME.totalScore}`,
-    primaryLabel: 'bodov',
+    primaryLabel: pluralSk(GAME.totalScore, 'bod', 'body', 'bodov'),
     time: timeText(),
     finalHtml: dom.question.innerHTML,
     rows: GAME.answers.map((row) => [
@@ -1010,7 +1164,10 @@ function nextPuzzleQuestion() {
   const original = GAME.mapView.entityPosition(entity);
   GAME.puzzleOrig = { x: original.x, y: original.y };
   const el = GAME.mapView.entityElement(entity);
-  GAME.puzzleTarget = { name: entity, el, original, nextSibling: el?.nextSibling || null, parent: el?.parentElement || null };
+  const nextSibling = el?.nextSibling || null;
+  const parent = el?.parentElement || null;
+  if (el && parent) parent.appendChild(el);
+  GAME.puzzleTarget = { name: entity, el, original, nextSibling, parent };
   GAME.mapView.centerEntity(entity);
 
   setQuestionNumber(GAME.questionIndex);
@@ -1173,12 +1330,20 @@ function answerPuzzle(targetNode) {
   }
   GAME.puzzlePrevious = { entity: key, wasIncorrect: !correct };
   GAME.puzzleTarget = null;
+  recordAttemptForNode(targetNode, 'puzzle', correct, correct ? 1 : 0, 1);
 
+  const context = attemptContext();
   GAME.answers.push({
     label: nodeLabel(targetNode),
     correct,
     points: correct ? 1 : 0,
+    maxPoints: 1,
+    mode: 'puzzle',
     distance: Math.round(distance),
+    mapKey: context.mapKey,
+    mapLabel: context.mapLabel,
+    markSymbol: targetNode.getAttribute('markSymbol') || '',
+    entity: nodeEntity(targetNode),
   });
   updateScore();
   updateProgress();
@@ -1203,12 +1368,13 @@ function showPuzzleFinal() {
   const answered = GAME.correct + GAME.incorrect;
   const percent = answered ? Math.round((GAME.correct / answered) * 100) : 0;
   const type = GAME.testEl.getAttribute('answer') || GAME.testEl.getAttribute('question') || GAME.testEl.getAttribute('label') || '';
+  const finalType = answered === 1 && type === 'štátov' ? 'štátu' : type;
   setQuestionHtml(htmlFromConfig(classicData.cfg('puzzleFinalScore'), {
     CORRECTQ: spaced(GAME.correct),
     TOTALQ: spaced(answered),
     TOTALTIME: spaced(timeText()),
     PERCENT: spaced(percent),
-    ENTITYTYPE: escapeHtml(type),
+    ENTITYTYPE: escapeHtml(finalType),
   }));
   dom.next.disabled = true;
   dom.progress.style.width = '100%';

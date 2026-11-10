@@ -292,6 +292,9 @@ function pickFileFallback() {
   return new Promise((resolve) => {
     const input = document.createElement('input');
     input.type = 'file';
+    input.id = 'editor-file-input';
+    input.name = 'mefFile';
+    input.setAttribute('aria-label', 'Vybrať súbor .mef');
     input.accept = '.mef,application/xml,text/xml';
     input.style.display = 'none';
     document.body.append(input);
@@ -781,6 +784,7 @@ function buildTreeNode(node, depth, parent) {
   const label = document.createElement('span');
   label.className = 'tree-label';
   label.textContent = nodeLabel(node) || (isUser ? 'vlastná popiska' : '(bez názvu)');
+  label.title = label.textContent;
   row.append(label);
   entry.labelEl = label;
 
@@ -1036,7 +1040,10 @@ function updateRowState(node) {
     entry.colorBtn.append(swatch);
     entry.colorBtn.title = hex ? `Farba ${hex}` : 'Zmiešaná farba';
   }
-  if (entry.labelEl) entry.labelEl.textContent = nodeLabel(node) || 'vlastná popiska';
+  if (entry.labelEl) {
+    entry.labelEl.textContent = nodeLabel(node) || 'vlastná popiska';
+    entry.labelEl.title = entry.labelEl.textContent;
+  }
 }
 
 function normalizeState(value) {
@@ -1129,6 +1136,9 @@ function openColorPopover(anchor, node) {
   custom.innerHTML = '<span>Vlastná farba</span>';
   const input = document.createElement('input');
   input.type = 'color';
+  input.id = 'editor-custom-color';
+  input.name = 'nodeColor';
+  input.setAttribute('aria-label', 'Vlastná farba objektu');
   input.value = current || '#000000';
   input.addEventListener('input', () => setColor(node, input.value, { live: true }));
   custom.append(input);

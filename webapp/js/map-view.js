@@ -602,6 +602,9 @@ export class MapView {
     const rect = mark.labelGroup.getBoundingClientRect();
     const input = document.createElement('input');
     input.className = 'mark-label-input';
+    input.id = 'editor-mark-label-input';
+    input.name = 'markLabel';
+    input.setAttribute('aria-label', 'Názov značky');
     input.type = 'text';
     input.value = mark.label;
     input.maxLength = 60;

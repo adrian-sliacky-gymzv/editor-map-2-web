@@ -62,26 +62,42 @@ function trapOverlayFocus(event) {
 
 export function openOverlay(overlay, focus = null) {
   if (!overlay) return;
+  overlay._openToken = (overlay._openToken || 0) + 1;
+  const token = overlay._openToken;
+  clearTimeout(overlay._closeTimer);
+  clearTimeout(overlay._focusTimer);
   overlay._previousFocus = document.activeElement;
   overlay.hidden = false;
-  requestAnimationFrame(() => overlay.classList.add('is-open'));
+  overlay.classList.add('is-open');
   document.body.classList.add('has-classic-overlay');
   overlay.addEventListener('keydown', trapOverlayFocus);
-  if (focus) setTimeout(() => focus.focus?.(), 30);
+  if (focus) {
+    overlay._focusTimer = setTimeout(() => {
+      if (overlay._openToken === token) focus.focus?.();
+    }, 30);
+  }
 }
 
 export function closeOverlay(overlay) {
   if (!overlay) return;
+  overlay._openToken = (overlay._openToken || 0) + 1;
+  const token = overlay._openToken;
+  clearTimeout(overlay._closeTimer);
+  clearTimeout(overlay._focusTimer);
   overlay.classList.remove('is-open');
   overlay.removeEventListener('keydown', trapOverlayFocus);
   const previous = overlay._previousFocus;
   overlay._previousFocus = null;
   if (previous && typeof previous.focus === 'function' && document.documentElement.contains(previous)) {
-    setTimeout(() => previous.focus(), 30);
+    setTimeout(() => {
+      if (overlay._openToken === token && overlay.hidden) previous.focus();
+    }, 30);
   }
-  setTimeout(() => {
-    if (!overlay.classList.contains('is-open')) overlay.hidden = true;
-    if (!document.querySelector('.overlay.is-open')) document.body.classList.remove('has-classic-overlay');
+  overlay._closeTimer = setTimeout(() => {
+    if (overlay._openToken === token && !overlay.classList.contains('is-open')) {
+      overlay.hidden = true;
+      if (!document.querySelector('.overlay.is-open')) document.body.classList.remove('has-classic-overlay');
+    }
   }, 160);
 }
 

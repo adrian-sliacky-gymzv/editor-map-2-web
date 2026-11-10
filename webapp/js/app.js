@@ -482,7 +482,10 @@ function goHome() {
   closeAllOverlays();
   showScreen('home');
   renderProgress();
-  requestAnimationFrame(() => dom.quickPlayBtn.focus({ preventScroll: true }));
+  requestAnimationFrame(() => {
+    const target = dom.quickPlayBtn || $('[data-classic-mode="test"]') || dom.homeHelpBtn;
+    target?.focus({ preventScroll: true });
+  });
 }
 
 function goAtlas() {
@@ -1746,6 +1749,8 @@ function renderAtlas() {
     dot.type = 'button';
     dot.className = `map-dot ${levelClass}`;
     dot.dataset.entity = city.entity;
+    dot.tabIndex = -1;
+    dot.setAttribute('aria-hidden', 'true');
     dot.style.left = `${(city.x / MAP_WIDTH) * 100}%`;
     dot.style.top = `${(city.y / MAP_HEIGHT) * 100}%`;
     dot.setAttribute('aria-label', `${city.label}, ${levelName(city.level)}`);
@@ -1845,7 +1850,10 @@ function trainAtlas(cities) {
     showToast('Najprv vyber aspoň jedno mesto.');
     return;
   }
-  const numQ = Math.min(state.numQ, cities.length);
+  // The legacy quick game settings are hidden in the new shell. Keep
+  // list training useful even for browsers that still have an old numQ=1.
+  const requested = cities.length === 1 ? 1 : Math.max(5, state.numQ);
+  const numQ = Math.min(requested, cities.length);
   startGame('distance', {
     pool: cities,
     numQ,
