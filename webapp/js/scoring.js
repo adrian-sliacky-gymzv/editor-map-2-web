@@ -7,6 +7,11 @@ export const MAP_HEIGHT = 520;
 /** Original: Math.round(Math.sqrt(map.width^2 + map.height^2)) === 1121 */
 export const MAX_DIST = Math.round(Math.sqrt(MAP_WIDTH * MAP_WIDTH + MAP_HEIGHT * MAP_HEIGHT));
 
+/** The original DistanceTest computes maxDist from the selected map, rounded. */
+export function maxDistanceForMap(width, height) {
+  return Math.round(Math.sqrt((Number(width) || 0) ** 2 + (Number(height) || 0) ** 2));
+}
+
 /**
  * Original: dist = Math.round(Point.distance(rightPoint, userPoint));
  *           score = Math.round((maxDist - 3 * dist) / maxDist * 100);

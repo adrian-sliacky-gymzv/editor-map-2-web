@@ -315,7 +315,8 @@ export function groupPools(mapDoc, testEl, maxLevel, { puzzle = false } = {}) {
       ? descendantEntityNodes(source).filter((node) => {
           const level = Number.parseInt(node.getAttribute('testLevel') || '0', 10);
           if (!(level > 0 && level <= maxLevel)) return false;
-          if (puzzle && node.getAttribute('nopuzzle') === 'true') return false;
+          // The original filters on attribute presence, not on its value.
+          if (puzzle && node.hasAttribute('nopuzzle')) return false;
           return true;
         })
       : [];

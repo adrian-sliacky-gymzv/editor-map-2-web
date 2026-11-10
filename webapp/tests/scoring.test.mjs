@@ -5,6 +5,7 @@ import {
   MAX_DIST,
   MAP_WIDTH,
   MAP_HEIGHT,
+  maxDistanceForMap,
   scoreForDistance,
   scoreForGuess,
   distanceBetween,
@@ -21,6 +22,19 @@ test('map constants match the original 993 x 520 vector map', () => {
   assert.equal(MAP_WIDTH, 993);
   assert.equal(MAP_HEIGHT, 520);
   assert.equal(MAX_DIST, 1121);
+});
+
+test('per-map max distance is rounded from the selected map dimensions', () => {
+  assert.equal(maxDistanceForMap(993, 520), 1121);
+  assert.equal(maxDistanceForMap(991, 638), 1179);
+  assert.equal(maxDistanceForMap(733, 662), 988);
+  assert.equal(maxDistanceForMap(612, 653), 895);
+  assert.equal(maxDistanceForMap(730, 671), 992);
+  assert.equal(maxDistanceForMap(656, 651), 924);
+  assert.equal(maxDistanceForMap(614, 659), 901);
+  assert.equal(maxDistanceForMap(843, 640), 1058);
+  assert.equal(maxDistanceForMap(Number.NaN, 10), 10);
+  assert.equal(maxDistanceForMap(-3, 4), 5);
 });
 
 test('original distance formula gives exact known scores', () => {
