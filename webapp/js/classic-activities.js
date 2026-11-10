@@ -68,6 +68,92 @@ const MODES = {
   },
 };
 
+const MISSION_TYPES = {
+  town: {
+    label: 'Mesto',
+    color: '#d97706',
+    icon: '<path d="M3 21h18M5 21V9l4-2v14M9 21V10l5-2v13M14 21V12l5 2v7M7 12h2M7 16h2M11 13h2M11 17h2M16 15h1M16 18h1"/>',
+  },
+  region: {
+    label: 'Región',
+    color: '#2563eb',
+    icon: '<path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3Z"/><path d="M9 3v15M15 6v15"/>',
+  },
+  district: {
+    label: 'Okres',
+    color: '#0f766e',
+    icon: '<path d="M12 3 21 12l-9 9-9-9Z"/>',
+  },
+  river: {
+    label: 'Rieka',
+    color: '#0284c7',
+    icon: '<path d="M3 7.5c3-3 5.5 3 8.5 0s5.5 3 9 0M3 12.5c3-3 5.5 3 8.5 0s5.5 3 9 0M3 17.5c3-3 5.5 3 8.5 0s5.5 3 9 0"/>',
+  },
+  lake: {
+    label: 'Vodná nádrž',
+    color: '#1d4ed8',
+    icon: '<path d="M12 3.5s6 6.2 6 10.2a6 6 0 0 1-12 0c0-4 6-10.2 6-10.2Z"/>',
+  },
+  sea: {
+    label: 'More / oceán',
+    color: '#0891b2',
+    icon: '<path d="M3 10c3-3 5.5 3 8.5 0s5.5 3 9 0M3 15c3-3 5.5 3 8.5 0s5.5 3 9 0M3 20c3-3 5.5 3 8.5 0s5.5 3 9 0"/>',
+  },
+  island: {
+    label: 'Ostrov',
+    color: '#0d9488',
+    icon: '<path d="M3 18c2.5-2 5.5-3 9-3s6.5 1 9 3M12 15V7M12 7c2-2 5-1.5 5 1M12 7c-2-2-5-1.5-5 1"/>',
+  },
+  reservation: {
+    label: 'Chránené územie',
+    color: '#15803d',
+    icon: '<path d="M12 3 6 11h3l-3 5h12l-3-5h3Z"/><path d="M12 16v5"/>',
+  },
+  geo: {
+    label: 'Geomorfologický celok',
+    color: '#a16207',
+    icon: '<path d="m3 20 6-11 4 6 2-3 6 8Z"/>',
+  },
+  legend: {
+    label: 'Legenda',
+    color: '#475569',
+    icon: '<path d="M12 21s7-6.1 7-12a7 7 0 1 0-14 0c0 5.9 7 12 7 12Z"/><circle cx="12" cy="9" r="2.6"/>',
+  },
+  default: {
+    label: 'Objekt',
+    color: '#475569',
+    icon: '<path d="M12 21s7-6.1 7-12a7 7 0 1 0-14 0c0 5.9 7 12 7 12Z"/><circle cx="12" cy="9" r="2.6"/>',
+  },
+};
+
+const MISSION_QUESTION_LABELS = {
+  'mesto': 'Mesto',
+  'mestá': 'Mesto',
+  'hlavné mesto': 'Hlavné mesto',
+  'štát': 'Štát',
+  'štáty': 'Štát',
+  'rieka': 'Rieka',
+  'rieku': 'Rieka',
+  'rieky': 'Rieka',
+  'jazero': 'Jazero',
+  'jazera': 'Jazero',
+  'jazier': 'Jazero',
+  'vodná nádrž': 'Vodná nádrž',
+  'vodnú nádrž': 'Vodná nádrž',
+  'vodné nádrže': 'Vodná nádrž',
+  'more a oceán': 'More / oceán',
+  'moria a oceány': 'More / oceán',
+  'povrchový celok': 'Povrchový celok',
+  'povrchové celky': 'Povrchový celok',
+  'geomorfologický celok': 'Geomorfologický celok',
+  'geomorfologické celky': 'Geomorfologický celok',
+  'chránená oblasť': 'Chránená oblasť',
+  'chránenú oblasť': 'Chránená oblasť',
+  'chránené územie': 'Chránené územie',
+  'vyšší územný celok': 'Vyšší územný celok',
+  'vyššie územné celky': 'Vyšší územný celok',
+};
+
 const SETUP = {
   mode: null,
   mapList: [],
@@ -175,9 +261,14 @@ function cacheDom() {
   dom.classicScreen = $('#classicScreen');
   dom.titleGame = $('#classicGameTitle');
   dom.context = $('#classicContext');
-  dom.scorePanel = $('#classicScreen .classic-score');
-  dom.scoreActivity = $('#classicScoreActivity');
-  dom.scoreTitle = $('#classicScoreTitle');
+  dom.mission = $('#classicMission');
+  dom.missionIcon = $('#classicMissionIcon');
+  dom.missionKicker = $('#classicMissionKicker');
+  dom.missionName = $('#classicMissionName');
+  dom.missionType = $('#classicMissionType');
+  dom.averageValue = $('#classicAverageValue');
+  dom.questionCounter = $('#classicQuestionCounter');
+  dom.feedback = $('#classicFeedback');
   dom.homeBtn = $('#classicHomeBtn');
   dom.qnum = $('#classicQnum');
   dom.question = $('#classicQuestion');
@@ -579,8 +670,7 @@ export async function startActivityGame(params) {
   showClassicScreen();
   setLoading(true, 'Načítavam mapu…');
   dom.titleGame.textContent = classicData.cfg(mode.titleKey) || mode.fallbackTitle;
-  if (dom.scoreActivity) dom.scoreActivity.textContent = dom.titleGame.textContent;
-  if (dom.scoreTitle) dom.scoreTitle.textContent = params.mode === 'distance' ? 'Body' : 'Výsledok';
+  resetMission(params.mode);
   dom.context.textContent = `${displayMapLabel(mapEl, mapDef)} · ${testEl.getAttribute('label') || ''}`;
   dom.mapTag.textContent = `${displayMapLabel(mapEl, mapDef)} · ${level.label}`;
   dom.qnum.textContent = '';
@@ -593,6 +683,8 @@ export async function startActivityGame(params) {
   dom.correctValue.textContent = '0';
   dom.wrongValue.textContent = '0';
   dom.timeValue.textContent = '00:00';
+  dom.averageValue.textContent = '—';
+  dom.questionCounter.textContent = `0/${GAME.numQ}`;
   if (dom.distanceValue) dom.distanceValue.textContent = '—';
   dom.scoreDistance.hidden = params.mode !== 'distance';
   dom.scoreCounts.hidden = params.mode === 'distance';
@@ -615,7 +707,7 @@ export async function startActivityGame(params) {
       interaction: params.mode === 'distance' ? 'click' : 'pan',
       paddingX: 24,
       paddingY: 24,
-      labelObstacles: () => [dom.scorePanel, dom.distanceLegend]
+      labelObstacles: () => [dom.mission, dom.distanceLegend]
         .filter((el) => el && !el.hidden)
         .map((el) => el.getBoundingClientRect()),
       onZoom: () => {
@@ -731,9 +823,9 @@ function positionNextFloat() {
   const isTop = nearBottom > nearTop;
   dom.nextFloat.classList.toggle('is-top', isTop);
   if (isTop) {
-    // Keep the floating action clear of the score card and marker legend.
+    // Keep the floating action clear of the mission HUD and marker legend.
     const hudBottom = Math.max(
-      dom.scorePanel ? dom.scorePanel.getBoundingClientRect().bottom : rect.top,
+      dom.mission ? dom.mission.getBoundingClientRect().bottom : rect.top,
       dom.distanceLegend && !dom.distanceLegend.hidden
         ? dom.distanceLegend.getBoundingClientRect().bottom
         : rect.top
@@ -802,6 +894,78 @@ function timeText() {
   return formatClock(GAME.elapsedMs / 1000);
 }
 
+function missionIconMarkup(symbol) {
+  const info = MISSION_TYPES[symbol] || MISSION_TYPES.default;
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${info.icon}</svg>`;
+}
+
+function missionInfoFor(node, fallbackType) {
+  const symbol = node?.getAttribute('markSymbol') || '';
+  const base = MISSION_TYPES[symbol] || MISSION_TYPES.default;
+  const question = String(fallbackType || '').trim();
+  const fallbackLabel = MISSION_QUESTION_LABELS[question]
+    || (question ? question.charAt(0).toLocaleUpperCase('sk') + question.slice(1) : '');
+  return {
+    symbol: MISSION_TYPES[symbol] ? symbol : 'default',
+    label: fallbackLabel || base.label,
+    color: base.color,
+    icon: base.icon,
+  };
+}
+
+function resetMission(mode) {
+  const info = MISSION_TYPES.default;
+  if (!dom.mission) return;
+  dom.mission.dataset.mode = mode || '';
+  dom.missionKicker.textContent = 'Načítavam…';
+  dom.missionKicker.classList.remove('is-correct', 'is-wrong', 'is-partial');
+  dom.missionName.textContent = '—';
+  dom.missionName.title = '';
+  dom.missionType.textContent = info.label;
+  dom.missionIcon.dataset.symbol = 'default';
+  dom.missionIcon.style.setProperty('--mission-color', info.color);
+  dom.missionIcon.innerHTML = missionIconMarkup('default');
+  dom.mission.setAttribute('aria-label', 'Načítavam úlohu');
+}
+
+function setMissionTarget(node, fallbackType, mode) {
+  if (!dom.mission) return;
+  const info = missionInfoFor(node, fallbackType);
+  const instruction = mode === 'test'
+    ? 'Vyber na mape'
+    : mode === 'puzzle'
+      ? 'Umiestni na mapu'
+      : 'Nájdi na mape';
+  dom.mission.dataset.mode = mode || '';
+  dom.missionKicker.textContent = instruction;
+  dom.missionKicker.classList.remove('is-correct', 'is-wrong', 'is-partial');
+  dom.missionName.textContent = nodeLabel(node) || '—';
+  dom.missionName.title = nodeLabel(node) || '';
+  dom.missionType.textContent = info.label;
+  dom.missionIcon.dataset.symbol = info.symbol;
+  dom.missionIcon.style.setProperty('--mission-color', info.color);
+  dom.missionIcon.innerHTML = missionIconMarkup(info.symbol);
+  dom.mission.setAttribute('aria-label', `${instruction}: ${info.label} ${nodeLabel(node) || ''}`.trim());
+}
+
+function setMissionFeedback(text, tone = '') {
+  if (!dom.missionKicker) return;
+  dom.missionKicker.textContent = text;
+  dom.missionKicker.classList.remove('is-correct', 'is-wrong', 'is-partial');
+  if (tone) dom.missionKicker.classList.add(`is-${tone}`);
+}
+
+function averageText() {
+  const answered = GAME.answers.length;
+  if (!answered) return '—';
+  const points = GAME.answers.reduce((sum, row) => sum + (Number(row.points) || 0), 0);
+  const maxPoints = GAME.answers.reduce((sum, row) => sum + (Number(row.maxPoints) || 0), 0);
+  if (GAME.mode === 'distance' || (GAME.mode === 'practice' && GAME.practiceFormat === 'distance')) {
+    return `${Math.round(points / answered)} b.`;
+  }
+  return `${maxPoints ? Math.round((points / maxPoints) * 100) : 0} %`;
+}
+
 function updateScore() {
   if (GAME.mode === 'distance') {
     dom.scoreValue.textContent = String(GAME.totalScore).padStart(3, '0');
@@ -810,6 +974,7 @@ function updateScore() {
     dom.wrongValue.textContent = String(GAME.incorrect);
   }
   dom.timeValue.textContent = timeText();
+  if (dom.averageValue) dom.averageValue.textContent = averageText();
 }
 
 function setQuestionHtml(html) {
@@ -901,6 +1066,9 @@ function updateProgress() {
   const done = Math.min(GAME.questionIndex, GAME.numQ);
   const pct = GAME.numQ ? (done - (GAME.answered ? 0 : 1)) / GAME.numQ : 0;
   dom.progress.style.width = `${clamp(pct * 100, 0, 100)}%`;
+  if (dom.questionCounter) {
+    dom.questionCounter.textContent = GAME.numQ ? `${Math.max(1, done)}/${GAME.numQ}` : '—';
+  }
 }
 
 /* ------------------------------------------------------------------------- */
@@ -953,6 +1121,7 @@ function nextTestQuestion() {
 
   setQuestionNumber(GAME.questionIndex);
   const questionType = questionTypeOf(group.configGroup);
+  setMissionTarget(chosen, questionType, 'test');
   setQuestionHtml(htmlFromConfig(classicData.cfg('testQuestion'), {
     ENTITYTYPE: escapeHtml(typeWithSpace(questionType)),
     ENTITYNAME: escapeHtml(nodeLabel(chosen)),
@@ -1013,6 +1182,7 @@ function answerTestQuestion(clickedNode) {
     GAME.incorrect += 1;
     setQuestionHtml(classicData.cfg('incorrectTestAnswer'));
   }
+  setMissionFeedback(correct ? 'Správne! +1' : 'Nesprávne!', correct ? 'correct' : 'wrong');
   recordAttemptForNode(GAME.targetNode, 'test', correct, correct ? 1 : 0, 1);
   const context = attemptContext();
   GAME.answers.push({
@@ -1114,6 +1284,7 @@ function nextDistanceQuestion() {
   GAME.targetNode = target;
   setQuestionNumber(GAME.questionIndex);
   const type = questionTypeOf(GAME.testEl);
+  setMissionTarget(target, type, 'distance');
   setQuestionHtml(htmlFromConfig(classicData.cfg('distanceQuestion'), {
     ENTITYTYPE: escapeHtml(typeWithSpace(type)),
     ENTITYNAME: escapeHtml(nodeLabel(target)),
@@ -1186,6 +1357,9 @@ function onDistanceClick(point) {
 
   const answer = distanceAnswerFor(score);
   setQuestionHtml(answer.html);
+  const feedbackTone = score >= 70 ? 'correct' : score > 0 ? 'partial' : 'wrong';
+  const feedbackLabel = score >= 90 ? 'Výborne' : score >= 70 ? 'Dobre' : score > 0 ? 'Tesne vedľa' : 'Vedľa';
+  setMissionFeedback(`${feedbackLabel}! +${score} b.`, feedbackTone);
   const isLast = GAME.questionIndex >= GAME.numQ;
   const suffix = isLast ? classicData.cfg('lastTestQuestion') : classicData.cfg('nextTestQuestion');
   dom.question.innerHTML += ` ${suffix}`;
@@ -1303,6 +1477,7 @@ function nextPuzzleQuestion() {
 
   setQuestionNumber(GAME.questionIndex);
   const type = questionTypeOf(GAME.testEl);
+  setMissionTarget(target, type, 'puzzle');
   setQuestionHtml(htmlFromConfig(classicData.cfg('puzzleQuestion'), {
     ENTITYTYPE: escapeHtml(typeWithSpace(type)),
     ENTITYNAME: escapeHtml(nodeLabel(target)),
@@ -1361,6 +1536,8 @@ function createPuzzleHandle(entityName, targetNode) {
   circle.addEventListener('pointerleave', rollOut);
 
   let drag = null;
+  let activePointerId = null;
+  let cancelForGesture = null;
   const move = (event) => {
     if (!drag) return;
     event.preventDefault();
@@ -1381,6 +1558,14 @@ function createPuzzleHandle(entityName, targetNode) {
     window.removeEventListener('pointermove', move, true);
     window.removeEventListener('pointerup', finish, true);
     window.removeEventListener('pointercancel', finish, true);
+    if (activePointerId != null) {
+      GAME.mapView?.endInteractiveDrag(activePointerId);
+      activePointerId = null;
+    }
+    if (cancelForGesture) {
+      GAME.mapView?.viewport.removeEventListener('map:gesturestart', cancelForGesture);
+      cancelForGesture = null;
+    }
     if (entityEl) {
       entityEl.removeEventListener('pointerdown', start, true);
       entityEl.removeEventListener('pointerenter', rollOver);
@@ -1407,11 +1592,12 @@ function createPuzzleHandle(entityName, targetNode) {
     answerPuzzle(targetNode);
   };
   const start = (event) => {
-    if (!GAME.active || GAME.answered) return;
+    if (!GAME.active || GAME.answered || drag) return;
     if (event.button != null && event.button !== 0) return;
     event.preventDefault();
-    event.stopPropagation();
     const pt = GAME.mapView.toMapPoint(event.clientX, event.clientY);
+    activePointerId = event.pointerId;
+    GAME.mapView.beginInteractiveDrag(event.pointerId);
     drag = {
       startX: pt.x,
       startY: pt.y,
@@ -1421,6 +1607,21 @@ function createPuzzleHandle(entityName, targetNode) {
       origX: GAME.mapView.entityPosition(entityName).x,
       origY: GAME.mapView.entityPosition(entityName).y,
     };
+    cancelForGesture = () => {
+      if (!drag) return;
+      const original = { x: drag.origX, y: drag.origY };
+      drag = null;
+      GAME.mapView.setEntityTranslation(entityName, original.x, original.y);
+      const box = GAME.mapView.entityBBox(entityName);
+      if (box) {
+        circle.setAttribute('cx', box.x + box.width / 2);
+        circle.setAttribute('cy', box.y + box.height / 2);
+      }
+      cleanup();
+      circle.style.cursor = 'grab';
+      circle.style.stroke = 'rgba(202, 138, 4, 0)';
+    };
+    GAME.mapView.viewport.addEventListener('map:gesturestart', cancelForGesture);
     circle.style.cursor = 'grabbing';
     circle.style.stroke = 'rgba(202, 138, 4, 0.85)';
     window.addEventListener('pointermove', move, true);
@@ -1460,12 +1661,14 @@ function answerPuzzle(targetNode) {
     GAME.correct += 1;
     GAME.mapView.setEntityColor(key, '#77ff77');
     setQuestionHtml(classicData.cfg('correctPuzzleAnswer'));
+    setMissionFeedback('Správne umiestnené! +1', 'correct');
   } else {
     GAME.incorrect += 1;
     GAME.mapView.setEntityColor(key, '#ff0000');
     setQuestionHtml(htmlFromConfig(classicData.cfg('incorrectPuzzleAnswer'), {
       ENTITYNAME: escapeHtml(nodeLabel(targetNode)),
     }));
+    setMissionFeedback('Nesprávne umiestnenie.', 'wrong');
   }
   GAME.mapView.setEntityTranslation(key, GAME.puzzleOrig.x, GAME.puzzleOrig.y);
   // Put the entity back into its original painting order.

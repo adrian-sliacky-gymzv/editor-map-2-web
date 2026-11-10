@@ -101,6 +101,9 @@ export class MapView {
     this.suppressClickUntil = 0;
     this.lastTap = null;
     this._settleTimer = 0;
+    this._renderFrame = 0;
+    this._gestureTimer = 0;
+    this.interactivePointer = null;
     this.lastLayout = { w: 0, h: 0 };
     this.mapClickHandler = options.onMapClick || null;
     this.markScale = 1;
@@ -113,6 +116,9 @@ export class MapView {
     this._eventAbort?.abort();
     this._resizeObserver?.disconnect();
     clearTimeout(this._settleTimer);
+    clearTimeout(this._gestureTimer);
+    if (this._renderFrame) cancelAnimationFrame(this._renderFrame);
+    this._renderFrame = 0;
     if (this._labelEditor) {
       this._labelEditor.remove();
       this._labelEditor = null;
@@ -556,22 +562,46 @@ export class MapView {
 
   _bindMarkDrag(mark) {
     let drag = null;
+    let cancelGesture = null;
+    const stopGestureListener = () => {
+      if (!cancelGesture) return;
+      this.viewport.removeEventListener('map:gesturestart', cancelGesture);
+      cancelGesture = null;
+    };
     mark.el.addEventListener('pointerdown', (event) => {
+      if (drag) return;
       if (event.button != null && event.button !== 0) return;
       event.preventDefault();
-      event.stopPropagation();
       const pt = this.toMapPoint(event.clientX, event.clientY);
-      drag = { startX: pt.x, startY: pt.y, x: mark.x, y: mark.y, moved: false };
+      drag = { startX: pt.x, startY: pt.y, x: mark.x, y: mark.y, moved: false, pointerId: event.pointerId };
+      this.beginInteractiveDrag(event.pointerId);
       try {
         mark.el.setPointerCapture?.(event.pointerId);
       } catch {}
       mark.el.style.cursor = 'grabbing';
       this.options.onMarkDragStart?.(mark);
+      stopGestureListener();
+      cancelGesture = () => {
+        if (!drag) return;
+        const { pointerId, x, y } = drag;
+        drag = null;
+        // A pinch cancels the drag, so put the marker back where it started.
+        mark.x = x;
+        mark.y = y;
+        this._positionMark(mark);
+        mark.el.style.cursor = 'grab';
+        try {
+          mark.el.releasePointerCapture?.(pointerId);
+        } catch {}
+        this.endInteractiveDrag(pointerId);
+        stopGestureListener();
+        this.options.onMarkDragCancel?.(mark);
+      };
+      this.viewport.addEventListener('map:gesturestart', cancelGesture);
     });
     mark.el.addEventListener('pointermove', (event) => {
       if (!drag) return;
       event.preventDefault();
-      event.stopPropagation();
       const pt = this.toMapPoint(event.clientX, event.clientY);
       const dx = pt.x - drag.startX;
       const dy = pt.y - drag.startY;
@@ -583,12 +613,14 @@ export class MapView {
     const finish = (event) => {
       if (!drag) return;
       event?.preventDefault();
-      event?.stopPropagation();
       const moved = drag.moved;
+      const pointerId = drag.pointerId;
       drag = null;
+      stopGestureListener();
+      this.endInteractiveDrag(pointerId);
       mark.el.style.cursor = 'grab';
       try {
-        mark.el.releasePointerCapture?.(event?.pointerId);
+        mark.el.releasePointerCapture?.(event?.pointerId ?? pointerId);
       } catch {}
       if (moved) mark.onMove?.(mark);
       else mark.onClick?.(mark, event);
@@ -860,14 +892,54 @@ export class MapView {
     }, { signal });
   }
 
+  beginInteractiveDrag(pointerId) {
+    this.interactivePointer = pointerId;
+  }
+
+  endInteractiveDrag(pointerId) {
+    if (this.interactivePointer === pointerId) this.interactivePointer = null;
+  }
+
+  _beginGesture() {
+    clearTimeout(this._gestureTimer);
+    this.canvas?.classList.add('is-gesturing');
+  }
+
+  _endGestureSoon() {
+    clearTimeout(this._gestureTimer);
+    this._gestureTimer = setTimeout(() => {
+      this.canvas?.classList.remove('is-gesturing');
+    }, 180);
+  }
+
+  _requestRender() {
+    if (this._renderFrame) return;
+    this._renderFrame = requestAnimationFrame(() => {
+      this._renderFrame = 0;
+      this._applyTransform();
+      this._notifyZoom();
+    });
+  }
+
+  _flushRender() {
+    if (this._renderFrame) cancelAnimationFrame(this._renderFrame);
+    this._renderFrame = 0;
+    if (!this.scene) return;
+    this._applyTransform();
+    this._notifyZoom();
+  }
+
   _onPointerDown(event) {
     if (event.target.closest('.zoom-controls, button, a, input, select, textarea, label')) return;
     if (event.pointerType === 'mouse' && event.button !== 0) return;
+    if (event.pointerType !== 'mouse') event.preventDefault();
     this._clearSettleAnimation();
+    this._beginGesture();
     // A fresh contact after every finger was lifted is a deliberate new tap;
     // do not make the user wait for the previous gesture's safety window.
     if (this.pointers.size === 0) this.suppressClickUntil = 0;
     const startedOnMark = Boolean(event.target.closest('.map-mark'));
+    const interactive = this.interactivePointer === event.pointerId;
     this.pointers.set(event.pointerId, {
       x: event.clientX,
       y: event.clientY,
@@ -875,26 +947,38 @@ export class MapView {
       startedOnMark,
     });
     if (this.pointers.size === 1) {
-      this.panning = {
-        startX: event.clientX,
-        startY: event.clientY,
-        panX: this.panX,
-        panY: this.panY,
-        moved: false,
-        slop: tapSlop(event.pointerType),
-        pointerType: event.pointerType || 'mouse',
-        startedOnMark,
-        offsetX: 0,
-        offsetY: 0,
-      };
-      this.pointerDragged = false;
+      if (interactive) {
+        // A drag handle owns the single finger, but the same pointer still
+        // participates if a second finger starts a pinch.
+        this.panning = null;
+        this.pointerDragged = false;
+      } else {
+        this.panning = {
+          startX: event.clientX,
+          startY: event.clientY,
+          panX: this.panX,
+          panY: this.panY,
+          moved: false,
+          slop: tapSlop(event.pointerType),
+          pointerType: event.pointerType || 'mouse',
+          startedOnMark,
+          offsetX: 0,
+          offsetY: 0,
+        };
+        this.pointerDragged = false;
+      }
     } else if (this.pointers.size === 2) {
       this.panning = null;
       const [a, b] = [...this.pointers.values()];
       const startMidpoint = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
       const anchor = this.toMapPoint(startMidpoint.x, startMidpoint.y);
+      const startDistance = Math.hypot(a.x - b.x, a.y - b.y);
       this.pinch = {
-        distance: Math.hypot(a.x - b.x, a.y - b.y),
+        distance: startDistance,
+        // If the fingers land very close together, wait until they are far
+        // enough apart before enabling zoom. This avoids a 10x jump from a
+        // couple of pixels of unintended movement.
+        pending: startDistance < 24,
         zoom: this.zoom,
         startMidpoint,
         anchorMapX: anchor.x,
@@ -907,6 +991,8 @@ export class MapView {
       this.pointerDragged = true;
       this.suppressClickUntil = performance.now() + 220;
       this.lastTap = null;
+      this.interactivePointer = null;
+      this.viewport.dispatchEvent(new CustomEvent('map:gesturestart', { bubbles: true }));
     }
   }
 
@@ -921,6 +1007,24 @@ export class MapView {
       const [a, b] = [...this.pointers.values()];
       const distance = Math.hypot(a.x - b.x, a.y - b.y);
       const midpoint = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+      if (this.pinch.pending) {
+        if (distance < 24) return;
+        const anchor = this.toMapPoint(midpoint.x, midpoint.y);
+        this.pinch = {
+          ...this.pinch,
+          pending: false,
+          distance,
+          zoom: this.zoom,
+          startMidpoint: midpoint,
+          anchorMapX: anchor.x,
+          anchorMapY: anchor.y,
+          fitScale: this.fitScale,
+          viewportRect: this.viewport.getBoundingClientRect(),
+          baseX: this.baseX,
+          baseY: this.baseY,
+        };
+        return;
+      }
       const next = pinchView({
         startZoom: this.pinch.zoom,
         startDistance: this.pinch.distance,
@@ -942,8 +1046,7 @@ export class MapView {
       this.panY = next.panY;
       this.suppressClickUntil = performance.now() + 220;
       this._clampPan();
-      this._applyTransform();
-      this._notifyZoom();
+      this._requestRender();
       return;
     }
     if (!this.panning) return;
@@ -969,7 +1072,7 @@ export class MapView {
       // feeling frozen; it settles back to centre when the finger is lifted.
       this.panX = maxX > 0 ? clamp(rawX, -maxX, maxX) : clamp(rawX * 0.22, -48, 48);
       this.panY = maxY > 0 ? clamp(rawY, -maxY, maxY) : clamp(rawY * 0.22, -48, 48);
-      this._applyTransform();
+      this._requestRender();
     }
   }
 
@@ -978,6 +1081,9 @@ export class MapView {
     const wasPinching = Boolean(this.pinch);
     const pointerType = this.pointers.get(event.pointerId)?.pointerType || event.pointerType || 'mouse';
     this.pointers.delete(event.pointerId);
+    this.endInteractiveDrag(event.pointerId);
+    this._flushRender();
+    if (this.pointers.size === 0) this._endGestureSoon();
     if (this.pinch && this.pointers.size < 2) {
       this.pinch = null;
       this.pointerDragged = true;
@@ -1029,19 +1135,25 @@ export class MapView {
     if (event?.pointerId != null) {
       if (!this.pointers.has(event.pointerId)) return;
       this.pointers.delete(event.pointerId);
+      this.endInteractiveDrag(event.pointerId);
     } else {
       this.pointers.clear();
+      this.interactivePointer = null;
     }
     this.panning = null;
     this.pinch = null;
     this.pointerDragged = true;
     this.suppressClickUntil = performance.now() + 220;
+    this._flushRender();
+    this._endGestureSoon();
     this._settlePan();
   }
 
   _onWheel(event) {
     if (this.interaction === 'draw') return;
     event.preventDefault();
+    this._beginGesture();
+    this._endGestureSoon();
     const factor = wheelZoomFactor(
       event.deltaY,
       event.deltaMode,
@@ -1086,6 +1198,10 @@ export class MapView {
   }
 
   _applyTransform() {
+    if (this._renderFrame) {
+      cancelAnimationFrame(this._renderFrame);
+      this._renderFrame = 0;
+    }
     const scale = this.fitScale * this.zoom;
     this.canvas.style.transformOrigin = '0 0';
     this.canvas.style.transform = `translate(${this.baseX + this.panX}px, ${this.baseY + this.panY}px) scale(${scale})`;

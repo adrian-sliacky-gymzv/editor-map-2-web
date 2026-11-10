@@ -44,6 +44,14 @@ const MODE_META = {
 };
 const LEVEL_LABELS = { 1: 'Ľahká', 2: 'Stredná', 3: 'Ťažká' };
 
+const LEGACY_CITY_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V9l4-2v14M9 21V10l5-2v13M14 21V12l5 2v7M7 12h2M7 16h2M11 13h2M11 17h2M16 15h1M16 18h1"></path></svg>';
+const LEGACY_MAP_SOURCES = {
+  base: 'assets/slovakia-map.svg',
+  vuc: 'assets/slovakia-map-vuc.svg',
+};
+const legacyMapText = new Map();
+let legacyMapLoadPromise = null;
+
 const dom = {
   homeScreen: $('#homeScreen'),
   homeTitle: $('#homeTitle'),
@@ -86,6 +94,14 @@ const dom = {
 
   gameScreen: $('#gameScreen'),
   gameTitle: $('#gameTitle'),
+  gameContext: $('#gameContext'),
+  gameMission: $('#gameMission'),
+  gameMissionIcon: $('#gameMissionIcon'),
+  gameMissionKicker: $('#gameMissionKicker'),
+  gameMissionName: $('#gameMissionName'),
+  gameMissionType: $('#gameMissionType'),
+  gameAverageValue: $('#gameAverageValue'),
+  gameQuestionCounter: $('#gameQuestionCounter'),
   qnum: $('#qnum'),
   questionText: $('#questionText'),
   nextBtn: $('#nextBtn'),
@@ -375,12 +391,70 @@ function recordResult(mode, result) {
   return Number(result.percent) > previousBest && Number(result.percent) > 0;
 }
 
+function legacyMapSource(showVuc) {
+  return showVuc ? LEGACY_MAP_SOURCES.vuc : LEGACY_MAP_SOURCES.base;
+}
+
+function renderLegacyMap(showVuc) {
+  if (!dom.mapImg) return false;
+  const source = legacyMapSource(showVuc);
+  const text = legacyMapText.get(source);
+  if (!text) return false;
+  if (dom.mapImg.dataset.source === source && dom.mapImg.querySelector('svg')) return true;
+  dom.mapImg.innerHTML = text.replace(/^\s*<\?xml[^>]*>\s*/i, '');
+  const svg = dom.mapImg.querySelector('svg');
+  if (svg) {
+    svg.setAttribute('width', '100%');
+    svg.setAttribute('height', '100%');
+    svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.removeAttribute('role');
+    svg.removeAttribute('aria-label');
+    svg.classList.add('legacy-map-svg');
+  }
+  dom.mapImg.dataset.source = source;
+  dom.mapImg.setAttribute('aria-label', showVuc
+    ? 'Mapa Slovenska s hranicami VÚC'
+    : 'Obrysová mapa Slovenska s riekami');
+  return true;
+}
+
+function loadLegacyMaps() {
+  if (legacyMapLoadPromise) return legacyMapLoadPromise;
+  const sources = [LEGACY_MAP_SOURCES.base, LEGACY_MAP_SOURCES.vuc];
+  legacyMapLoadPromise = Promise.all(sources.map(async (source) => {
+    try {
+      const response = await fetch(source, { cache: 'no-cache' });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      legacyMapText.set(source, await response.text());
+    } catch (error) {
+      console.error(`Mapový podklad sa nepodarilo načítať: ${source}`, error);
+    }
+  })).then(() => {
+    if (renderLegacyMap(state.showVuc)) return;
+    // If the inline fetch is unavailable (for example when opening the file
+    // directly), keep the original image fallback instead of a blank map.
+    if (dom.mapImg && !dom.mapImg.firstElementChild) {
+      const source = legacyMapSource(state.showVuc);
+      const image = document.createElement('img');
+      image.src = source;
+      image.alt = 'Obrysová mapa Slovenska s riekami';
+      image.className = 'legacy-map-fallback';
+      dom.mapImg.append(image);
+    }
+  });
+  return legacyMapLoadPromise;
+}
+
 function syncVucUI() {
   if (dom.homeVucToggle) dom.homeVucToggle.checked = state.showVuc;
   if (dom.vucToggle) dom.vucToggle.setAttribute('aria-pressed', String(state.showVuc));
 
-  const source = state.showVuc ? 'assets/slovakia-map-vuc.svg' : 'assets/slovakia-map.svg';
-  if (dom.mapImg.getAttribute('src') !== source) dom.mapImg.src = source;
+  const source = legacyMapSource(state.showVuc);
+  if (!renderLegacyMap(state.showVuc)) {
+    const fallback = dom.mapImg?.querySelector('.legacy-map-fallback');
+    if (fallback && fallback.getAttribute('src') !== source) fallback.src = source;
+  }
   if (dom.atlasMapImg && dom.atlasMapImg.getAttribute('src') !== source) {
     dom.atlasMapImg.src = source;
   }
@@ -533,6 +607,50 @@ function finishReturn() {
 /* game start / question flow                                          */
 /* ------------------------------------------------------------------ */
 
+function resetGameMission() {
+  if (!dom.gameMission) return;
+  dom.gameMission.dataset.mode = state.mode || '';
+  dom.gameMissionKicker.textContent = 'Načítavam…';
+  dom.gameMissionKicker.classList.remove('is-correct', 'is-wrong', 'is-partial');
+  dom.gameMissionName.textContent = '—';
+  dom.gameMissionName.title = '';
+  dom.gameMissionType.textContent = 'Mesto';
+  dom.gameMissionIcon.style.setProperty('--mission-color', '#d97706');
+  dom.gameMissionIcon.innerHTML = LEGACY_CITY_ICON;
+  dom.gameMission.setAttribute('aria-label', 'Načítavam úlohu');
+}
+
+function setGameMissionTarget(target) {
+  if (!dom.gameMission) return;
+  const instruction = state.mode === 'quiz'
+    ? 'Vyber na mape'
+    : state.mode === 'puzzle'
+      ? 'Umiestni na mapu'
+      : 'Nájdi na mape';
+  dom.gameMissionKicker.textContent = instruction;
+  dom.gameMissionKicker.classList.remove('is-correct', 'is-wrong', 'is-partial');
+  dom.gameMissionName.textContent = target?.label || '—';
+  dom.gameMissionName.title = target?.label || '';
+  dom.gameMissionType.textContent = 'Mesto';
+  dom.gameMissionIcon.style.setProperty('--mission-color', '#d97706');
+  dom.gameMissionIcon.innerHTML = LEGACY_CITY_ICON;
+  dom.gameMission.setAttribute('aria-label', `${instruction}: Mesto ${target?.label || ''}`.trim());
+}
+
+function setGameMissionFeedback(text, tone = '') {
+  if (!dom.gameMissionKicker) return;
+  dom.gameMissionKicker.textContent = text;
+  dom.gameMissionKicker.classList.remove('is-correct', 'is-wrong', 'is-partial');
+  if (tone) dom.gameMissionKicker.classList.add(`is-${tone}`);
+}
+
+function gameAverageText() {
+  const answered = state.answers.length;
+  if (!answered) return '—';
+  if (state.mode === 'distance') return `${Math.round(state.total / answered)} b.`;
+  return `${Math.round((state.correct / answered) * 100)} %`;
+}
+
 function syncGameModeUI() {
   dom.gameScreen.classList.remove('mode-distance', 'mode-quiz', 'mode-puzzle');
   dom.gameScreen.classList.add(`mode-${state.mode}`);
@@ -542,6 +660,7 @@ function syncGameModeUI() {
   const isDistance = state.mode === 'distance';
   dom.scoreDistanceRow.hidden = !isDistance;
   dom.scoreCountsRow.hidden = isDistance;
+  if (dom.gameMission) dom.gameMission.dataset.mode = state.mode;
 }
 
 function startGame(mode, options = {}) {
@@ -591,7 +710,12 @@ function startGame(mode, options = {}) {
   clearMarkers();
   syncGameModeUI();
   syncVucUI();
+  dom.gameContext.textContent = `Rýchla hra · ${state.contextLabel}`;
+  resetGameMission();
+  dom.gameAverageValue.textContent = '—';
+  dom.gameQuestionCounter.textContent = `0/${state.gameNumQ}`;
   showScreen('game');
+  loadLegacyMaps();
   updateScorePanel();
   updateTime(0);
   startTimer();
@@ -615,6 +739,7 @@ function showQuestion() {
   state.puzzle = null;
   state.markerGroups = [];
   clearMarkers();
+  setGameMissionTarget(target);
 
   dom.mapViewport.classList.remove('is-answered', 'is-dragging');
   dom.qnum.innerHTML = `Otázka č.<b>${state.index + 1}</b>:`;
@@ -704,6 +829,9 @@ function answerDistance(guess) {
   dom.mapHint.hidden = true;
 
   const feedback = feedbackForScore(score);
+  const feedbackTone = score >= 70 ? 'correct' : score > 0 ? 'partial' : 'wrong';
+  const feedbackLabel = score >= 90 ? 'Výborne' : score >= 70 ? 'Dobre' : score > 0 ? 'Tesne vedľa' : 'Vedľa';
+  setGameMissionFeedback(`${feedbackLabel}! +${score} b.`, feedbackTone);
   dom.questionText.innerHTML = renderDistanceFeedback(feedback, score) + nextPrompt();
   dom.nextBtn.disabled = false;
   dom.nextBtn.classList.add('is-ready');
@@ -741,6 +869,7 @@ function answerQuiz(clicked) {
   dom.mapHint.hidden = true;
 
   const prompt = nextPrompt();
+  setGameMissionFeedback(correct ? 'Správne! +1' : 'Nesprávne!', correct ? 'correct' : 'wrong');
   dom.questionText.innerHTML = correct
     ? `<b class="tone-great">Správne!</b>${prompt}`
     : `<b class="tone-miss">Nesprávne!</b> Správna odpoveď je zobrazená v mape!${prompt}`;
@@ -780,6 +909,7 @@ function answerPuzzle(drop) {
   dom.mapHint.hidden = true;
 
   const prompt = nextPrompt();
+  setGameMissionFeedback(correct ? 'Správne umiestnené! +1' : 'Nesprávne umiestnenie.', correct ? 'correct' : 'wrong');
   dom.questionText.innerHTML = correct
     ? `<b class="tone-great">Výborne! To je správne miesto.</b>${prompt}`
     : `<b class="tone-miss">Nie, ${escapeHtml(target.label)} tam nepatrí!</b>${prompt}`;
@@ -947,12 +1077,16 @@ function updateScorePanel() {
     dom.scoreSr.textContent =
       `Správne ${state.correct}, nesprávne ${state.incorrect}, čas ${formatTime(state.elapsed)}`;
   }
+  if (dom.gameAverageValue) dom.gameAverageValue.textContent = gameAverageText();
 }
 
 function updateProgress() {
   const total = state.targets.length || state.gameNumQ || 1;
   const current = state.final ? total : state.index + (state.answered ? 1 : 0);
   dom.progressFill.style.width = `${clamp((current / total) * 100, 0, 100)}%`;
+  if (dom.gameQuestionCounter) {
+    dom.gameQuestionCounter.textContent = `${Math.max(1, state.final ? total : state.index + 1)}/${total}`;
+  }
 }
 
 function updateMapTag() {

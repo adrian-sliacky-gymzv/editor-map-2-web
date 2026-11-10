@@ -1805,7 +1805,6 @@ kbd {
 .map-stage {
   position: absolute;
   transform-origin: 50% 50%;
-  will-change: transform;
 }
 
 .map-img {
@@ -1814,6 +1813,23 @@ kbd {
   height: 100%;
   pointer-events: none;
   -webkit-user-drag: none;
+}
+
+.map-img-inline > svg,
+.map-img-inline > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  shape-rendering: geometricPrecision;
+  text-rendering: geometricPrecision;
+}
+
+.legacy-map-svg path,
+.legacy-map-svg line,
+.legacy-map-svg polyline,
+.legacy-map-svg polygon {
+  vector-effect: non-scaling-stroke;
 }
 
 .marker-layer {

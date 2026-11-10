@@ -114,25 +114,49 @@ test('keyboard shortcuts are documented and exposed to assistive technology', ()
   assert.match(html, /class="mode-kbd"/);
 });
 
-test('Traf-sa HUD, legend and marker callouts stay explicit', () => {
+test('mission HUDs, legend and marker callouts stay explicit', () => {
   const html = read('index.html');
-  assert.match(html, /class="score-activity" id="classicScoreActivity"/);
-  assert.match(html, /class="score-caption">Čas/);
-  assert.match(html, /class="score-count-label">správne/);
+  assert.match(html, /class="mission-hud" id="classicMission"/);
+  assert.match(html, /id="classicMissionName"/);
+  assert.match(html, /id="classicMissionType"/);
+  assert.match(html, /id="classicAverageValue"/);
+  assert.match(html, /id="classicQuestionCounter"/);
+  assert.match(html, /class="mission-hud" id="gameMission"/);
+  assert.match(html, /id="gameAverageValue"/);
+  assert.match(html, /id="gameQuestionCounter"/);
   assert.match(html, /id="classicDistanceLegend"/);
   assert.match(html, /class="distance-legend-foot"/);
   assert.match(html, /id="classicDistanceValue"/);
   assert.match(html, /Vzdialenosť/);
 
   const classic = read('js/classic-activities.js');
+  assert.match(classic, /setMissionTarget\(/);
+  assert.match(classic, /averageText\(/);
   assert.match(classic, /labelPlacement: targetAbove \? 'above' : 'below'/);
   assert.match(classic, /labelPlacement: targetAbove \? 'below' : 'above'/);
   assert.match(classic, /dom\.distanceValue\.textContent/);
   assert.match(classic, /labelObstacles:/);
 
+  const app = read('js/app.js');
+  assert.match(app, /setGameMissionTarget\(/);
+  assert.match(app, /gameAverageText\(/);
+
+  assert.match(html, /id="mapImg" class="map-img map-img-inline"/);
+  assert.match(app, /LEGACY_MAP_SOURCES/);
+  assert.match(app, /renderLegacyMap\(/);
+  const styles = read('styles.css');
+  assert.match(styles, /\.legacy-map-svg path/);
+  assert.match(styles, /vector-effect: non-scaling-stroke/);
+
   const mapView = read('js/map-view.js');
   assert.match(mapView, /data-label-placement/);
+  assert.match(mapView, /beginInteractiveDrag/);
+  assert.match(mapView, /_requestRender/);
   assert.match(mapView, /_refreshPlacedLabels/);
+
+  const classicCss = read('classic.css');
   assert.match(read('styles.css'), /\.distance-legend-foot/);
-  assert.match(read('classic.css'), /\.classic-score \.score-activity/);
+  assert.match(classicCss, /\.mission-hud/);
+  assert.match(classicCss, /vector-effect: non-scaling-stroke/);
+  assert.match(classicCss, /\.map-canvas\.is-gesturing/);
 });

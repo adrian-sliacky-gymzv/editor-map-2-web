@@ -191,9 +191,16 @@ body.editor-tree-open {
   top: 0;
   left: 0;
   transform-origin: 0 0;
-  will-change: transform;
+  will-change: auto;
   touch-action: none;
   -webkit-touch-callout: none;
+}
+
+/* Promote the canvas only while a gesture is active. Leaving it promoted
+   permanently can make some mobile browsers keep a low-resolution raster of
+   the vector map after the zoom ends. */
+.map-canvas.is-gesturing {
+  will-change: transform;
 }
 
 .map-scene {
@@ -201,6 +208,17 @@ body.editor-tree-open {
   overflow: visible;
   touch-action: none;
   -webkit-touch-callout: none;
+  shape-rendering: geometricPrecision;
+  text-rendering: geometricPrecision;
+}
+
+/* Keep linework crisp at every zoom level. Scaling stroke widths with the
+   canvas makes borders and rivers look soft and bloated when zoomed in. */
+.map-scene path,
+.map-scene line,
+.map-scene polyline,
+.map-scene polygon {
+  vector-effect: non-scaling-stroke;
 }
 
 .map-overlay {
@@ -428,7 +446,8 @@ html[data-darkreader-mode] .marker-correct .label-text {
   background: #ffffff;
 }
 
-.classic-screen .classic-topbar {
+.classic-screen .classic-topbar,
+.legacy-game-topbar {
   --mode-color: #2f6fed;
   background: linear-gradient(180deg, #eef2ff 0%, #dfe6fb 58%, #cfd8f5 100%);
   border-bottom-color: #9aa8d9;
@@ -467,127 +486,171 @@ html[data-darkreader-mode] .marker-correct .label-text {
   flex: 0 0 auto;
 }
 
-.classic-score {
-  top: 10px;
-  left: 10px;
-  width: 148px;
-  padding: 0;
-  overflow: hidden;
-  border: 1px solid rgba(148, 163, 184, 0.5);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 8px 24px rgba(21, 31, 66, 0.14);
-  backdrop-filter: blur(8px);
-  font-family: var(--font);
+.classic-topbar-row {
+  align-items: center;
 }
 
-.classic-score .score-activity {
+.classic-topbar .topbar-actions,
+.legacy-game-topbar .topbar-actions {
+  margin-left: auto;
+}
+
+.mission-hud {
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 8px 11px 7px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.26);
-  background: linear-gradient(180deg, rgba(47, 111, 237, 0.1), rgba(47, 111, 237, 0.02));
-  color: #3357d6;
-  font: 800 9px/1.2 var(--font);
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  gap: 14px;
+  margin: 6px 0 7px;
+  padding: 8px 11px;
+  border: 1px solid rgba(47, 111, 237, 0.2);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(247, 250, 255, 0.9));
+  box-shadow: 0 4px 14px rgba(21, 31, 66, 0.08);
 }
 
-.classic-score .score-activity::before {
-  content: "";
+.mission-object {
+  display: flex;
+  min-width: 0;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.mission-icon {
+  display: grid;
   flex: 0 0 auto;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #2f6fed;
-  box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.13);
+  width: 40px;
+  height: 42px;
+  place-items: center;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--mission-color, #475569) 12%, #ffffff);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mission-color, #475569) 22%, transparent);
+  color: var(--mission-color, #475569);
 }
 
-.classic-score .score-main {
-  padding: 8px 11px 7px;
+.mission-icon svg {
+  width: 24px;
+  height: 24px;
 }
 
-.classic-score .score-main .score-title {
-  display: block;
-  margin: 0 0 2px;
-  padding: 0;
-  border: 0;
+.mission-copy {
+  display: grid;
+  min-width: 0;
+  gap: 0;
+}
+
+.mission-kicker {
+  overflow: hidden;
   color: #64748b;
   font: 800 8.5px/1.2 var(--font);
   letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
-.classic-score .score-row {
-  gap: 6px;
+.mission-kicker.is-correct {
+  color: #15803d;
 }
 
-.classic-score .lcd {
-  padding-left: 1px;
+.mission-kicker.is-partial {
+  color: #a16207;
+}
+
+.mission-kicker.is-wrong {
+  color: #b91c1c;
+}
+
+.mission-name {
+  overflow: hidden;
+  color: #10224d;
+  font: 800 20px/1.08 var(--font);
+  letter-spacing: -0.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mission-type {
+  margin-top: 1px;
+  color: #3357d6;
+  font: 700 9px/1.2 var(--font);
+  letter-spacing: 0.04em;
+}
+
+.mission-stats {
+  display: flex;
+  min-width: 0;
+  align-items: stretch;
+  gap: 2px;
+  margin-left: auto;
+}
+
+.mission-stat {
+  display: flex;
+  min-width: 54px;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 8px;
+  border-left: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.mission-stat:first-child {
+  border-left: 0;
+}
+
+.mission-stat-label {
+  color: #64748b;
+  font: 800 8px/1.2 var(--font);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mission-stat-value {
   color: #1e293b;
   font-family: var(--lcd);
-  font-size: 20px;
-  text-shadow: none;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  line-height: 1.05;
+  white-space: nowrap;
 }
 
-.classic-score .score-main .lcd {
-  display: block;
-  font-size: 27px;
-  line-height: 1;
-  letter-spacing: 1.3px;
+.mission-stat-primary .mission-stat-value {
+  color: #10224d;
+  font-size: 22px;
 }
 
-.classic-score .score-counts {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  min-height: 0;
-  height: auto;
-  padding: 9px 11px 7px;
+.mission-stat-counts .mission-stat-value {
+  font-size: 21px;
 }
 
-.classic-score .score-count {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: center;
-  gap: 0 4px;
+.mission-stat-counts .mission-stat-value > span:first-child {
+  color: #15803d;
 }
 
-.classic-score .score-count .lcd {
-  font-size: 19px;
+.mission-stat-counts .mission-stat-value > span:last-child {
+  color: #dc2626;
 }
 
-.classic-score .score-count-label {
-  grid-column: 1 / -1;
-  color: #64748b;
-  font: 800 7.5px/1.2 var(--font);
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-}
-
-.classic-score .score-row-clock {
-  height: auto;
-  padding: 7px 11px 8px;
-  border-top: 1px solid rgba(148, 163, 184, 0.24);
-}
-
-.classic-score .score-row-clock .lcd {
-  margin-left: auto;
+.mission-stat-time .mission-stat-value {
   color: #475569;
-  font-size: 13px;
-  letter-spacing: 0.5px;
+  font-size: 14px;
 }
 
-.classic-score .score-caption {
-  color: #64748b;
-  font: 800 8px/1 var(--font);
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+.mission-stat-sep {
+  margin: 0 1px;
+  color: #94a3b8;
+  font-size: 0.8em;
 }
 
-.classic-score .clock {
-  width: 15px;
-  height: 15px;
+.classic-sr-feedback {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .classic-map-viewport {
@@ -1883,29 +1946,46 @@ html[data-darkreader-mode] .marker-correct .label-text {
    ------------------------------------------------------------ */
 
 @media (max-width: 900px) {
-  .classic-topbar .topbar-row {
+  .classic-topbar .topbar-row,
+  .legacy-game-topbar .topbar-row {
     flex-wrap: wrap;
     gap: 5px 10px;
   }
 
   .classic-title-wrap {
-    flex: 1 1 100%;
+    flex: 1 1 auto;
   }
 
   .classic-context {
-    max-width: none;
+    max-width: 190px;
   }
 
-  .classic-topbar .question-line {
-    flex: 1 1 100%;
-  }
-
-  .classic-topbar .topbar-actions {
+  .classic-topbar .topbar-actions,
+  .legacy-game-topbar .topbar-actions {
     margin-left: auto;
   }
 
-  .classic-score {
-    width: 118px;
+  .mission-hud {
+    flex-wrap: wrap;
+    gap: 7px 10px;
+    padding: 8px 10px 0;
+  }
+
+  .mission-object {
+    flex: 1 1 100%;
+  }
+
+  .mission-stats {
+    flex: 1 1 100%;
+    margin-left: 0;
+    padding: 7px 0 8px;
+    border-top: 1px solid rgba(148, 163, 184, 0.26);
+  }
+
+  .mission-stat {
+    min-width: 0;
+    flex: 1 1 0;
+    padding: 0 8px;
   }
 
   .classic-map-viewport .zoom-controls {
@@ -1915,9 +1995,151 @@ html[data-darkreader-mode] .marker-correct .label-text {
   }
 }
 
+@media (max-height: 430px) and (max-width: 900px) {
+  .classic-topbar .topbar-row,
+  .legacy-game-topbar .topbar-row {
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+
+  .classic-context {
+    max-width: 130px;
+  }
+
+  .mission-hud {
+    flex-wrap: nowrap;
+    gap: 8px;
+    margin: 4px 0 5px;
+    padding: 5px 10px;
+  }
+
+  .mission-object {
+    flex: 1 1 auto;
+    gap: 7px;
+  }
+
+  .mission-icon {
+    width: 32px;
+    height: 34px;
+    border-radius: 9px;
+  }
+
+  .mission-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .mission-name {
+    font-size: 16px;
+  }
+
+  .mission-kicker {
+    font-size: 7.5px;
+  }
+
+  .mission-type {
+    display: none;
+  }
+
+  .mission-stats {
+    flex: 0 0 auto;
+    margin-left: auto;
+    padding: 0;
+    border-top: 0;
+  }
+
+  .mission-stat {
+    min-width: 40px;
+    padding: 0 6px;
+  }
+
+  .mission-stat-label {
+    font-size: 7px;
+  }
+
+  .mission-stat-value {
+    font-size: 15px;
+  }
+
+  .mission-stat-primary .mission-stat-value {
+    font-size: 18px;
+  }
+
+  .mission-stat-counts .mission-stat-value {
+    font-size: 17px;
+  }
+
+  .mission-stat-time .mission-stat-value {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .classic-topbar .topbar-actions .win-btn,
+  .legacy-game-topbar .topbar-actions .win-btn {
+    width: 42px;
+    min-width: 42px;
+    height: 42px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .classic-topbar .topbar-actions .win-btn > span:last-child,
+  .legacy-game-topbar .topbar-actions .win-btn > span:last-child {
+    display: none;
+  }
+}
+
 @media (max-width: 600px) {
   .classic-screen .game-title {
     font-size: 15px;
+  }
+
+  .classic-context {
+    max-width: 145px;
+  }
+
+  .mission-hud {
+    margin-top: 4px;
+  }
+
+  .mission-icon {
+    width: 36px;
+    height: 38px;
+    border-radius: 11px;
+  }
+
+  .mission-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .mission-name {
+    font-size: 18px;
+  }
+
+  .mission-kicker {
+    font-size: 8px;
+  }
+
+  .mission-stat {
+    padding: 0 6px;
+  }
+
+  .mission-stat-label {
+    font-size: 7px;
+  }
+
+  .mission-stat-value {
+    font-size: 16px;
+  }
+
+  .mission-stat-primary .mission-stat-value {
+    font-size: 20px;
+  }
+
+  .mission-stat-time .mission-stat-value {
+    font-size: 12.5px;
   }
 
   .classic-map-viewport .map-tag {

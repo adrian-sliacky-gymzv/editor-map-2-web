@@ -256,47 +256,75 @@
          LEGACY QUICK GAME (city training, kept as a bonus)
          ============================================================ -->
     <section id="gameScreen" class="screen game-screen" hidden tabindex="-1" aria-label="Rýchla hra">
-      <header class="game-topbar">
-        <div class="topbar-row">
-          <h1 class="game-title" id="gameTitle">Traf sa!</h1>
-          <div class="question-line">
-            <span id="qnum" class="qnum">Otázka č.<b>1</b>:</span>
-            <span id="questionText" class="question-text" aria-live="polite"></span>
+      <header class="game-topbar legacy-game-topbar">
+        <div class="topbar-row classic-topbar-row">
+          <div class="classic-title-wrap">
+            <h1 class="game-title" id="gameTitle">Traf sa!</h1>
+            <div>
+              <p class="classic-context" id="gameContext">Rýchla hra · mestá SR</p>
+            </div>
           </div>
           <div class="topbar-actions">
-            <button type="button" id="nextBtn" class="win-btn" aria-keyshortcuts="Enter Space" title="Ďalej (Enter alebo Space)" disabled>
+            <button type="button" id="nextBtn" class="win-btn" aria-label="Ďalej" aria-keyshortcuts="Enter Space" title="Ďalej (Enter alebo Space)" disabled>
               <span class="ico ico-next" aria-hidden="true"></span><span>Ďalej</span>
             </button>
-            <button type="button" id="endBtn" class="win-btn">
+            <button type="button" id="endBtn" class="win-btn" aria-label="Koniec" title="Koniec">
               <span class="ico ico-x" aria-hidden="true"></span><span>Koniec</span>
             </button>
           </div>
         </div>
+
+        <section class="mission-hud" id="gameMission" aria-label="Aktuálna úloha">
+          <div class="mission-object">
+            <span class="mission-icon" id="gameMissionIcon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 21h18M5 21V9l4-2v14M9 21V10l5-2v13M14 21V12l5 2v7M7 12h2M7 16h2M11 13h2M11 17h2M16 15h1M16 18h1"></path>
+              </svg>
+            </span>
+            <span class="mission-copy">
+              <span class="mission-kicker" id="gameMissionKicker">Načítavam…</span>
+              <strong class="mission-name" id="gameMissionName">—</strong>
+              <span class="mission-type" id="gameMissionType">Mesto</span>
+            </span>
+          </div>
+          <div class="mission-stats">
+            <div class="mission-stat mission-stat-primary" id="scoreDistanceRow">
+              <span class="mission-stat-label">Body</span>
+              <b class="mission-stat-value" id="scoreValue">000</b>
+            </div>
+            <div class="mission-stat mission-stat-primary mission-stat-counts" id="scoreCountsRow" hidden>
+              <span class="mission-stat-label">Výsledok</span>
+              <b class="mission-stat-value" aria-label="správne a chyby"><span id="correctValue">0</span><span class="mission-stat-sep">:</span><span id="wrongValue">0</span></b>
+            </div>
+            <div class="mission-stat">
+              <span class="mission-stat-label">Priemer</span>
+              <b class="mission-stat-value" id="gameAverageValue">—</b>
+            </div>
+            <div class="mission-stat">
+              <span class="mission-stat-label">Otázka</span>
+              <b class="mission-stat-value" id="gameQuestionCounter">1/3</b>
+            </div>
+            <div class="mission-stat mission-stat-time">
+              <span class="mission-stat-label">Čas</span>
+              <b class="mission-stat-value" id="timeValue">00:00</b>
+            </div>
+          </div>
+        </section>
+
+        <div class="classic-sr-feedback sr-only">
+          <span id="qnum" class="qnum"></span>
+          <span id="questionText" class="question-text" aria-live="polite"></span>
+        </div>
+        <span class="sr-only" id="scoreSr" aria-live="polite">Skóre 0 bodov, čas 00:00</span>
         <div class="game-progress" aria-hidden="true"><span id="progressFill"></span></div>
       </header>
 
       <div class="game-body">
-        <div class="score-panel" aria-label="Skóre a čas">
-          <span class="score-title">Skóre</span>
-          <div class="score-row score-distance" id="scoreDistanceRow">
-            <span class="lcd" id="scoreValue">000</span>
-          </div>
-          <div class="score-row score-counts" id="scoreCountsRow" hidden>
-            <span class="count-icon count-correct" aria-hidden="true">✓</span>
-            <span class="lcd" id="correctValue">0</span>
-            <span class="count-icon count-wrong" aria-hidden="true">✕</span>
-            <span class="lcd" id="wrongValue">0</span>
-          </div>
-          <div class="score-row score-row-clock">
-            <span class="clock" aria-hidden="true"></span>
-            <span class="lcd" id="timeValue">00:00</span>
-          </div>
-          <span class="sr-only" id="scoreSr" aria-live="polite">Skóre 0 bodov, čas 00:00</span>
-        </div>
-
         <div id="mapViewport" class="map-viewport">
           <div id="mapStage" class="map-stage">
-            <img id="mapImg" class="map-img" src="assets/slovakia-map.svg" alt="Obrysová mapa Slovenska s riekami" draggable="false">
+            <div id="mapImg" class="map-img map-img-inline" role="img" aria-label="Obrysová mapa Slovenska s riekami">
+              <img class="legacy-map-fallback" src="assets/slovakia-map.svg" alt="" loading="lazy" decoding="async">
+            </div>
             <svg id="markerLayer" class="marker-layer" viewBox="0 0 993 520" aria-hidden="true">
               <defs>
                 <linearGradient id="flagRed" x1="0" y1="0" x2="0" y2="1">
@@ -336,7 +364,7 @@
          ============================================================ -->
     <section id="classicScreen" class="screen classic-screen" hidden tabindex="-1" aria-labelledby="classicGameTitle">
       <header class="game-topbar classic-topbar">
-        <div class="topbar-row">
+        <div class="topbar-row classic-topbar-row">
           <div class="classic-title-wrap">
             <button type="button" id="classicHomeBtn" class="icon-btn" aria-label="Domov" title="Domov">←</button>
             <div>
@@ -344,48 +372,62 @@
               <p class="classic-context" id="classicContext">Slovensko · mestá</p>
             </div>
           </div>
-          <div class="question-line">
-            <span id="classicQnum" class="qnum">Otázka č.<b>1</b>:</span>
-            <span id="classicQuestion" class="question-text" aria-live="polite"></span>
-          </div>
           <div class="topbar-actions">
-            <button type="button" id="classicNextBtn" class="win-btn" aria-keyshortcuts="Enter Space" title="Ďalej (Enter alebo Space)" disabled>
+            <button type="button" id="classicNextBtn" class="win-btn" aria-label="Ďalej" aria-keyshortcuts="Enter Space" title="Ďalej (Enter alebo Space)" disabled>
               <span class="ico ico-next" aria-hidden="true"></span><span>Ďalej</span>
             </button>
-            <button type="button" id="classicEndBtn" class="win-btn">
+            <button type="button" id="classicEndBtn" class="win-btn" aria-label="Koniec" title="Koniec">
               <span class="ico ico-x" aria-hidden="true"></span><span>Koniec</span>
             </button>
           </div>
+        </div>
+
+        <section class="mission-hud" id="classicMission" aria-label="Aktuálna úloha">
+          <div class="mission-object">
+            <span class="mission-icon" id="classicMissionIcon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 21s7-6.1 7-12a7 7 0 1 0-14 0c0 5.9 7 12 7 12Z"></path>
+                <circle cx="12" cy="9" r="2.6"></circle>
+              </svg>
+            </span>
+            <span class="mission-copy">
+              <span class="mission-kicker" id="classicMissionKicker">Načítavam…</span>
+              <strong class="mission-name" id="classicMissionName">—</strong>
+              <span class="mission-type" id="classicMissionType">Objekt</span>
+            </span>
+          </div>
+          <div class="mission-stats">
+            <div class="mission-stat mission-stat-primary" id="classicScoreDistanceRow">
+              <span class="mission-stat-label">Body</span>
+              <b class="mission-stat-value" id="classicScoreValue">000</b>
+            </div>
+            <div class="mission-stat mission-stat-primary mission-stat-counts" id="classicScoreCountsRow" hidden>
+              <span class="mission-stat-label">Výsledok</span>
+              <b class="mission-stat-value" aria-label="správne a chyby"><span id="classicCorrectValue">0</span><span class="mission-stat-sep">:</span><span id="classicWrongValue">0</span></b>
+            </div>
+            <div class="mission-stat">
+              <span class="mission-stat-label">Priemer</span>
+              <b class="mission-stat-value" id="classicAverageValue">—</b>
+            </div>
+            <div class="mission-stat">
+              <span class="mission-stat-label">Otázka</span>
+              <b class="mission-stat-value" id="classicQuestionCounter">1/3</b>
+            </div>
+            <div class="mission-stat mission-stat-time">
+              <span class="mission-stat-label">Čas</span>
+              <b class="mission-stat-value" id="classicTimeValue">00:00</b>
+            </div>
+          </div>
+        </section>
+
+        <div class="classic-sr-feedback sr-only" id="classicFeedback">
+          <span id="classicQnum" class="qnum"></span>
+          <span id="classicQuestion" class="question-text" aria-live="polite"></span>
         </div>
         <div class="game-progress" aria-hidden="true"><span id="classicProgressFill"></span></div>
       </header>
 
       <div class="game-body classic-body">
-        <aside class="score-panel classic-score" aria-label="Skóre a čas">
-          <span class="score-activity" id="classicScoreActivity">Traf sa!</span>
-          <div class="score-main" id="classicScoreDistanceRow">
-            <span class="score-title" id="classicScoreTitle">Body</span>
-            <span class="lcd" id="classicScoreValue">000</span>
-          </div>
-          <div class="score-row score-counts" id="classicScoreCountsRow" hidden>
-            <span class="score-count">
-              <span class="count-icon count-correct" aria-hidden="true">✓</span>
-              <span class="lcd" id="classicCorrectValue">0</span>
-              <span class="score-count-label">správne</span>
-            </span>
-            <span class="score-count">
-              <span class="count-icon count-wrong" aria-hidden="true">✕</span>
-              <span class="lcd" id="classicWrongValue">0</span>
-              <span class="score-count-label">chyby</span>
-            </span>
-          </div>
-          <div class="score-row score-row-clock">
-            <span class="clock" aria-hidden="true"></span>
-            <span class="score-caption">Čas</span>
-            <span class="lcd" id="classicTimeValue">00:00</span>
-          </div>
-        </aside>
-
         <div id="classicMapViewport" class="map-viewport classic-map-viewport">
           <div id="classicMapHost" class="map-host"></div>
           <div class="map-hint" id="classicMapHint">Klikni na mapu</div>

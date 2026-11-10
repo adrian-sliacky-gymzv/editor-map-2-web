@@ -115,14 +115,17 @@ dostupných objektov v zvolenom teste.
 
 ### Traf sa!
 
-Ťukni alebo klikni na mapu tam, kde si myslíš, že objekt leží. Správna poloha
-sa označí **zeleným pinom s fajkou**, tvoj tip **červeným zameriavacím krížom**.
-Štítky „Správna poloha“ a „Tvoj tip“ sú vždy na opačných stranách (vyšší bod
-hore, nižší dole), takže zostanú čitateľné aj pri tesnom zásahu alebo prekrytí
-ikôn. Vpravo hore je legenda s názvom hľadaného objektu a vzdialenosťou tipu od
-cieľa. Body sa počítajú pôvodnou formulou; skóre pod 5 bodov sa mení na 0. Hra
-nevyžaduje potvrdenie tipu, takže tok zostáva rýchly; náhodné odpovede pri
-pinchi alebo posune zachytáva gestový filter.
+Ťukni alebo klikni na mapu tam, kde si myslíš, že objekt leží. HUD v hornej
+časti vždy ukazuje **ikonu a typ hľadaného objektu, jeho názov, body, priemer
+kola, číslo otázky a čas**. Po odpovedi sa krátka spätná väzba zobrazí priamo
+v HUD (napr. „Výborne! +95 b.“), takže sa mapa neposunie a nestráca priblíženie.
+Správna poloha sa označí **zeleným pinom s fajkou**, tvoj tip **červeným
+zameriavacím krížom**. Štítky „Správna poloha“ a „Tvoj tip“ sú vždy na opačných
+stranách (vyšší bod hore, nižší dole), takže zostanú čitateľné aj pri tesnom
+zásahu alebo prekrytí ikôn. Vpravo hore je legenda s názvom hľadaného objektu
+a vzdialenosťou tipu od cieľa. Body sa počítajú pôvodnou formulou; skóre pod
+5 bodov sa mení na 0. Hra nevyžaduje potvrdenie tipu, takže tok zostáva rýchly;
+náhodné odpovede pri pinchi alebo posune zachytáva gestový filter.
 
 ### Poskladaj!
 
@@ -148,7 +151,14 @@ Mapy sa ovládajú rovnako v hrách aj v editore:
   Posun sa nikdy nezasekne o falošný 60 px limit.
 - **Dva prsty** plynulo približujú a zároveň posúvajú mapu. Zoom je ukotvený
   na stred medzi prstami, takže obsah pod prstami neujíde. Pinch funguje aj
-  vtedy, keď jeden alebo oba prsty začnú priamo na značke.
+  vtedy, keď jeden alebo oba prsty začnú priamo na značke, výsledkovom markere
+  alebo na žltom objekte v „Poskladaj!“. Ak prsty pristanú veľmi blízko seba,
+  zoom sa aktivuje až po ich dostatočnom rozostúpení; nevznikne skok.
+- **Plynulosť** je zabezpečená zlučovaním pohybov do jedného frame cez
+  `requestAnimationFrame`; vrstva sa na kompozítor povýši len počas gesta.
+- **Vektorová ostrosť**: hrúbky čiar mapy sa pri zoomovaní nezväčšujú
+  (`vector-effect: non-scaling-stroke`) a rýchla hra používa inline SVG namiesto
+  rastrovej `<img>` vrstvy. Mapa preto zostáva ostrá aj pri 300 % a viac.
 - **Minimálny zoom je celá mapa**; pod ňu sa už nedá omylom oddialiť.
 - **Dvojité ťuknutie alebo dvojklik** priblíži mapu na približne 2,4× v mieste
   dotyku. Druhé dvojité ťuknutie vráti celú mapu.
@@ -267,7 +277,8 @@ Aktuálne **63 testov, 63 passing**. Testy pokrývajú:
 - atlas, štatistiky a tréning slabých miest,
 - matematiku pinchu, dvojitého ťuknutia, kolieska a ukotvenia zoomu,
 - dokumentáciu a `aria-keyshortcuts` pre klávesové skratky,
-- prehľadný Traf-sa HUD, legendu a čitateľné štítky markerov,
+- prehľadný HUD úlohy s cieľom, bodmi, priemerom a číslom otázky v oboch
+  herných obrazovkách, legendu a čitateľné štítky markerov,
 - prítomnosť všetkých 8 máp a presnú zhodu objektov medzi `.mef` a scénami,
 - existenciu všetkých testovacích skupín z `config.xml`,
 - zoznamy máp pre jednotlivé aktivity,
@@ -362,8 +373,10 @@ Následný mobilný a gestový audit pridal:
 - jasné výsledkové značky Traf-sa: zelený pin s fajkou pre správnu polohu,
   červený zameriavač pre tip, spojnica, štítky na opačných stranách a legenda
   s názvom objektu aj vzdialenosťou,
-- prehľadný HUD „Traf sa! / Body / Čas“ s popismi a počítadlom správnych
-  odpovedí namiesto nejasného bloku „Aktivita Traf sa!“ a údaja 9.8,
+- HUD úlohy s ikonou a typom cieľa, veľkým názvom objektu, bodmi, priemerom
+  kola, číslom otázky a časom; spätná väzba sa mení priamo v HUD bez skoku mapy,
+- ostré vektorové čiary pri každom priblížení a inline SVG mapa v rýchlej hre
+  namiesto nízko rozlíšeného `<img>` podkladu,
 - opravu svetlých štítkov značiek, ktoré predtým v svetlom režime splývali
   s pozadím,
 - kompatibilitu s Dark Readerom cez `revert-layer` pre SVG štítky,
@@ -372,11 +385,14 @@ Následný mobilný a gestový audit pridal:
 - kompaktný editor toolbar na 320 px a v krátkom landscape režime,
 - relatívne cesty, `.nojekyll`, `404.html` a GitHub Pages workflow.
 
-Overené bolo 22 kombinácií aktivita × mapa, 8 máp editora, reálne dotykové
-gestá cez CDP (`touchStart`/`touchMove`/`touchEnd`), šírky 320, 390, 568
-(landscape), 768, 1024 a 1280 px, klávesové skratky a ich fokusové guardy,
-Dark Reader 4.9.135, forced-dark Chromium, GitHub Pages podcesta a finálne
-Lighthouse audity.
+Overených bolo **94 kombinácií aktivita × mapa × test** (61 test, 26 Traf sa!,
+7 Poskladaj!), 8 máp editora s pridaním značky, farbou, viditeľnosťou,
+všetkými nástrojmi kreslenia, uložením/otvorením `.mef`, PNG/JPEG exportom
+a tlačou, reálne dotykové gestá cez CDP (`touchStart`/`touchMove`/`touchEnd`)
+vrátane pinchu na markeroch a puzzle objekte, frame pacing počas pinchu,
+šírky 320, 390, 568 (landscape), 768, 1024 a 1280 px, klávesové skratky
+a ich fokusové guardy, Dark Reader 4.9.135, forced-dark Chromium, GitHub Pages
+podcesta a finálne Lighthouse audity.
 
 ## Štruktúra
 
