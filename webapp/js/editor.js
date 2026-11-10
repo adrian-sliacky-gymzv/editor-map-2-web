@@ -29,6 +29,7 @@ import {
   toast,
 } from './classic-ui.js';
 import { goHome } from './classic-activities.js';
+import { defaultTitleForLanguage, getLanguage, t } from './i18n.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const LAST_MAP_KEY = 'editorMap2.lastMap.v1';
@@ -76,7 +77,6 @@ const E = {
   contextMenu: null,
   labelEditor: null,
   loading: false,
-  defaultDocumentTitle: document.title,
   focusEntity: null,
   loadToken: 0,
 };
@@ -193,7 +193,9 @@ function showEditorScreen() {
   D.screen.hidden = false;
   document.body.classList.remove('game-active', 'classic-active');
   document.body.classList.add('editor-active');
-  document.title = `${E.filename || 'Editor máp'} – Editor máp 2`;
+  document.title = getLanguage() === 'en'
+    ? `${E.filename || 'Map editor'} – Map Editor 2`
+    : `${E.filename || 'Editor máp'} – Editor máp 2`;
   requestAnimationFrame(() => {
     E.mapView?.layout();
     updateZoomLabel();
@@ -209,7 +211,7 @@ function hideEditorScreen() {
   document.body.classList.remove('editor-tree-open');
   D.screen.hidden = true;
   document.body.classList.remove('editor-active');
-  document.title = E.defaultDocumentTitle;
+  document.title = defaultTitleForLanguage();
 }
 
 function setLoading(visible, text = 'Načítavam…') {
@@ -411,7 +413,9 @@ async function mountDocument() {
 function updateDocumentChrome() {
   const base = E.filename || `${E.mapKey}.mef`;
   D.fileLabel.textContent = `${base}${E.dirty ? ' *' : ''}`;
-  document.title = `${base}${E.dirty ? ' *' : ''} – Editor máp 2`;
+  document.title = getLanguage() === 'en'
+    ? `${base}${E.dirty ? ' *' : ''} – Map Editor 2`
+    : `${base}${E.dirty ? ' *' : ''} – Editor máp 2`;
   updateMeta();
 }
 
@@ -529,7 +533,7 @@ async function runExport() {
     const canvas = await renderExportCanvas({ crop, resolution, watermark });
     const base = (E.filename || `${E.mapKey}.mef`).replace(/\.mef$/i, '');
     const stamp = new Date().toISOString().slice(0, 10);
-    const filename = `${base}-${crop === 'view' ? 'vyrez' : 'mapa'}-${stamp}.${format === 'jpeg' ? 'jpg' : 'png'}`;
+    const filename = `${base}-${crop === 'view' ? t('vyrez') : t('mapa')}-${stamp}.${format === 'jpeg' ? 'jpg' : 'png'}`;
     const blob = await canvasToBlob(canvas, format);
     downloadBlob(blob, filename);
     toast(`Export hotový: ${filename}`, 'success');

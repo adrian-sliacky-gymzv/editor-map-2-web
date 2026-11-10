@@ -86,7 +86,8 @@ test('GitHub Pages deployment files are present', () => {
   assert.equal(read('CNAME').trim(), 'em.adriansliacky.sk');
   const fallback = read('404.html');
   assert.match(fallback, /href="\.\/"/);
-  assert.match(fallback, /Táto adresa na mape nie je/);
+  assert.match(fallback, /This address is not on the map/);
+  assert.match(fallback, /Táto adresa na mape nie je|Stránka neexistuje/);
   const workflow = fs.readFileSync(path.join(REPO, '.github', 'workflows', 'pages.yml'), 'utf8');
   assert.match(workflow, /actions\/configure-pages@/);
   assert.match(workflow, /actions\/upload-pages-artifact@/);
@@ -174,6 +175,24 @@ test('the redesign stays deployment-safe', () => {
   assert.match(html, /id="mapy"/);
   assert.match(html, /class="map-shelf"/);
   assert.match(html, /id="postup"/);
+});
+
+test('language settings and automatic translation hooks are present', () => {
+  const html = read('index.html');
+  const css = read('redesign.css');
+  assert.match(html, /id="settingsBtn"/);
+  assert.match(html, /id="settingsOverlay"/);
+  assert.match(html, /data-language="auto"/);
+  assert.match(html, /data-language="sk"/);
+  assert.match(html, /data-language="en"/);
+  assert.match(html, /data-i18n-html="heroTitle"/);
+  assert.match(html, /id="homeTitle"[^>]*data-i18n-skip/);
+  assert.match(read('js/i18n.js'), /editorMap2\.language/);
+  assert.match(read('js/i18n.js'), /MutationObserver/);
+  assert.match(read('js/translations.js'), /GAME_MESSAGES_EN/);
+  assert.match(css, /\.settings-dialog/);
+  assert.match(css, /\.settings-languages/);
+  assert.match(css, /clamp\(156px, 20vw, 196px\)/);
 });
 
 test('mission HUDs, legend and marker callouts stay explicit', () => {

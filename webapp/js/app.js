@@ -21,6 +21,7 @@ import {
   mergeStats,
 } from './modes.js';
 import { tapSlop } from './map-gestures.js';
+import { initI18n, t } from './i18n.js';
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
@@ -56,6 +57,7 @@ const dom = {
   homeScreen: $('#homeScreen'),
   homeTitle: $('#homeTitle'),
   homeHelpBtn: $('#homeHelpBtn'),
+  settingsBtn: $('#settingsBtn'),
   quickPlayBtn: $('#quickPlayBtn'),
   heroAtlasBtn: $('#heroAtlasBtn'),
   atlasCardBtn: $('#atlasCardBtn'),
@@ -132,6 +134,9 @@ const dom = {
   helpOverlay: $('#helpOverlay'),
   resultOverlay: $('#resultOverlay'),
   confirmOverlay: $('#confirmOverlay'),
+  settingsOverlay: $('#settingsOverlay'),
+  settingsClose: $('#settingsClose'),
+  settingsDone: $('#settingsDone'),
   resultTitle: $('#resultTitle'),
   recordBadge: $('#recordBadge'),
   resultPercent: $('#resultPercent'),
@@ -649,7 +654,11 @@ function setGameMissionTarget(target) {
   dom.gameMissionType.textContent = 'Mesto';
   dom.gameMissionIcon.style.setProperty('--mission-color', '#d97706');
   dom.gameMissionIcon.innerHTML = LEGACY_CITY_ICON;
-  dom.gameMission.setAttribute('aria-label', `${instruction}: Mesto ${target?.label || ''}`.trim());
+  dom.gameMission.setAttribute('aria-label', t('{instruction}: {type} {name}', {
+    instruction: t(instruction),
+    type: t('Mesto'),
+    name: target?.label || '',
+  }).trim());
 }
 
 function setGameMissionFeedback(text, tone = '') {
@@ -771,21 +780,27 @@ function showQuestion() {
   setView({ zoom: 1, panX: 0, panY: 0 });
 
   if (state.mode === 'distance') {
-    dom.questionText.innerHTML =
-      `Klikni kde sa nachádza mesto <b class="entity">${escapeHtml(target.label)}</b>.`;
+    dom.questionText.innerHTML = t(
+      'Klikni kde sa nachádza mesto <b class="entity">{name}</b>.',
+      { name: escapeHtml(target.label) }
+    );
     dom.mapHint.textContent = 'Klikni na mapu';
   } else if (state.mode === 'quiz') {
     const options = buildQuizOptions(target, state.pool, LEVEL_TARGETS[state.level]);
     state.current = { target, options };
     state.quizOptions = options;
     drawQuizMarkers(options);
-    dom.questionText.innerHTML =
-      `Ukáž na mape mesto <b class="entity">${escapeHtml(target.label)}</b>.`;
+    dom.questionText.innerHTML = t(
+      'Ukáž na mape mesto <b class="entity">{name}</b>.',
+      { name: escapeHtml(target.label) }
+    );
     dom.mapHint.textContent = 'Klikni na správny bod';
   } else {
     drawPuzzleToken(target);
-    dom.questionText.innerHTML =
-      `Ťahaním na mape ulož mesto <b class="entity">${escapeHtml(target.label)}</b> na správne miesto.`;
+    dom.questionText.innerHTML = t(
+      'Ťahaním na mape ulož mesto <b class="entity">{name}</b> na správne miesto.',
+      { name: escapeHtml(target.label) }
+    );
     dom.mapHint.textContent = 'Pretiahni mesto na správne miesto';
   }
 }
@@ -1007,9 +1022,10 @@ function buildFinalText(percent, timeText) {
       points: state.total,
       possible: state.gameNumQ * 100,
     };
-    const summary =
-      `Celkovo si získal <b class="red">${state.total}</b> bodov v čase ` +
-      `<b class="red">${timeText}</b>. Tvoja úspešnosť je <b class="red">${percent}%</b>.`;
+    const summary = t(
+      'Celkovo si získal <b class="red">{total}</b> bodov v čase <b class="red">{time}</b>. Tvoja úspešnosť je <b class="red">{percent}%</b>.',
+      { total: state.total, time: timeText, percent }
+    );
     const rows = state.answers
       .map((entry) => {
         const cls =
@@ -1024,10 +1040,10 @@ function buildFinalText(percent, timeText) {
       })
       .join('');
     return {
-      topbar: `${summary} Klikni „Koniec“.`,
+      topbar: `${summary} ${t('Klikni „Koniec“.')}`,
       summary,
       stat2: state.total,
-      stat2Label: 'bodov',
+      stat2Label: t('bodov'),
       tableHead: '<th>Mesto</th><th>Body</th>',
       rows,
       stats,
@@ -1036,16 +1052,24 @@ function buildFinalText(percent, timeText) {
 
   const noun = state.mode === 'quiz' ? 'otázok' : 'miest';
   const prefix = state.mode === 'quiz'
-    ? 'Zodpovedal si správne'
-    : 'Uložil si správne';
+    ? t('Zodpovedal si správne')
+    : t('Uložil si správne');
   const stats = {
     percent,
     correct: state.correct,
     total: state.gameNumQ,
   };
-  const summary =
-    `${prefix} <b class="red">${state.correct}</b> z <b class="red">${state.gameNumQ}</b> ${noun} v čase ` +
-    `<b class="red">${timeText}</b>. Tvoja úspešnosť je <b class="red">${percent}%</b>.`;
+  const summary = t(
+    '{prefix} <b class="red">{correct}</b> z <b class="red">{total}</b> {noun} v čase <b class="red">{time}</b>. Tvoja úspešnosť je <b class="red">{percent}%</b>.',
+    {
+      prefix,
+      correct: state.correct,
+      total: state.gameNumQ,
+      noun: t(noun),
+      time: timeText,
+      percent,
+    }
+  );
   const rows = state.answers
     .map((entry) => {
       const correct = Boolean(entry.correct);
@@ -1053,10 +1077,10 @@ function buildFinalText(percent, timeText) {
     })
     .join('');
   return {
-    topbar: `${summary} Klikni „Koniec“.`,
+    topbar: `${summary} ${t('Klikni „Koniec“.')}`,
     summary,
     stat2: state.correct,
-    stat2Label: 'správne',
+    stat2Label: t('správne'),
     tableHead: '<th>Mesto</th><th>Výsledok</th>',
     rows,
     stats,
@@ -2181,7 +2205,7 @@ function downloadCsv() {
     return;
   }
 
-  const header = ['Mesto', 'Obtiažnosť', 'testLevel', 'x', 'y', 'entity'];
+  const header = [t('Mesto'), t('Obtiažnosť'), 'testLevel', 'x', 'y', 'entity'];
   const lines = [
     header,
     ...cities.map((city) => [city.label, levelName(city.level), city.level, city.x, city.y, city.entity]),
@@ -2191,7 +2215,7 @@ function downloadCsv() {
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement('a');
   anchor.href = url;
-  anchor.download = `mesta-slovenska-${cities.length}.csv`;
+  anchor.download = `${document.documentElement.lang === 'en' ? 'slovak-cities' : 'mesta-slovenska'}-${cities.length}.csv`;
   document.body.appendChild(anchor);
   anchor.click();
   anchor.remove();
@@ -2243,6 +2267,14 @@ function openConfirm({ title, message, okLabel, cancelLabel, onConfirm }) {
 function bindOverlayEvents() {
   dom.helpOverlay.addEventListener('click', (event) => {
     if (event.target === dom.helpOverlay) closeOverlay(dom.helpOverlay);
+  });
+
+  const openSettings = () => openOverlay(dom.settingsOverlay, dom.settingsDone);
+  dom.settingsBtn?.addEventListener('click', openSettings);
+  dom.settingsClose?.addEventListener('click', () => closeOverlay(dom.settingsOverlay));
+  dom.settingsDone?.addEventListener('click', () => closeOverlay(dom.settingsOverlay));
+  dom.settingsOverlay?.addEventListener('click', (event) => {
+    if (event.target === dom.settingsOverlay) closeOverlay(dom.settingsOverlay);
   });
   dom.gameResultBtn?.addEventListener('click', () => {
     openOverlay(dom.resultOverlay, dom.playAgainBtn);
@@ -2359,7 +2391,10 @@ function copyTextFallback(text) {
 }
 
 function anyOverlayOpen() {
-  return !dom.helpOverlay.hidden || !dom.resultOverlay.hidden || !dom.confirmOverlay.hidden;
+  return !dom.helpOverlay.hidden
+    || !dom.resultOverlay.hidden
+    || !dom.confirmOverlay.hidden
+    || !dom.settingsOverlay?.hidden;
 }
 
 function openOverlay(overlay, focusTarget = null) {
@@ -2388,14 +2423,15 @@ function closeAllOverlays() {
   dom.helpOverlay.hidden = true;
   dom.resultOverlay.hidden = true;
   dom.confirmOverlay.hidden = true;
+  if (dom.settingsOverlay) dom.settingsOverlay.hidden = true;
   document.body.classList.remove('overlay-open');
   state.confirmAction = null;
   state.lastFocus = null;
 }
 
 function trapFocus(event) {
-  const overlay = [dom.resultOverlay, dom.helpOverlay, dom.confirmOverlay].find(
-    (candidate) => !candidate.hidden
+  const overlay = [dom.resultOverlay, dom.helpOverlay, dom.confirmOverlay, dom.settingsOverlay].find(
+    (candidate) => candidate && !candidate.hidden
   );
   if (!overlay) return;
 
@@ -2426,7 +2462,8 @@ function hasBlockingOverlay() {
   return Boolean(document.querySelector('.overlay.is-open'))
     || !dom.helpOverlay.hidden
     || !dom.resultOverlay.hidden
-    || !dom.confirmOverlay.hidden;
+    || !dom.confirmOverlay.hidden
+    || !dom.settingsOverlay?.hidden;
 }
 
 function isVisible(selector) {
@@ -2446,6 +2483,12 @@ function panLegacyMapBy(dx, dy) {
 function bindGlobalEvents() {
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
+      if (dom.settingsOverlay && !dom.settingsOverlay.hidden) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        closeOverlay(dom.settingsOverlay);
+        return;
+      }
       if (!dom.confirmOverlay.hidden) {
         state.confirmAction = null;
         closeOverlay(dom.confirmOverlay);
@@ -2549,6 +2592,7 @@ function bindGlobalEvents() {
 /* ------------------------------------------------------------------ */
 
 function init() {
+  initI18n();
   const settings = loadSettings();
   state.level = settings.level;
   state.numQ = settings.numQ;

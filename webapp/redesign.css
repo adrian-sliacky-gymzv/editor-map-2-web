@@ -336,9 +336,28 @@ kbd {
   color: var(--blue);
 }
 
-.home-help {
+.home-help,
+.home-settings {
   justify-self: end;
   border-color: var(--line-2);
+}
+
+.home-settings {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.settings-dialog {
+  width: min(460px, calc(100vw - 24px));
+}
+
+.settings-languages {
+  margin-top: 8px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.settings-languages .seg-btn {
+  min-height: 58px;
 }
 
 /* ---------------------------------------------------------- */
@@ -4655,7 +4674,7 @@ kbd {
   .classic-screen,
   .game-screen {
     display: grid;
-    grid-template-columns: clamp(236px, 33vw, 302px) minmax(0, 1fr);
+    grid-template-columns: clamp(156px, 20vw, 196px) minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr);
     height: 100dvh;
     overflow: hidden;
@@ -4671,10 +4690,10 @@ kbd {
     height: 100%;
     overflow-y: auto;
     padding:
-      max(7px, env(safe-area-inset-top))
-      9px
-      max(7px, env(safe-area-inset-bottom))
-      max(9px, env(safe-area-inset-left));
+      max(5px, env(safe-area-inset-top))
+      6px
+      max(5px, env(safe-area-inset-bottom))
+      max(7px, env(safe-area-inset-left));
     border-right: 1px solid var(--line-2);
     border-bottom: 0;
     scrollbar-width: thin;
@@ -4693,21 +4712,30 @@ kbd {
   .classic-topbar-row {
     flex-direction: column;
     align-items: stretch;
-    gap: 6px;
+    gap: 4px;
     min-height: 0;
   }
 
   .classic-title-wrap {
     width: 100%;
+    gap: 5px;
+  }
+
+  .classic-title-wrap .icon-btn {
+    width: 24px;
+    min-width: 24px;
+    height: 24px;
+    font-size: 14px;
   }
 
   .classic-context {
     max-width: 100%;
-    font-size: 6.8px;
+    font-size: 6px;
   }
 
   .game-title {
-    font-size: 19px;
+    font-size: 15px;
+    line-height: 1.05;
   }
 
   .topbar-actions {
@@ -4715,14 +4743,19 @@ kbd {
     grid-template-columns: 1fr 1fr;
     width: 100%;
     margin-left: 0;
-    gap: 5px;
+    gap: 3px;
   }
 
   .win-btn {
     justify-content: center;
-    min-height: 31px;
-    padding: 0 7px;
-    font-size: 9px;
+    min-height: 27px;
+    padding: 0 4px;
+    font-size: 8px;
+  }
+
+  .win-btn .ico {
+    width: 10px;
+    height: 10px;
   }
 
   .mission-hud {
@@ -4730,35 +4763,36 @@ kbd {
     flex-direction: column;
     align-items: stretch;
     gap: 0;
-    margin: 7px 0;
+    margin: 4px 0;
     padding: 0;
   }
 
   .mission-object {
     width: 100%;
-    gap: 8px;
-    padding: 8px;
+    gap: 5px;
+    padding: 5px;
   }
 
   .mission-icon {
-    width: 28px;
-    height: 30px;
+    width: 22px;
+    height: 24px;
+    flex: 0 0 22px;
   }
 
   .mission-icon svg {
-    width: 17px;
-    height: 17px;
+    width: 14px;
+    height: 14px;
   }
 
   .mission-kicker {
-    font-size: 6.2px;
+    font-size: 5.3px;
   }
 
   .mission-name {
     display: -webkit-box;
     overflow: hidden;
-    font-size: 19px;
-    line-height: 1.03;
+    font-size: 15px;
+    line-height: 1.02;
     white-space: normal;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
@@ -4780,7 +4814,7 @@ kbd {
   .mission-stat {
     min-width: 0;
     align-items: flex-start;
-    padding: 6px 8px;
+    padding: 4px 6px;
     border-left: 1px solid var(--line);
   }
 
@@ -4794,15 +4828,15 @@ kbd {
   }
 
   .mission-stat-label {
-    font-size: 6.2px;
+    font-size: 5.3px;
   }
 
   .mission-stat-value {
-    font-size: 15px;
+    font-size: 12px;
   }
 
   .mission-stat-primary .mission-stat-value {
-    font-size: 17px;
+    font-size: 14px;
   }
 
   .game-progress {
@@ -4875,6 +4909,15 @@ kbd {
   .setup-dialog {
     width: min(720px, calc(100vw - 16px));
     max-height: calc(100dvh - 12px);
+  }
+
+  .settings-dialog {
+    width: min(520px, calc(100vw - 24px));
+    max-height: calc(100dvh - 16px);
+  }
+
+  .settings-languages .seg-btn {
+    min-height: 44px;
   }
 
   .setup-head {

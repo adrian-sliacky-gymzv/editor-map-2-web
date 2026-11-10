@@ -23,6 +23,13 @@ import { MapView } from './map-view.js';
 import { practiceStats } from './practice-stats.js';
 import { tapSlop } from './map-gestures.js';
 import { FORMAT_LABELS, answerSuccess } from './practice-stats-core.js';
+import { candidatesFor, nextGroupIndex, pickUnusedIndex, randomSequence } from './quiz-selection.js';
+import {
+  distanceBetween,
+  maxDistanceForMap,
+  scoreForDistance,
+} from './scoring.js';
+import { gameMessage, getLanguage, t } from './i18n.js';
 import {
   $,
   announce,
@@ -37,6 +44,9 @@ import {
 } from './classic-ui.js';
 
 const SETUP_KEY = 'editorMap2.activitySetup.v2';
+
+/** Original config.xml text, or its English equivalent in English mode. */
+const cfgText = (name) => gameMessage(name, classicData.cfg(name));
 
 const MODES = {
   test: {
@@ -191,7 +201,6 @@ const GAME = {
   totalScore: 0,
   answers: [],
   testPools: [],
-  testUsed: [],
   currentGroup: -1,
   candidates: [],
   targetNode: null,
@@ -360,7 +369,7 @@ export async function openActivitySetup(modeKey, preset = null) {
   SETUP.levelIndex = preset?.levelIndex ?? saved.levelIndex ?? 0;
   SETUP.numQ = preset?.numQ ?? saved.numQ ?? 3;
 
-  dom.title.textContent = classicData.cfg(mode.titleKey) || mode.defaultTitle;
+  dom.title.textContent = cfgText(mode.titleKey) || mode.defaultTitle;
   dom.subtitle.textContent = mode.description;
   renderMapCards();
   await selectMap(SETUP.mapIndex, SETUP.testIndex, SETUP.levelIndex, SETUP.numQ);
@@ -545,17 +554,25 @@ function updateSetupSummary() {
   const empty = SETUP.pools.filter((p) => !p.nodes.length).map((p) => p.label);
   const targetWord = pluralSk(level.numTargets, 'možnosť', 'možnosti', 'možností');
   const targetText = mode.key === 'test'
-    ? `V každej otázke ${level.numTargets} ${targetWord}.`
+    ? t('V každej otázke {count} {noun}.', {
+      count: level.numTargets,
+      noun: t(targetWord),
+    })
     : mode.key === 'distance'
-      ? 'Skóre podľa vzdialenosti od správneho bodu.'
-      : 'Tolerancia uloženia je 15 mapových jednotiek.';
+      ? t('Skóre podľa vzdialenosti od správneho bodu.')
+      : t('Tolerancia uloženia je 15 mapových jednotiek.');
   const noun = mode.key === 'puzzle'
     ? pluralSk(SETUP.totalNodes, 'objekt', 'objekty', 'objektov')
     : pluralSk(SETUP.totalNodes, 'otázka', 'otázky', 'otázok');
   const groupNoun = pluralSk(activeLevels, 'testovacia skupina', 'testovacie skupiny', 'testovacích skupín');
+  const emptyText = empty.length
+    ? ` ${t('Prázdne skupiny sa preskočia ({groups}).', {
+      groups: empty.map((label) => escapeLabel(t(label))).join(', '),
+    })}`
+    : '';
   dom.summary.innerHTML = `
-    <p class="setup-summary-main"><b>${SETUP.totalNodes}</b> dostupných ${noun} · <b>${activeLevels}</b> ${groupNoun}</p>
-    <p class="setup-summary-sub">${targetText}${empty.length ? ` Prázdne skupiny sa preskočia (${empty.map(escapeLabel).join(', ')}).` : ''}</p>`;
+    <p class="setup-summary-main"><b>${SETUP.totalNodes}</b> ${t('dostupných')} ${t(noun)} · <b>${activeLevels}</b> ${t(groupNoun)}</p>
+    <p class="setup-summary-sub">${targetText}${emptyText}</p>`;
   dom.start.disabled = SETUP.totalNodes === 0;
 
   const levelButtons = dom.levels.querySelectorAll('.setup-level');
@@ -673,7 +690,6 @@ export async function startActivityGame(params) {
   GAME.currentGroup = -1;
   GAME.candidates = [];
   GAME.testPools = [];
-  GAME.testUsed = [];
   GAME.distancePool = [];
   GAME.distanceSeq = [];
   GAME.puzzlePool = [];
@@ -697,7 +713,7 @@ export async function startActivityGame(params) {
 
   showClassicScreen();
   setLoading(true, 'Načítavam mapu…');
-  dom.titleGame.textContent = classicData.cfg(mode.titleKey) || mode.fallbackTitle;
+  dom.titleGame.textContent = cfgText(mode.titleKey) || mode.fallbackTitle;
   resetMission(params.mode);
   dom.context.textContent = `${displayMapLabel(mapEl, mapDef)} · ${testEl.getAttribute('label') || ''}`;
   dom.mapTag.textContent = `${displayMapLabel(mapEl, mapDef)} · ${level.label}`;
@@ -989,7 +1005,11 @@ function setMissionTarget(node, fallbackType, mode) {
   dom.missionIcon.dataset.symbol = info.symbol;
   dom.missionIcon.style.setProperty('--mission-color', info.color);
   dom.missionIcon.innerHTML = missionIconMarkup(info.symbol);
-  dom.mission.setAttribute('aria-label', `${instruction}: ${info.label} ${nodeLabel(node) || ''}`.trim());
+  dom.mission.setAttribute('aria-label', t('{instruction}: {type} {name}', {
+    instruction: t(instruction),
+    type: t(info.label),
+    name: nodeLabel(node) || '',
+  }).trim());
 }
 
 function setMissionFeedback(text, tone = '') {
@@ -1146,28 +1166,33 @@ function nextTestQuestion() {
   showMapHint();
   GAME.mapView.fit();
 
-  const group = nextTestGroup();
-  if (!group) {
+  const groupIndex = nextGroupIndex(GAME.currentGroup, GAME.testPools);
+  if (groupIndex < 0) {
     showTestFinal();
     return;
   }
-  GAME.currentGroup = group.index;
-  const pool = group.pool;
-  const unused = pool.nodes.filter((node) => !pool.used.has(node));
-  const chosen = unused[Math.floor(Math.random() * unused.length)];
+  GAME.currentGroup = groupIndex;
+  const pool = GAME.testPools[groupIndex];
+  const chosenIndex = pickUnusedIndex(pool.nodes, pool.used);
+  if (chosenIndex < 0) {
+    showTestFinal();
+    return;
+  }
+  const chosen = pool.nodes[chosenIndex];
   pool.used.add(chosen);
   GAME.targetNode = chosen;
-  const otherNodes = shuffle(pool.nodes.filter((node) => node !== chosen)).slice(0, Math.max(0, GAME.numTargets - 1));
-  GAME.candidates = [chosen, ...otherNodes];
+  // Original: target pinned first, then a random sample of the full group,
+  // so objects already used as answers can still appear as distractors.
+  GAME.candidates = candidatesFor(pool.nodes, chosenIndex, GAME.numTargets);
 
-  const groupLabels = visibleLabels(GAME.mapEl, GAME.testEl, group.configGroup);
+  const groupLabels = visibleLabels(GAME.mapEl, GAME.testEl, pool.configGroup);
   GAME.mapView.showBaseLayers(groupLabels);
 
   setQuestionNumber(GAME.questionIndex);
-  const questionType = questionTypeOf(group.configGroup);
+  const questionType = questionTypeOf(pool.configGroup);
   setMissionTarget(chosen, questionType, 'test');
-  setQuestionHtml(htmlFromConfig(classicData.cfg('testQuestion'), {
-    ENTITYTYPE: escapeHtml(typeWithSpace(questionType)),
+  setQuestionHtml(htmlFromConfig(cfgText('testQuestion'), {
+    ENTITYTYPE: escapeHtml(typeWithSpace(t(questionType))),
     ENTITYNAME: escapeHtml(nodeLabel(chosen)),
   }));
 
@@ -1191,19 +1216,6 @@ function nextTestQuestion() {
   announce(`Otázka ${GAME.questionIndex}: ${nodeLabel(chosen)}`);
 }
 
-function nextTestGroup() {
-  if (!GAME.testPools.length) return null;
-  for (let guard = 0; guard < GAME.testPools.length * 4; guard += 1) {
-    GAME.currentGroup += 1;
-    if (GAME.currentGroup >= GAME.testPools.length) GAME.currentGroup = 0;
-    const pool = GAME.testPools[GAME.currentGroup];
-    if (pool.nodes.some((node) => !pool.used.has(node))) {
-      return { index: GAME.currentGroup, pool, configGroup: pool.configGroup };
-    }
-  }
-  return null;
-}
-
 function answerTestQuestion(clickedNode) {
   if (!GAME.active || GAME.answered) return;
   GAME.answered = true;
@@ -1221,10 +1233,10 @@ function answerTestQuestion(clickedNode) {
   }
   if (correct) {
     GAME.correct += 1;
-    setQuestionHtml(classicData.cfg('correctTestAnswer'));
+    setQuestionHtml(cfgText('correctTestAnswer'));
   } else {
     GAME.incorrect += 1;
-    setQuestionHtml(classicData.cfg('incorrectTestAnswer'));
+    setQuestionHtml(cfgText('incorrectTestAnswer'));
   }
   setMissionFeedback(correct ? 'Správne! +1' : 'Nesprávne!', correct ? 'correct' : 'wrong');
   recordAttemptForNode(GAME.targetNode, 'test', correct, correct ? 1 : 0, 1);
@@ -1245,7 +1257,7 @@ function answerTestQuestion(clickedNode) {
   updateProgress();
   dom.next.disabled = false;
   const isLast = GAME.questionIndex >= GAME.numQ;
-  const suffix = isLast ? classicData.cfg('lastTestQuestion') : classicData.cfg('nextTestQuestion');
+  const suffix = isLast ? cfgText('lastTestQuestion') : cfgText('nextTestQuestion');
   dom.question.innerHTML += ` ${suffix}`;
   if (isLast) stopClock();
   announce(correct ? 'Správne.' : `Nesprávne. Správna odpoveď je ${nodeLabel(GAME.targetNode)}.`);
@@ -1273,21 +1285,25 @@ function showTestFinal() {
   // The original leaves the last question's marks and shapes on screen.
   setQuestionNumber(0);
   const percent = Math.round((GAME.correct / GAME.numQ) * 100);
-  let finalHtml = htmlFromConfig(classicData.cfg('testFinalScore'), {
+  let finalHtml = htmlFromConfig(cfgText('testFinalScore'), {
     CORRECTQ: spaced(GAME.correct),
     TOTALQ: spaced(GAME.numQ),
     TOTALTIME: spaced(timeText()),
     PERCENT: spaced(percent),
   });
-  if (GAME.numQ === 1) finalHtml = finalHtml.replace(/\botázok\b/g, 'otázky');
+  if (GAME.numQ === 1) {
+    finalHtml = getLanguage() === 'en'
+      ? finalHtml.replace(/\bquestions\b/g, 'question')
+      : finalHtml.replace(/\botázok\b/g, 'otázky');
+  }
   setQuestionHtml(finalHtml);
   dom.next.disabled = true;
   dom.progress.style.width = '100%';
   showResult({
-    title: 'Vyskúšaj sa! — výsledok',
+    title: t('Vyskúšaj sa! — výsledok'),
     percent,
     primaryValue: `${GAME.correct}/${GAME.numQ}`,
-    primaryLabel: 'správne',
+    primaryLabel: t('správne'),
     time: timeText(),
     finalHtml: dom.question.innerHTML,
     rows: GAME.answers.map((row) => [
@@ -1295,7 +1311,7 @@ function showTestFinal() {
       row.correct ? '✓' : `✕ (${row.picked})`,
       row.correct ? '1' : '0',
     ]),
-    columns: ['Objekt', 'Odpoveď', 'Body'],
+    columns: [t('Objekt'), t('Odpoveď'), t('Body')],
   });
 }
 
@@ -1308,7 +1324,7 @@ function prepareDistance() {
   GAME.distancePool = pools.flatMap((pool) => pool.nodes);
   const total = GAME.distancePool.length;
   GAME.numQ = Math.min(GAME.numQ, Math.max(1, total));
-  GAME.distanceSeq = shuffle([...GAME.distancePool.keys()]).slice(0, GAME.numQ);
+  GAME.distanceSeq = randomSequence(GAME.distancePool.length, GAME.numQ);
   GAME.mapView.interaction = 'click';
   GAME.mapView.mapClickHandler = onDistanceClick;
 }
@@ -1329,8 +1345,8 @@ function nextDistanceQuestion() {
   setQuestionNumber(GAME.questionIndex);
   const type = questionTypeOf(GAME.testEl);
   setMissionTarget(target, type, 'distance');
-  setQuestionHtml(htmlFromConfig(classicData.cfg('distanceQuestion'), {
-    ENTITYTYPE: escapeHtml(typeWithSpace(type)),
+  setQuestionHtml(htmlFromConfig(cfgText('distanceQuestion'), {
+    ENTITYTYPE: escapeHtml(typeWithSpace(t(type))),
     ENTITYNAME: escapeHtml(nodeLabel(target)),
   }));
   updateScore();
@@ -1349,10 +1365,11 @@ function onDistanceClick(point) {
   const target = GAME.targetNode;
   const targetX = getNumberAttr(target, 'markX');
   const targetY = getNumberAttr(target, 'markY');
-  const dist = Math.hypot(targetX - point.x, targetY - point.y);
-  const maxDist = Math.hypot(GAME.mapView.W, GAME.mapView.H);
-  let score = Math.round(((maxDist - 3 * dist) / maxDist) * 100);
-  if (score < 5) score = 0;
+  // Original DistanceTest: round the pixel distance first, then use a max
+  // distance rounded from the selected map's own width and height.
+  const dist = distanceBetween(point, { x: targetX, y: targetY });
+  const maxDist = maxDistanceForMap(GAME.mapView.W, GAME.mapView.H);
+  const score = scoreForDistance(dist, maxDist);
   GAME.totalScore += score;
   const success = score >= 70;
   if (GAME.mode === 'practice') {
@@ -1405,7 +1422,7 @@ function onDistanceClick(point) {
   const feedbackLabel = score >= 90 ? 'Výborne' : score >= 70 ? 'Dobre' : score > 0 ? 'Tesne vedľa' : 'Vedľa';
   setMissionFeedback(`${feedbackLabel}! +${score} b.`, feedbackTone);
   const isLast = GAME.questionIndex >= GAME.numQ;
-  const suffix = isLast ? classicData.cfg('lastTestQuestion') : classicData.cfg('nextTestQuestion');
+  const suffix = isLast ? cfgText('lastTestQuestion') : cfgText('nextTestQuestion');
   dom.question.innerHTML += ` ${suffix}`;
   const context = attemptContext();
   GAME.answers.push({
@@ -1434,10 +1451,14 @@ function distanceAnswerFor(score) {
     const min = Number.parseFloat(el.getAttribute('min') ?? '0');
     const max = Number.parseFloat(el.getAttribute('max') ?? '0');
     if (score >= min && score <= max) {
-      return { html: htmlFromConfig(el.innerHTML, { SCORE: spaced(score) }), score };
+      const source = gameMessage(`distanceAnswer.${min}.${max}`, el.innerHTML);
+      return { html: htmlFromConfig(source, { SCORE: spaced(score) }), score };
     }
   }
-  return { html: `Získal si <b>${score}</b> bodov.`, score };
+  return {
+    html: t('Získal si <b>{score}</b> bodov.', { score }),
+    score,
+  };
 }
 
 function showDistanceFinal() {
@@ -1449,7 +1470,7 @@ function showDistanceFinal() {
   // Keep the final guess and correct position visible for review.
   setQuestionNumber(0);
   const percent = Math.round(GAME.totalScore / GAME.numQ);
-  let finalHtml = htmlFromConfig(classicData.cfg('distanceFinalScore'), {
+  let finalHtml = htmlFromConfig(cfgText('distanceFinalScore'), {
     TOTALSCORE: spaced(GAME.totalScore),
     TOTALTIME: spaced(timeText()),
     PERCENT: spaced(percent),
@@ -1460,18 +1481,18 @@ function showDistanceFinal() {
   dom.next.disabled = true;
   dom.progress.style.width = '100%';
   showResult({
-    title: 'Traf sa! — výsledok',
+    title: t('Traf sa! — výsledok'),
     percent,
     primaryValue: `${GAME.totalScore}`,
-    primaryLabel: pluralSk(GAME.totalScore, 'bod', 'body', 'bodov'),
+    primaryLabel: t(GAME.totalScore === 1 ? 'bod' : 'bodov'),
     time: timeText(),
     finalHtml: dom.question.innerHTML,
     rows: GAME.answers.map((row) => [
       row.label,
-      `${row.distance} j.`,
+      t(`${row.distance} j.`),
       String(row.points),
     ]),
-    columns: ['Objekt', 'Vzdialenosť', 'Body'],
+    columns: [t('Objekt'), t('Vzdialenosť'), t('Body')],
   });
 }
 
@@ -1484,7 +1505,7 @@ function preparePuzzle() {
   GAME.puzzlePool = pools.flatMap((pool) => pool.nodes);
   const total = GAME.puzzlePool.length;
   GAME.numQ = Math.min(GAME.numQ, Math.max(1, total));
-  GAME.puzzleSeq = shuffle([...GAME.puzzlePool.keys()]).slice(0, GAME.numQ);
+  GAME.puzzleSeq = randomSequence(GAME.puzzlePool.length, GAME.numQ);
   GAME.mapView.interaction = 'pan';
 }
 
@@ -1522,8 +1543,8 @@ function nextPuzzleQuestion() {
   setQuestionNumber(GAME.questionIndex);
   const type = questionTypeOf(GAME.testEl);
   setMissionTarget(target, type, 'puzzle');
-  setQuestionHtml(htmlFromConfig(classicData.cfg('puzzleQuestion'), {
-    ENTITYTYPE: escapeHtml(typeWithSpace(type)),
+  setQuestionHtml(htmlFromConfig(cfgText('puzzleQuestion'), {
+    ENTITYTYPE: escapeHtml(typeWithSpace(t(type))),
     ENTITYNAME: escapeHtml(nodeLabel(target)),
   }));
   updateScore();
@@ -1704,12 +1725,12 @@ function answerPuzzle(targetNode) {
   if (correct) {
     GAME.correct += 1;
     GAME.mapView.setEntityColor(key, '#77ff77');
-    setQuestionHtml(classicData.cfg('correctPuzzleAnswer'));
+    setQuestionHtml(cfgText('correctPuzzleAnswer'));
     setMissionFeedback('Správne umiestnené! +1', 'correct');
   } else {
     GAME.incorrect += 1;
     GAME.mapView.setEntityColor(key, '#ff0000');
-    setQuestionHtml(htmlFromConfig(classicData.cfg('incorrectPuzzleAnswer'), {
+    setQuestionHtml(htmlFromConfig(cfgText('incorrectPuzzleAnswer'), {
       ENTITYNAME: escapeHtml(nodeLabel(targetNode)),
     }));
     setMissionFeedback('Nesprávne umiestnenie.', 'wrong');
@@ -1743,7 +1764,7 @@ function answerPuzzle(targetNode) {
   updateScore();
   updateProgress();
   dom.next.disabled = false;
-  const suffix = isLast ? classicData.cfg('lastPuzzleQuestion') : classicData.cfg('nextPuzzleQuestion');
+  const suffix = isLast ? cfgText('lastPuzzleQuestion') : cfgText('nextPuzzleQuestion');
   dom.question.innerHTML += ` ${suffix}`;
   if (isLast) stopClock();
   announce(correct ? 'Správne umiestnené.' : 'Nesprávne umiestnené.');
@@ -1765,20 +1786,20 @@ function showPuzzleFinal() {
   const percent = answered ? Math.round((GAME.correct / answered) * 100) : 0;
   const type = GAME.testEl.getAttribute('answer') || GAME.testEl.getAttribute('question') || GAME.testEl.getAttribute('label') || '';
   const finalType = answered === 1 && type === 'štátov' ? 'štátu' : type;
-  setQuestionHtml(htmlFromConfig(classicData.cfg('puzzleFinalScore'), {
+  setQuestionHtml(htmlFromConfig(cfgText('puzzleFinalScore'), {
     CORRECTQ: spaced(GAME.correct),
     TOTALQ: spaced(answered),
     TOTALTIME: spaced(timeText()),
     PERCENT: spaced(percent),
-    ENTITYTYPE: escapeHtml(finalType),
+    ENTITYTYPE: escapeHtml(t(finalType)),
   }));
   dom.next.disabled = true;
   dom.progress.style.width = '100%';
   showResult({
-    title: 'Poskladaj! — výsledok',
+    title: t('Poskladaj! — výsledok'),
     percent,
     primaryValue: `${GAME.correct}/${answered}`,
-    primaryLabel: 'správne',
+    primaryLabel: t('správne'),
     time: timeText(),
     finalHtml: dom.question.innerHTML,
     rows: GAME.answers.map((row) => [
@@ -1786,7 +1807,7 @@ function showPuzzleFinal() {
       row.correct ? '✓' : '✕',
       row.correct ? '1' : '0',
     ]),
-    columns: ['Objekt', 'Uloženie', 'Body'],
+    columns: [t('Objekt'), t('Uloženie'), t('Body')],
   });
 }
 
@@ -1997,14 +2018,6 @@ function showResult(result) {
 /* ------------------------------------------------------------------------- */
 /* helpers                                                                   */
 /* ------------------------------------------------------------------------- */
-
-function shuffle(array) {
-  for (let i = array.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
 
 function displayMapLabel(mapEl, mapDef) {
   const label = mapEl?.getAttribute('label') || mapDef?.label || '';

@@ -28,7 +28,7 @@
           <div class="brand">
             <img class="brand-logo" src="assets/editormap-logo.png" alt="Logo Editor máp 2" width="44" height="44">
             <div class="brand-copy">
-              <h1 id="homeTitle">Editor máp <span>2</span></h1>
+              <h1 id="homeTitle" data-i18n-skip translate="no">Editor máp <span>2</span></h1>
               <p class="brand-kicker">8 máp · 3 hry · 1 editor</p>
             </div>
           </div>
@@ -41,6 +41,7 @@
             <button type="button" class="home-header-play" data-classic-mode="distance" data-classic-preset="hero" aria-label="Hrať Traf sa! — ťažká, 10 otázok">
               Hrať <span aria-hidden="true">→</span>
             </button>
+            <button type="button" id="settingsBtn" class="icon-btn home-settings" aria-label="Nastavenia" title="Nastavenia" aria-keyshortcuts=",">⚙</button>
             <button type="button" id="homeHelpBtn" class="icon-btn home-help" aria-label="Ako hrať (?)" title="Ako hrať (?)" aria-keyshortcuts="Shift+/">?</button>
           </div>
         </header>
@@ -48,7 +49,7 @@
         <section class="hero" aria-labelledby="heroTitle">
           <div class="hero-copy">
             <p class="hero-kicker"><span class="hero-kicker-rule" aria-hidden="true"></span> Kartografický ateliér · pôvodná hra z roku 2010</p>
-            <h2 id="heroTitle">Mapa, ktorú si <em>zahráš</em>.</h2>
+            <h2 id="heroTitle" data-i18n-html="heroTitle">Mapa, ktorú si <em>zahráš</em>.</h2>
             <p class="hero-lead">Osem pôvodných máp, tri hry a editor. Vyber si aktivitu nižšie alebo začni odporúčaným tréningom — bez registrácie.</p>
             <div class="hero-actions">
               <button type="button" id="heroPlayBtn" class="btn-primary btn-hero" data-classic-mode="distance" data-classic-preset="hero">
@@ -142,7 +143,7 @@
                 <span class="home-card-num" aria-hidden="true">04</span>
               </div>
               <h3>Editor máp</h3>
-              <p>Vrstvy, farby, vlastné značky, kreslenie, ukladanie <b>.mef</b>, export PNG/JPEG a tlač. Všetko na ôsmich mapách.</p>
+              <p data-i18n-html="editorCardBody">Vrstvy, farby, vlastné značky, kreslenie, ukladanie <b>.mef</b>, export PNG/JPEG a tlač. Všetko na ôsmich mapách.</p>
               <div class="home-card-foot">
                 <span>8 máp · .mef · PNG/JPEG</span>
                 <button type="button" class="home-card-btn" data-editor-open aria-keyshortcuts="4">Otvoriť editor <span aria-hidden="true">→</span></button>
@@ -237,7 +238,7 @@
         <footer class="home-footer">
           <div class="footer-brand">
             <img src="assets/editormap-logo.png" alt="" width="28" height="28">
-            <p>Nekomerčná edukatívna webová reimplementácia hry <i>Editor máp 2</i> (2010).</p>
+            <p data-i18n-html="footerBrand">Nekomerčná edukatívna webová reimplementácia hry <i>Editor máp 2</i> (2010).</p>
           </div>
           <p class="footer-credits">© 2010 RNDr. Štefan Karolčík, PhD · dizajn a programovanie Ing. Juraj Hrabovec – MAX MEDIA · mapové podklady RNDr. Daniel Gurňák, PhD.</p>
         </footer>
@@ -427,7 +428,7 @@
             <button type="button" id="zoomOut" class="zoom-btn" aria-label="Oddialiť" aria-keyshortcuts="-">−</button>
             <button type="button" id="zoomCenter" class="zoom-btn zoom-btn-center" aria-label="Vycentrovať mapu" title="Vycentrovať mapu">◎</button>
             <button type="button" id="zoomReset" class="zoom-btn zoom-btn-home" aria-label="Obnoviť celú mapu" aria-keyshortcuts="0">⌂</button>
-            <button type="button" id="vucToggle" class="zoom-btn zoom-btn-vuc" aria-pressed="false" aria-label="Zobraziť hranice VÚC">VÚC</button>
+            <button type="button" id="vucToggle" class="zoom-btn zoom-btn-vuc" aria-pressed="false" aria-label="Zobraziť hranice VÚC" data-i18n-skip translate="no">VÚC</button>
           </div>
           <button type="button" id="gameNextFloat" class="map-next-float" hidden>
             <span>Ďalej</span><span aria-hidden="true">→</span>
@@ -601,7 +602,7 @@
           </div>
           <div id="editorTree" class="editor-tree" role="tree" aria-label="Strom objektov mapy"></div>
           <div class="editor-sidebar-foot">
-            <p><b>Oko</b> = viditeľnosť objektu, <b>pin</b> = značka. Kliknutím na farbu zmeníš farbu vetvy alebo objektu.</p>
+            <p data-i18n-html="editorSidebarFoot"><b>Oko</b> = viditeľnosť objektu, <b>pin</b> = značka. Kliknutím na farbu zmeníš farbu vetvy alebo objektu.</p>
             <p class="editor-file-meta" id="editorFileMeta">—</p>
           </div>
         </aside>
@@ -845,9 +846,9 @@
           <div class="shortcut-row"><span class="shortcut-keys"><kbd>Esc</kbd></span><span>Zavrieť dialóg alebo ukončiť rozohranú aktivitu.</span></div>
           <div class="shortcut-row"><span class="shortcut-keys"><kbd>?</kbd></span><span>Otvoriť alebo zavrieť túto nápovedu.</span></div>
           <div class="shortcut-row"><span class="shortcut-keys"><kbd>+</kbd><kbd>−</kbd><kbd>0</kbd></span><span>Priblížiť, oddialiť a zobraziť celú mapu.</span></div>
-          <div class="shortcut-row"><span class="shortcut-keys"><kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd></span><span>Posun mapy; so <kbd>Shift</kbd> rýchlejšie.</span></div>
-          <div class="shortcut-row"><span class="shortcut-keys"><kbd>/</kbd></span><span>Atlas: skočiť do vyhľadávania. <kbd>Esc</kbd> ho vyčistí.</span></div>
-          <div class="shortcut-row"><span class="shortcut-keys"><kbd>Ctrl</kbd><span>+</span><kbd>S</kbd><span>/</span><kbd>Ctrl</kbd><span>+</span><kbd>Shift</kbd><span>+</span><kbd>S</kbd></span><span>Editor: uložiť / uložiť ako. <kbd>Ctrl</kbd>+<kbd>O</kbd> otvorí, <kbd>Ctrl</kbd>+<kbd>N</kbd> vytvorí novú mapu.</span></div>
+          <div class="shortcut-row"><span class="shortcut-keys"><kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd></span><span data-i18n-html="helpShortcutPan">Posun mapy; so <kbd>Shift</kbd> rýchlejšie.</span></div>
+          <div class="shortcut-row"><span class="shortcut-keys"><kbd>/</kbd></span><span data-i18n-html="helpShortcutAtlas">Atlas: skočiť do vyhľadávania. <kbd>Esc</kbd> ho vyčistí.</span></div>
+          <div class="shortcut-row"><span class="shortcut-keys"><kbd>Ctrl</kbd><span>+</span><kbd>S</kbd><span>/</span><kbd>Ctrl</kbd><span>+</span><kbd>Shift</kbd><span>+</span><kbd>S</kbd></span><span data-i18n-html="helpShortcutEditor">Editor: uložiť / uložiť ako. <kbd>Ctrl</kbd>+<kbd>O</kbd> otvorí, <kbd>Ctrl</kbd>+<kbd>N</kbd> vytvorí novú mapu.</span></div>
         </div>
 
         <h3 class="help-heading">Vyskúšaj sa!</h3>
@@ -860,10 +861,10 @@
         <p>Objekt sa objaví v strede mapy. Pretiahni ho na skutočné miesto. Ak je vzdialenosť od správnej polohy menšia ako 15 mapových jednotiek, bod získaš.</p>
 
         <h3 class="help-heading">Editor máp</h3>
-        <p>Nová/Otvoriť/Ulož/Ulož ako pracujú s pôvodnými <b>.mef</b> súbormi. Strom vľavo ovláda viditeľnosť, značky a farby. Kreslenie ponúka čiary, obdĺžniky, elipsy a voľnú kresbu. Export vytvorí PNG alebo JPEG, prípadne môžeš mapu vytlačiť.</p>
+        <p data-i18n-html="helpEditor">Nová/Otvoriť/Ulož/Ulož ako pracujú s pôvodnými <b>.mef</b> súbormi. Strom vľavo ovláda viditeľnosť, značky a farby. Kreslenie ponúka čiary, obdĺžniky, elipsy a voľnú kresbu. Export vytvorí PNG alebo JPEG, prípadne môžeš mapu vytlačiť.</p>
 
         <h3 class="help-heading">Ovládanie mapy</h3>
-        <p>Mapu priblížiš kolieskom myši, štipcom alebo tlačidlami <b>+</b> / <b>−</b>. Tlačidlom <b>⌂</b> obnovíš celú mapu. Posúvaš ju ťahaním prázdneho miesta.</p>
+        <p data-i18n-html="helpMapControls">Mapu priblížiš kolieskom myši, štipcom alebo tlačidlami <b>+</b> / <b>−</b>. Tlačidlom <b>⌂</b> obnovíš celú mapu. Posúvaš ju ťahaním prázdneho miesta.</p>
 
         <h3 class="help-heading">Atlas miest SR</h3>
         <p>Doplnkový atlas všetkých 74 slovenských miest s hľadaním, filtrami a rýchlym tréningom. Neovplyvňuje pôvodné aktivity.</p>
@@ -957,6 +958,38 @@
       <div class="dialog-actions">
         <button type="button" id="classicPromptOk" class="btn-primary">Uložiť</button>
         <button type="button" id="classicPromptCancel" class="btn-soft">Zrušiť</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="settingsOverlay" class="overlay" hidden>
+    <div class="dialog settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="dialog-head">
+        <h2 id="settingsTitle">Nastavenia</h2>
+        <button type="button" id="settingsClose" class="dialog-x" aria-label="Zavrieť">×</button>
+      </div>
+      <div class="dialog-body">
+        <div class="setup-field">
+          <span class="setup-label">Jazyk</span>
+          <div class="segmented settings-languages" role="group" aria-label="Jazyk">
+            <button type="button" class="seg-btn" data-language="auto" aria-pressed="true">
+              <span class="seg-name">Automaticky</span>
+              <span class="seg-count">Auto</span>
+            </button>
+            <button type="button" class="seg-btn" data-language="sk" aria-pressed="false">
+              <span class="seg-name">Slovenčina</span>
+              <span class="seg-count">SK</span>
+            </button>
+            <button type="button" class="seg-btn" data-language="en" aria-pressed="false">
+              <span class="seg-name">English</span>
+              <span class="seg-count">EN</span>
+            </button>
+          </div>
+          <p class="setup-field-hint">Automaticky podľa jazyka prehliadača.</p>
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" id="settingsDone" class="btn-primary">Hotovo</button>
       </div>
     </div>
   </div>
