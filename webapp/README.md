@@ -29,10 +29,14 @@ karta s gradientom:
   gradientov a farebných pruhov na kartách,
 - nadpisy v serifovom písme (Georgia / Palatino), technické štítky a čísla
   v monospace písme,
-- jemné pravidlá, číslované riadky aktivít, rámované mapové listy a súradnicové
+- jemné pravidlá, prehľadné karty aktivít, rámované mapové listy a súradnicové
   popisky namiesto jednotnej mriežky zaoblených boxov,
 - mapové plátno je položené na milimetrovom papieri, takže prázdny priestor
   okolo mapy pôsobí ako pracovná plocha, nie ako chýbajúci obsah,
+- horná lišta s navigáciou a rýchlym **Hrať** tlačidlom zostáva pri scrollovaní
+  poruke; domov je prehľadnejší a kratší,
+- hero používa všeobecnú svetovú mapu, nie jednu konkrétnu krajinu,
+- klikateľný výber mapy otvorí **Vyskúšaj sa!** pre zvolenú mapu,
 - tmavá téma je samostatná kurátorovaná paleta, nie automatické prevrátenie
   stránky.
 
@@ -219,10 +223,18 @@ zavrieť a znova otvoriť bez opustenia hry.
 
 ## Mobilné rozhranie
 
-Na telefóne je zámerne len to podstatné: cieľový objekt s ikonou a typom,
-body, priemer, číslo otázky a jedna akcia. Skryté sú pomocné popisky mapy,
-štítok mapy/mierky, percento zoomu, čas v HUD a duplicitné tlačidlo **Ďalej**
-v hornej lište. Pri hre zostáva väčší priestor pre mapu a menej prekrývania.
+Na telefóne je zámerne len to podstatné: cieľový objekt, body, číslo otázky
+a jedna akcia. Body a otázka sú menšie a sedia v jednom riadku s názvom cieľa;
+priemer, čas, pomocné popisky mapy, štítok mapy/mierky, percento zoomu
+a duplicitné tlačidlo **Ďalej** v hornej lište sú skryté. HUD tak zaberá
+približne 100 px namiesto pôvodných 160–190 px a väčšina obrazovky zostáva mape.
+
+Pri otočení telefónu na šírku sa HUD presunie do **ľavého postranného panelu**
+a mapa vyplní celú zostávajúcu plochu. Rovnaké pravidlo platí pre rýchlu hru aj
+editor, ktorý v landscape zbalí toolbar do jedného riadku.
+
+Každá mapa má tlačidlo **◎ Vycentrovať mapu**: zachová aktuálny zoom a vráti
+mapu do stredu. Tlačidlo **⌂** naďalej zobrazí celú mapu.
 
 ## Klávesové skratky
 
@@ -314,7 +326,7 @@ Počas vývoja bolo overené:
 npm test
 ```
 
-Aktuálne **67 testov, 67 passing**. Testy pokrývajú:
+Aktuálne **69 testov, 69 passing**. Testy pokrývajú:
 
 - pôvodné bodovanie a prahy,
 - výber otázok bez opakovania,
@@ -325,6 +337,9 @@ Aktuálne **67 testov, 67 passing**. Testy pokrývajú:
 - dokumentáciu a `aria-keyshortcuts` pre klávesové skratky,
 - prehľadný HUD úlohy s cieľom, bodmi, priemerom a číslom otázky v oboch
   herných obrazovkách, legendu a čitateľné štítky markerov,
+- klikateľný výber mapy s predvybraním mapy v nastavení aktivity,
+- tlačidlo **◎ Vycentrovať mapu** v klasických hrách, rýchlej hre aj editore,
+- kompaktný mobilný HUD a postranný panel v landscape režime,
 - prítomnosť všetkých 8 máp a presnú zhodu objektov medzi `.mef` a scénami,
 - existenciu všetkých testovacích skupín z `config.xml`,
 - zoznamy máp pre jednotlivé aktivity,
@@ -447,9 +462,19 @@ Posledný redizajn a oprava zoomu pridali:
 - reálne dotykové overenie: ukotvenie pinchu s odchýlkou **0,000025 mapovej
   jednotky**, posun dole **294 px** a hore **316 px** po tom istom pinchi,
 - hero na domovskej stránke spúšťa **Traf sa! — ťažká — 10 otázok** priamo,
+- prehľadnejší domov: kompaktný hero so **všeobecnou svetovou mapou**, jasné
+  CTA, sticky navigácia, rýchle **Hrať** tlačidlo a prehľadné karty aktivít,
+- klikateľný výber mapy otvorí **Vyskúšaj sa!** pre zvolenú mapu,
+- **◎ Vycentrovať mapu** zachová zoom a vráti mapu do stredu; **⌂** zostáva
+  na zobrazenie celej mapy,
+- mobilný portrait HUD je jeden riadok: cieľ + menšie body a číslo otázky;
+  priemer a čas sú skryté,
+- v landscape sa HUD presunie do ľavého postranného panelu, mapa dostane celú
+  zvyšnú plochu a editor zbalí toolbar do jedného riadku,
 - kartografický redizajn domova, hier, nastavení, výsledkov, atlasu, editora,
   dialógov, 404 a pomocných stránok,
-- výsledkové akcie sú na telefóne v prehľadnej 2×2 mriežke,
+- výsledkové akcie sú na telefóne v prehľadnej 2×2 mriežke, v landscape v jednom
+  rade,
 - čitateľné tmavé tlačidlá a mapa ako negatív na tmavej tabuli.
 
 Overených bolo **94 kombinácií aktivita × mapa × test** (61 test, 26 Traf sa!,

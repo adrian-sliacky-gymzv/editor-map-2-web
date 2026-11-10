@@ -1362,6 +1362,14 @@ export class MapView {
     this._applyTransform();
   }
 
+  center() {
+    this._stopMomentum();
+    this._clearSettleAnimation();
+    this.panX = 0;
+    this.panY = 0;
+    this._applyTransform();
+  }
+
   fit() {
     this._clearSettleAnimation();
     this.zoom = 1;

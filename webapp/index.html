@@ -29,178 +29,199 @@
             <img class="brand-logo" src="assets/editormap-logo.png" alt="Logo Editor máp 2" width="44" height="44">
             <div class="brand-copy">
               <h1 id="homeTitle">Editor máp <span>2</span></h1>
-              <p class="brand-kicker">Slovensko · svet · osem máp</p>
+              <p class="brand-kicker">8 máp · 3 hry · 1 editor</p>
             </div>
           </div>
           <nav class="home-nav" aria-label="Sekcie na stránke">
-            <a href="#aktivity">Aktivity</a>
+            <a href="#aktivity">Hry</a>
             <a href="#mapy">Mapy</a>
             <a href="#postup">Postup</a>
           </nav>
-          <button type="button" id="homeHelpBtn" class="icon-btn home-help" aria-label="Ako hrať (?)" title="Ako hrať (?)" aria-keyshortcuts="Shift+/">?</button>
+          <div class="home-header-actions">
+            <button type="button" class="home-header-play" data-classic-mode="distance" data-classic-preset="hero" aria-label="Hrať Traf sa! — ťažká, 10 otázok">
+              Hrať <span aria-hidden="true">→</span>
+            </button>
+            <button type="button" id="homeHelpBtn" class="icon-btn home-help" aria-label="Ako hrať (?)" title="Ako hrať (?)" aria-keyshortcuts="Shift+/">?</button>
+          </div>
         </header>
 
         <section class="hero" aria-labelledby="heroTitle">
           <div class="hero-copy">
-            <p class="hero-kicker"><span class="hero-kicker-rule" aria-hidden="true"></span> Interaktívny atlas · pôvodná hra z roku 2010</p>
-            <h2 id="heroTitle">Nájdi svoje <em>miesto</em> na mape.</h2>
-            <p class="hero-lead">Osem pôvodných máp, tri hry a editor, v ktorom si mapu prekreslíš podľa seba. Bez registrácie, priamo v prehliadači — na počítači aj na telefóne.</p>
+            <p class="hero-kicker"><span class="hero-kicker-rule" aria-hidden="true"></span> Kartografický ateliér · pôvodná hra z roku 2010</p>
+            <h2 id="heroTitle">Mapa, ktorú si <em>zahráš</em>.</h2>
+            <p class="hero-lead">Osem pôvodných máp, tri hry a editor. Vyber si aktivitu nižšie alebo začni odporúčaným tréningom — bez registrácie.</p>
             <div class="hero-actions">
               <button type="button" id="heroPlayBtn" class="btn-primary btn-hero" data-classic-mode="distance" data-classic-preset="hero">
                 <span class="btn-hero-label">Hrať Traf sa!</span>
-                <span class="btn-hero-meta">Ťažká · 10 otázok</span>
+                <span class="btn-hero-meta">Ťažká · 10 otázok · Slovensko</span>
               </button>
-              <a class="btn-text" href="#aktivity">Prezrieť aktivity <span aria-hidden="true">→</span></a>
+              <a class="btn-ghost btn-hero-secondary" href="#aktivity">Vybrať inú aktivitu</a>
             </div>
-            <dl class="hero-facts">
-              <div><dt>8</dt><dd>pôvodných máp</dd></div>
-              <div><dt>1 982</dt><dd>objektov</dd></div>
-              <div><dt>74</dt><dd>miest v atlase</dd></div>
-            </dl>
+            <ul class="hero-quickfacts" aria-label="Rýchle informácie">
+              <li>Bez registrácie</li>
+              <li>Na telefóne aj počítači</li>
+              <li>Pôvodné testy a mapy</li>
+            </ul>
           </div>
 
           <figure class="hero-plate">
             <div class="plate-frame">
               <div class="plate-head">
-                <span>Mapový list 01</span>
-                <span>Slovensko</span>
-                <span class="plate-coords">48° 40′ N / 19° 30′ E</span>
+                <span>Mapový archív</span>
+                <span>8 máp</span>
+                <span class="plate-coords">Slovensko → svet</span>
               </div>
               <div class="plate-map">
-                <img src="assets/slovakia-map.svg" alt="Obrysová mapa Slovenska s riekami" width="993" height="520">
-                <span class="plate-guess" style="left:58%;top:58%" aria-hidden="true"><i></i><b>Tvoj tip</b></span>
-                <span class="plate-pin" style="left:40.3%;top:45.2%" aria-hidden="true"><i></i><b>Banská Bystrica</b></span>
-                <span class="plate-north" aria-hidden="true"><i></i>N</span>
+                <img src="assets/thumbs/svet.png" alt="Mapa sveta — jeden z ôsmich mapových listov" width="520" height="335">
               </div>
               <div class="plate-foot">
-                <span class="plate-key"><i class="key-pin"></i>Správna poloha</span>
-                <span class="plate-key"><i class="key-guess"></i>Tvoj tip</span>
-                <span class="plate-scale"><i></i>1 : 1 000 000</span>
+                <span class="plate-key">8 mapových listov</span>
+                <span class="plate-key">3 hry · 1 editor</span>
+                <span class="plate-scale">1 982 objektov</span>
               </div>
             </div>
             <figcaption class="plate-caption">
-              <span>Vektorová mapa · 993 × 520</span>
-              <span>8 máp · 1 982 objektov</span>
+              <span>Svet · jeden z 8 mapových listov</span>
+              <span>Vektorové mapy</span>
             </figcaption>
           </figure>
         </section>
 
         <section class="activities" id="aktivity" aria-labelledby="activitiesTitle">
-          <header class="section-head">
+          <header class="section-head section-head-compact">
             <div>
-              <p class="section-index">01 / Aktivity</p>
-              <h2 id="activitiesTitle">Tri hry. Jeden editor. Celá mapa.</h2>
+              <p class="section-index">Hry a nástroje</p>
+              <h2 id="activitiesTitle">Vyber si, čo chceš robiť</h2>
             </div>
-            <p class="section-lead">Vyber si spôsob, ktorý ti sedí. Všetko vychádza z pôvodných testov, levelov a bodovania.</p>
+            <p class="section-lead">Každá hra používa rovnaké pôvodné mapy a testy. Editor a atlas sú doplnky, ktoré môžeš použiť kedykoľvek.</p>
           </header>
 
-          <div class="mode-grid activity-list">
-            <article class="activity-row">
-              <span class="activity-num" aria-hidden="true">01</span>
-              <div class="activity-copy">
-                <p class="activity-kicker">Poznávanie</p>
-                <h3>Vyskúšaj sa!</h3>
-                <p>Na mape sa objaví 3, 5 alebo 7 značiek. Jedna patrí zadanému objektu — klikni na tú správnu.</p>
+          <div class="mode-grid home-card-grid">
+            <article class="home-card">
+              <div class="home-card-top">
+                <span class="home-card-tag">Poznávanie</span>
+                <span class="home-card-num" aria-hidden="true">01</span>
               </div>
-              <p class="activity-meta">3 / 5 / 7 možností<br><span>Testy a obtiažnosti z pôvodnej hry</span></p>
-              <button type="button" class="activity-link" data-classic-mode="test" aria-keyshortcuts="1">Hrať <span aria-hidden="true">→</span></button>
+              <h3>Vyskúšaj sa!</h3>
+              <p>Na mape sa objaví 3, 5 alebo 7 značiek. Vyber tú, ktorá patrí zadanému objektu.</p>
+              <div class="home-card-foot">
+                <span>3 / 5 / 7 možností</span>
+                <button type="button" class="home-card-btn" data-classic-mode="test" aria-keyshortcuts="1">Hrať <span aria-hidden="true">→</span></button>
+              </div>
             </article>
 
-            <article class="activity-row">
-              <span class="activity-num" aria-hidden="true">02</span>
-              <div class="activity-copy">
-                <p class="activity-kicker">Presnosť</p>
-                <h3>Traf sa!</h3>
-                <p>Klikni na mapu tam, kde si myslíš, že objekt leží. Body sa počítajú podľa vzdialenosti od správnej polohy.</p>
+            <article class="home-card home-card-featured">
+              <div class="home-card-top">
+                <span class="home-card-tag">Presnosť</span>
+                <span class="home-card-badge">Odporúčaný štart</span>
               </div>
-              <p class="activity-meta">10 otázok · ťažká<br><span>Odporúčaný štart</span></p>
-              <button type="button" class="activity-link activity-link-hot" data-classic-mode="distance" aria-keyshortcuts="2">Hrať <span aria-hidden="true">→</span></button>
+              <h3>Traf sa!</h3>
+              <p>Klikni na mapu tam, kde si myslíš, že objekt leží. Čím bližšie, tým viac bodov.</p>
+              <div class="home-card-foot">
+                <span>Ťažká · 10 otázok</span>
+                <button type="button" class="home-card-btn home-card-btn-light" data-classic-mode="distance" aria-keyshortcuts="2">Hrať <span aria-hidden="true">→</span></button>
+              </div>
             </article>
 
-            <article class="activity-row">
-              <span class="activity-num" aria-hidden="true">03</span>
-              <div class="activity-copy">
-                <p class="activity-kicker">Šikovnosť</p>
-                <h3>Poskladaj!</h3>
-                <p>Objekt sa objaví v strede mapy. Pretiahni ho na skutočné miesto. Rozhoduje pôvodná tolerancia 15 mapových jednotiek.</p>
+            <article class="home-card">
+              <div class="home-card-top">
+                <span class="home-card-tag">Šikovnosť</span>
+                <span class="home-card-num" aria-hidden="true">03</span>
               </div>
-              <p class="activity-meta">Presné umiestnenie<br><span>Tréning orientácie v mape</span></p>
-              <button type="button" class="activity-link" data-classic-mode="puzzle" aria-keyshortcuts="3">Hrať <span aria-hidden="true">→</span></button>
+              <h3>Poskladaj!</h3>
+              <p>Pretiahni objekt z prostriedku mapy na jeho skutočné miesto. Rozhoduje presnosť.</p>
+              <div class="home-card-foot">
+                <span>Tolerancia 15 jednotiek</span>
+                <button type="button" class="home-card-btn" data-classic-mode="puzzle" aria-keyshortcuts="3">Hrať <span aria-hidden="true">→</span></button>
+              </div>
             </article>
 
-            <article class="activity-row activity-row-studio">
-              <span class="activity-num" aria-hidden="true">04</span>
-              <div class="activity-copy">
-                <p class="activity-kicker">Tvorba</p>
-                <h3>Editor máp</h3>
-                <p>Strom objektov, viditeľnosť, farby, vlastné značky, kreslenie, ukladanie <b>.mef</b>, export PNG/JPEG a tlač.</p>
+            <article class="home-card home-card-wide">
+              <div class="home-card-top">
+                <span class="home-card-tag">Tvorba</span>
+                <span class="home-card-num" aria-hidden="true">04</span>
               </div>
-              <p class="activity-meta">8 máp · vrstvy · export<br><span>Plnohodnotný editor</span></p>
-              <button type="button" class="activity-link" data-editor-open aria-keyshortcuts="4">Otvoriť <span aria-hidden="true">→</span></button>
+              <h3>Editor máp</h3>
+              <p>Vrstvy, farby, vlastné značky, kreslenie, ukladanie <b>.mef</b>, export PNG/JPEG a tlač. Všetko na ôsmich mapách.</p>
+              <div class="home-card-foot">
+                <span>8 máp · .mef · PNG/JPEG</span>
+                <button type="button" class="home-card-btn" data-editor-open aria-keyshortcuts="4">Otvoriť editor <span aria-hidden="true">→</span></button>
+              </div>
             </article>
 
-            <article class="activity-row activity-row-studio">
-              <span class="activity-num" aria-hidden="true">05</span>
-              <div class="activity-copy">
-                <p class="activity-kicker">Atlas · bonus</p>
-                <h3>Mestá Slovenska</h3>
-                <p>Všetkých 74 miest v prehľadnom atlase s hľadaním, filtrami, štatistikami a rýchlym tréningom.</p>
+            <article class="home-card">
+              <div class="home-card-top">
+                <span class="home-card-tag">Atlas · bonus</span>
+                <span class="home-card-num" aria-hidden="true">05</span>
               </div>
-              <p class="activity-meta">74 miest · 3 úrovne<br><span>Doplnok nad pôvodnú hru</span></p>
-              <button type="button" id="atlasCardBtn" class="activity-link" aria-keyshortcuts="5">Prezrieť <span aria-hidden="true">→</span></button>
+              <h3>Mestá Slovenska</h3>
+              <p>Všetkých 74 miest v prehľadnom atlase s hľadaním, filtrami a rýchlym tréningom.</p>
+              <div class="home-card-foot">
+                <span>74 miest · 3 úrovne</span>
+                <button type="button" id="atlasCardBtn" class="home-card-btn" aria-keyshortcuts="5">Prezrieť atlas <span aria-hidden="true">→</span></button>
+              </div>
             </article>
           </div>
         </section>
 
         <section class="map-library" id="mapy" aria-labelledby="mapsTitle">
-          <header class="section-head section-head-split">
+          <header class="section-head section-head-compact">
             <div>
-              <p class="section-index">02 / Mapové listy</p>
-              <h2 id="mapsTitle">Osem máp. Jeden spôsob čítania.</h2>
+              <p class="section-index">Mapy</p>
+              <h2 id="mapsTitle">Vyber si mapu</h2>
             </div>
-            <p class="section-lead">Od Slovenska po obe Ameriky. Každá mapa má vlastné objekty, testy a obtiažnosti — presne ako v pôvodnom vydaní.</p>
+            <p class="section-lead">Klikni na mapu a otvorí sa Vyskúšaj sa! s výberom testu. Každá mapa má vlastné objekty, testy a obtiažnosti.</p>
           </header>
           <div class="map-shelf">
             <figure class="map-sheet">
+              <button type="button" class="map-sheet-hit" data-classic-mode="test" data-classic-map="slovensko" aria-label="Otvoriť mapu Slovensko v hre Vyskúšaj sa"></button>
               <div class="map-sheet-img"><img src="assets/thumbs/slovensko.png" alt="Mapa Slovenska" width="520" height="272" loading="lazy"></div>
               <figcaption><b>Slovensko</b><span>Mestá, rieky, vodné nádrže</span></figcaption>
             </figure>
             <figure class="map-sheet">
+              <button type="button" class="map-sheet-hit" data-classic-mode="test" data-classic-map="europa" aria-label="Otvoriť mapu Európa v hre Vyskúšaj sa"></button>
               <div class="map-sheet-img"><img src="assets/thumbs/europa.png" alt="Mapa Európy" width="520" height="470" loading="lazy"></div>
               <figcaption><b>Európa</b><span>Štáty a európske mestá</span></figcaption>
             </figure>
             <figure class="map-sheet">
+              <button type="button" class="map-sheet-hit" data-classic-mode="test" data-classic-map="svet" aria-label="Otvoriť mapu Svet v hre Vyskúšaj sa"></button>
               <div class="map-sheet-img"><img src="assets/thumbs/svet.png" alt="Mapa sveta" width="520" height="335" loading="lazy"></div>
               <figcaption><b>Svet</b><span>Kontinenty a oceány</span></figcaption>
             </figure>
             <figure class="map-sheet">
+              <button type="button" class="map-sheet-hit" data-classic-mode="test" data-classic-map="afrika" aria-label="Otvoriť mapu Afrika v hre Vyskúšaj sa"></button>
               <div class="map-sheet-img"><img src="assets/thumbs/afrika.png" alt="Mapa Afriky" width="520" height="555" loading="lazy"></div>
               <figcaption><b>Afrika</b><span>Štáty, rieky a pohoria</span></figcaption>
             </figure>
             <figure class="map-sheet">
+              <button type="button" class="map-sheet-hit" data-classic-mode="test" data-classic-map="azia" aria-label="Otvoriť mapu Ázia v hre Vyskúšaj sa"></button>
               <div class="map-sheet-img"><img src="assets/thumbs/azia.png" alt="Mapa Ázie" width="520" height="478" loading="lazy"></div>
               <figcaption><b>Ázia</b><span>Najväčší kontinent</span></figcaption>
             </figure>
             <figure class="map-sheet">
+              <button type="button" class="map-sheet-hit" data-classic-mode="test" data-classic-map="australia" aria-label="Otvoriť mapu Austrália v hre Vyskúšaj sa"></button>
               <div class="map-sheet-img"><img src="assets/thumbs/australia.png" alt="Mapa Austrálie" width="520" height="395" loading="lazy"></div>
               <figcaption><b>Austrália</b><span>Kontinent a Oceánia</span></figcaption>
             </figure>
             <figure class="map-sheet">
+              <button type="button" class="map-sheet-hit" data-classic-mode="test" data-classic-map="severna_amerika" aria-label="Otvoriť mapu Severná Amerika v hre Vyskúšaj sa"></button>
               <div class="map-sheet-img"><img src="assets/thumbs/severna_amerika.png" alt="Mapa Severnej Ameriky" width="520" height="516" loading="lazy"></div>
               <figcaption><b>Severná Amerika</b><span>Od Kanady po Panamu</span></figcaption>
             </figure>
             <figure class="map-sheet">
+              <button type="button" class="map-sheet-hit" data-classic-mode="test" data-classic-map="juzna_amerika" aria-label="Otvoriť mapu Južná Amerika v hre Vyskúšaj sa"></button>
               <div class="map-sheet-img"><img src="assets/thumbs/juzna_amerika.png" alt="Mapa Južnej Ameriky" width="520" height="558" loading="lazy"></div>
               <figcaption><b>Južná Amerika</b><span>Andy, Amazonia a juh</span></figcaption>
             </figure>
           </div>
+          <p class="map-shelf-hint">Na telefóne potiahni do strany pre ďalšie mapy.</p>
         </section>
 
         <section class="progress-section" id="postup" aria-labelledby="progressTitle">
-          <header class="section-head section-head-split">
+          <header class="section-head section-head-compact">
             <div>
-              <p class="section-index">03 / Váš postup</p>
-              <h2 id="progressTitle">Rýchly tréning</h2>
+              <p class="section-index">Postup</p>
+              <h2 id="progressTitle">Váš postup</h2>
             </div>
             <p class="section-lead">Štatistiky doplnkového tréningu 74 slovenských miest. Plné aktivity vyššie si vedú vlastné výsledky.</p>
           </header>
@@ -353,7 +374,7 @@
               <span class="mission-stat-label">Výsledok</span>
               <b class="mission-stat-value" aria-label="správne a chyby"><span id="correctValue">0</span><span class="mission-stat-sep">:</span><span id="wrongValue">0</span></b>
             </div>
-            <div class="mission-stat">
+            <div class="mission-stat mission-stat-average">
               <span class="mission-stat-label">Priemer</span>
               <b class="mission-stat-value" id="gameAverageValue">—</b>
             </div>
@@ -404,6 +425,7 @@
           <div class="zoom-controls" role="group" aria-label="Ovládanie mapy">
             <button type="button" id="zoomIn" class="zoom-btn" aria-label="Priblížiť" aria-keyshortcuts="+">+</button>
             <button type="button" id="zoomOut" class="zoom-btn" aria-label="Oddialiť" aria-keyshortcuts="-">−</button>
+            <button type="button" id="zoomCenter" class="zoom-btn zoom-btn-center" aria-label="Vycentrovať mapu" title="Vycentrovať mapu">◎</button>
             <button type="button" id="zoomReset" class="zoom-btn zoom-btn-home" aria-label="Obnoviť celú mapu" aria-keyshortcuts="0">⌂</button>
             <button type="button" id="vucToggle" class="zoom-btn zoom-btn-vuc" aria-pressed="false" aria-label="Zobraziť hranice VÚC">VÚC</button>
           </div>
@@ -465,7 +487,7 @@
               <span class="mission-stat-label">Výsledok</span>
               <b class="mission-stat-value" aria-label="správne a chyby"><span id="classicCorrectValue">0</span><span class="mission-stat-sep">:</span><span id="classicWrongValue">0</span></b>
             </div>
-            <div class="mission-stat">
+            <div class="mission-stat mission-stat-average">
               <span class="mission-stat-label">Priemer</span>
               <b class="mission-stat-value" id="classicAverageValue">—</b>
             </div>
@@ -511,6 +533,7 @@
           <div class="zoom-controls" role="group" aria-label="Ovládanie mapy">
             <button type="button" id="classicZoomIn" class="zoom-btn" aria-label="Priblížiť" aria-keyshortcuts="+">+</button>
             <button type="button" id="classicZoomOut" class="zoom-btn" aria-label="Oddialiť" aria-keyshortcuts="-">−</button>
+            <button type="button" id="classicZoomCenter" class="zoom-btn zoom-btn-center" aria-label="Vycentrovať mapu" title="Vycentrovať mapu">◎</button>
             <button type="button" id="classicZoomFit" class="zoom-btn zoom-btn-home" aria-label="Obnoviť celú mapu" aria-keyshortcuts="0">⌂</button>
             <span class="zoom-value" id="classicZoomValue">100%</span>
           </div>
@@ -589,6 +612,7 @@
               <button type="button" id="editorZoomOut" class="zoom-btn" aria-label="Oddialiť" aria-keyshortcuts="-">−</button>
               <span class="zoom-value" id="editorZoomValue">100%</span>
               <button type="button" id="editorZoomIn" class="zoom-btn" aria-label="Priblížiť" aria-keyshortcuts="+">+</button>
+              <button type="button" id="editorZoomCenter" class="zoom-btn zoom-btn-center" aria-label="Vycentrovať mapu" title="Vycentrovať mapu">◎</button>
               <button type="button" id="editorZoomFit" class="zoom-btn zoom-btn-home" aria-label="Prispôsobiť" aria-keyshortcuts="0">⌂</button>
             </div>
             <div class="editor-view-toggles">

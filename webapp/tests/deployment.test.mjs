@@ -113,10 +113,34 @@ test('keyboard shortcuts are documented and exposed to assistive technology', ()
   assert.match(html, /aria-keyshortcuts="\/"/);
   assert.match(html, /Klávesové skratky/);
   assert.match(html, /class="shortcut-list"/);
-  assert.match(html, /class="activity-row"/);
-  assert.match(html, /class="activity-num"/);
+  assert.match(html, /home-card-grid/);
+  assert.match(html, /class="home-card/);
   assert.match(html, /id="heroPlayBtn"/);
   assert.match(html, /data-classic-preset="hero"/);
+});
+
+test('the map picker opens the setup for the selected map', () => {
+  const html = read('index.html');
+  assert.match(html, /data-classic-map="slovensko"/);
+  assert.match(html, /data-classic-map="australia"/);
+  assert.match(html, /src="assets\/thumbs\/svet\.png"[^>]*alt="Mapa sveta/);
+  const classic = read('js/classic-activities.js');
+  assert.match(classic, /preset\?\.mapKey/);
+  assert.match(classic, /dataset\.classicMap/);
+  assert.match(classic, /keyForConfigMap\(el\) === preset\.mapKey/);
+});
+
+test('every map exposes a recenter control', () => {
+  const html = read('index.html');
+  assert.match(html, /id="classicZoomCenter"/);
+  assert.match(html, /id="zoomCenter"/);
+  assert.match(html, /id="editorZoomCenter"/);
+  assert.match(html, /Vycentrovať mapu/);
+  assert.match(read('js/map-view.js'), /center\(\)\s*\{/);
+  assert.match(read('js/classic-activities.js'), /zoomCenter\?\.addEventListener/);
+  assert.match(read('js/app.js'), /zoomCenter\?\.addEventListener/);
+  assert.match(read('js/editor.js'), /zoomCenter\?\.addEventListener/);
+  assert.match(read('js/map-view.js'), /center\(\)\s*\{/);
 });
 
 test('the hero starts Traf sa on hard with ten questions', () => {
@@ -137,7 +161,8 @@ test('the redesign stays deployment-safe', () => {
   const css = read('redesign.css');
   assert.ok(css.length > 12000);
   assert.match(css, /--display: Georgia/);
-  assert.match(css, /\.activity-row-studio/);
+  assert.match(css, /\.home-card-featured/);
+  assert.match(css, /\.map-sheet-hit/);
   assert.match(css, /prefers-color-scheme: dark/);
   assert.ok(!/#6d28d9|#7c3aed/i.test(css));
   assert.match(html, /id="mapy"/);

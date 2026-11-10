@@ -235,6 +235,8 @@ export async function initActivities() {
       event.preventDefault();
       if (trigger.dataset.classicPreset === 'hero') {
         startHeroGame();
+      } else if (trigger.dataset.classicMap) {
+        openActivitySetup(trigger.dataset.classicMode, { mapKey: trigger.dataset.classicMap });
       } else {
         openActivitySetup(trigger.dataset.classicMode);
       }
@@ -310,6 +312,7 @@ function cacheDom() {
   dom.distanceValue = $('#classicDistanceValue');
   dom.zoomIn = $('#classicZoomIn');
   dom.zoomOut = $('#classicZoomOut');
+  dom.zoomCenter = $('#classicZoomCenter');
   dom.zoomFit = $('#classicZoomFit');
   dom.zoomValue = $('#classicZoomValue');
   dom.loading = $('#classicLoading');
@@ -347,7 +350,12 @@ export async function openActivitySetup(modeKey, preset = null) {
     return;
   }
   const saved = readSetup();
-  SETUP.mapIndex = clamp(preset?.mapIndex ?? saved.mapIndex ?? 0, 0, SETUP.mapList.length - 1);
+  let mapIndex = clamp(preset?.mapIndex ?? saved.mapIndex ?? 0, 0, SETUP.mapList.length - 1);
+  if (preset?.mapKey) {
+    const found = SETUP.mapList.findIndex((el) => classicData.keyForConfigMap(el) === preset.mapKey);
+    if (found >= 0) mapIndex = found;
+  }
+  SETUP.mapIndex = mapIndex;
   SETUP.testIndex = preset?.testIndex ?? saved.testIndex ?? 0;
   SETUP.levelIndex = preset?.levelIndex ?? saved.levelIndex ?? 0;
   SETUP.numQ = preset?.numQ ?? saved.numQ ?? 3;
@@ -1813,6 +1821,7 @@ function bindGameEvents() {
   dom.homeBtn?.addEventListener('click', () => endActivity());
   dom.zoomIn.addEventListener('click', () => GAME.mapView?.zoomIn());
   dom.zoomOut.addEventListener('click', () => GAME.mapView?.zoomOut());
+  dom.zoomCenter?.addEventListener('click', () => GAME.mapView?.center());
   dom.zoomFit.addEventListener('click', () => GAME.mapView?.fit());
   document.addEventListener('keydown', (event) => {
     if (dom.classicScreen.hidden) return;

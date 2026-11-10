@@ -133,6 +133,7 @@ function cacheDom() {
   D.drawTools = $$Deep('.draw-btn[data-draw-tool]');
   D.zoomIn = $('#editorZoomIn');
   D.zoomOut = $('#editorZoomOut');
+  D.zoomCenter = $('#editorZoomCenter');
   D.zoomFit = $('#editorZoomFit');
   D.zoomValue = $('#editorZoomValue');
   D.mapHost = $('#editorMapHost');
@@ -1607,6 +1608,7 @@ function bindToolbar() {
   });
   D.zoomIn.addEventListener('click', () => E.mapView?.zoomIn());
   D.zoomOut.addEventListener('click', () => E.mapView?.zoomOut());
+  D.zoomCenter?.addEventListener('click', () => E.mapView?.center());
   D.zoomFit.addEventListener('click', () => E.mapView?.fit());
 }
 

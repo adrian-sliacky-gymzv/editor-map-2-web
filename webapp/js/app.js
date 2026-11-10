@@ -125,6 +125,7 @@ const dom = {
   mapTag: $('#mapTag'),
   zoomIn: $('#zoomIn'),
   zoomOut: $('#zoomOut'),
+  zoomCenter: $('#zoomCenter'),
   zoomReset: $('#zoomReset'),
   vucToggle: $('#vucToggle'),
 
@@ -1229,6 +1230,12 @@ function setView(view) {
   applyView();
 }
 
+function recenterView() {
+  clearViewSettle();
+  state.view = clampView({ ...state.view, panX: 0, panY: 0 });
+  applyView();
+}
+
 function zoomAt(clientX, clientY, factor) {
   const viewport = dom.mapViewport.getBoundingClientRect();
   if (viewport.width < 2 || viewport.height < 2) return;
@@ -1747,6 +1754,7 @@ function bindGameEvents() {
 function bindMapEvents() {
   dom.zoomIn.addEventListener('click', () => zoomFromButton(1.45));
   dom.zoomOut.addEventListener('click', () => zoomFromButton(1 / 1.45));
+  dom.zoomCenter?.addEventListener('click', recenterView);
   dom.zoomReset.addEventListener('click', () => setView({ zoom: 1, panX: 0, panY: 0 }));
 
   dom.vucToggle.addEventListener('click', () => {
