@@ -114,6 +114,7 @@ const GAME = {
   puzzleOrig: null,
   puzzlePrevious: null,
   lastResult: null,
+  loadToken: 0,
 };
 
 const dom = {};
@@ -475,6 +476,7 @@ function changeNumQ(delta) {
 export async function startActivityGame(params) {
   const mode = MODES[params.mode];
   if (!mode) return;
+  const loadToken = ++GAME.loadToken;
   await classicData.init();
   const list = childrenByTag(classicData.cfgEl(mode.listName), 'map');
   let mapEl = null;
@@ -555,6 +557,7 @@ export async function startActivityGame(params) {
       classicData.getMefDocument(mapKey),
       classicData.getSceneText(mapKey),
     ]);
+    if (loadToken !== GAME.loadToken) return;
     GAME.mapDoc = doc;
 
     if (GAME.mapView) GAME.mapView.destroy();
@@ -568,6 +571,11 @@ export async function startActivityGame(params) {
     });
     GAME.mapView.setMarksVisible(true);
     await GAME.mapView.load(mapDef, doc, scene);
+    if (loadToken !== GAME.loadToken) {
+      GAME.mapView?.destroy();
+      GAME.mapView = null;
+      return;
+    }
     requestAnimationFrame(() => GAME.mapView.layout());
 
     const baseLabels = visibleLabels(mapEl, testEl, null);
@@ -594,9 +602,10 @@ export async function startActivityGame(params) {
     // For test/puzzle the pointer is used for zooming/panning; the distance
     // mode receives clean map clicks.
     GAME.mapView.mapClickHandler = params.mode === 'distance' ? onDistanceClick : null;
-    setLoading(false);
+    if (loadToken === GAME.loadToken) setLoading(false);
   } catch (error) {
     console.error(error);
+    if (loadToken !== GAME.loadToken) return;
     setLoading(false);
     toast(`Mapu sa nepodarilo načítať: ${error.message}`, 'error');
     GAME.active = false;
@@ -1282,6 +1291,7 @@ async function endActivity() {
 }
 
 export function goHome() {
+  GAME.loadToken += 1;
   stopClock();
   GAME.active = false;
   GAME.finalShown = false;

@@ -78,6 +78,7 @@ const E = {
   loading: false,
   defaultDocumentTitle: document.title,
   focusEntity: null,
+  loadToken: 0,
 };
 
 /* ------------------------------------------------------------------------- */
@@ -227,9 +228,11 @@ async function loadNewMap(key, { initial = false } = {}) {
     toast('Neznáma mapa.', 'error');
     return;
   }
+  const loadToken = ++E.loadToken;
   setLoading(true, `Načítavam ${def.label}…`);
   try {
     const doc = await classicData.getMefDocument(key);
+    if (loadToken !== E.loadToken) return;
     E.doc = doc;
     E.mapKey = key;
     E.mapDef = def;
@@ -242,16 +245,18 @@ async function loadNewMap(key, { initial = false } = {}) {
     D.treeSearch.value = '';
     ensureDrawingList();
     await mountDocument();
+    if (loadToken !== E.loadToken) return;
     try {
       localStorage.setItem(LAST_MAP_KEY, key);
     } catch {}
     updateDocumentChrome();
     if (!initial) toast(`Nová mapa: ${def.label}`, 'success');
   } catch (error) {
+    if (loadToken !== E.loadToken) return;
     console.error(error);
     toast(`Mapu sa nepodarilo načítať: ${error.message}`, 'error');
   } finally {
-    setLoading(false);
+    if (loadToken === E.loadToken) setLoading(false);
   }
 }
 
@@ -307,6 +312,7 @@ async function openFileFromFile(file, handle) {
   const key = classicData.keyForMefMapName(mapName);
   if (!key) throw new Error(`Mapa „${mapName}“ nie je podporovaná.`);
   const def = classicData.mapDef(key);
+  const loadToken = ++E.loadToken;
   setLoading(true, `Otváram ${file.name}…`);
   try {
     E.doc = doc;
@@ -321,13 +327,14 @@ async function openFileFromFile(file, handle) {
     D.treeSearch.value = '';
     ensureDrawingList();
     await mountDocument();
+    if (loadToken !== E.loadToken) return;
     try {
       localStorage.setItem(LAST_MAP_KEY, key);
     } catch {}
     updateDocumentChrome();
     toast(`Otvorené: ${E.filename}`, 'success');
   } finally {
-    setLoading(false);
+    if (loadToken === E.loadToken) setLoading(false);
   }
 }
 
@@ -343,6 +350,7 @@ function ensureDrawingList() {
 }
 
 async function mountDocument() {
+  const loadToken = E.loadToken;
   const key = E.mapKey || classicData.keyForMefMapName(E.doc.documentElement.getAttribute('mapName'));
   if (!key) throw new Error('Nepodarilo sa určiť typ mapy.');
   E.mapKey = key;
@@ -351,19 +359,27 @@ async function mountDocument() {
   if (!mapDef) throw new Error('Mapa nie je v zozname máp.');
 
   const scene = await classicData.getSceneText(key);
+  if (loadToken !== E.loadToken) return;
   if (E.mapView) E.mapView.destroy();
-  E.mapView = new MapView(D.mapHost, {
+  const view = new MapView(D.mapHost, {
     interaction: 'pan',
     paddingX: 28,
     paddingY: 28,
     onZoom: updateZoomLabel,
   });
-  await E.mapView.load(mapDef, E.doc, scene);
+  E.mapView = view;
+  await view.load(mapDef, E.doc, scene);
+  if (loadToken !== E.loadToken) {
+    view.destroy();
+    if (E.mapView === view) E.mapView = null;
+    return;
+  }
   const list = ensureDrawingList();
-  E.mapView.setDrawingList(list);
-  E.mapView.setMarksVisible(E.showMarks);
-  E.mapView.setDrawingsVisible(E.showDrawings);
-  E.mapView.applyDocument();
+  view.setDrawingList(list);
+  view.setMarksVisible(E.showMarks);
+  view.setDrawingsVisible(E.showDrawings);
+  view.applyDocument();
+  if (loadToken !== E.loadToken) return;
   E.treeRoot = firstChildByTag(E.doc.documentElement, 'nodelist') || E.doc.documentElement;
   E.expanded = new Set([E.treeRoot]);
   E.rowByNode.clear();
@@ -909,12 +925,9 @@ function focusNode(node) {
   }
   const entry = E.rowByNode.get(node);
   if (entry?.childrenEl && !E.expanded.has(node)) toggleExpanded(node, true);
-  const marks = E.markByNode.get(node);
-  if (marks && E.mapView) {
-    E.mapView.setZoom(Math.max(E.mapView.zoom, 1.7));
-    E.mapView.panX = 0;
-    E.mapView.panY = 0;
-    E.mapView._applyTransform();
+  const mark = E.markByNode.get(node);
+  if (mark && E.mapView) {
+    E.mapView.focusPoint(mark.x, mark.y, 1.7);
   }
 }
 

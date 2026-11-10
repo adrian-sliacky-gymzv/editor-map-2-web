@@ -581,18 +581,20 @@ export class MapView {
     if (mark) this._editMarkLabel(mark);
   }
 
-  focusEntity(name, zoomAtLeast = 2.2) {
-    const bbox = this.entityBBox(name);
-    if (!bbox) return;
+  focusPoint(cx, cy, zoomAtLeast = 2.2) {
     if (this.zoom < zoomAtLeast) this.setZoom(zoomAtLeast);
     const scale = this.fitScale * this.zoom;
     const rect = this.viewport.getBoundingClientRect();
-    const cx = bbox.x + bbox.width / 2;
-    const cy = bbox.y + bbox.height / 2;
     this.panX = rect.width / 2 - this.baseX - cx * scale;
     this.panY = rect.height / 2 - this.baseY - cy * scale;
     this._clampPan();
     this._applyTransform();
+  }
+
+  focusEntity(name, zoomAtLeast = 2.2) {
+    const bbox = this.entityBBox(name);
+    if (!bbox) return;
+    this.focusPoint(bbox.x + bbox.width / 2, bbox.y + bbox.height / 2, zoomAtLeast);
   }
 
   _editMarkLabel(mark) {

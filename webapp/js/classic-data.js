@@ -19,6 +19,7 @@ const cache = {
 };
 
 const listeners = new Set();
+let initPromise = null;
 
 export const classicData = {
   config: null,
@@ -27,25 +28,35 @@ export const classicData = {
   ready: false,
 
   async init() {
-    const [configText, mapsJson] = await Promise.all([
-      fetchText(`${DATA_ROOT}config.xml`),
-      fetchJson(`${DATA_ROOT}maps.json`),
-    ]);
-    cache.configText = configText;
-    // The original file contains a malformed XML declaration (`<?xmlversion`).
-    // Browsers reject it; the shipped copy is valid, but this keeps the loader
-    // tolerant for re-opened original files too.
-    const repaired = configText.replace(/<\?xmlversion/i, '<?xml version');
-    const doc = parseXml(repaired, 'config.xml');
-    const root = doc.documentElement;
-    if (!root || root.nodeName !== 'config') throw new Error('Neplatný config.xml');
+    if (classicData.ready) return classicData;
+    if (initPromise) return initPromise;
+    initPromise = (async () => {
+      const [configText, mapsJson] = await Promise.all([
+        fetchText(`${DATA_ROOT}config.xml`),
+        fetchJson(`${DATA_ROOT}maps.json`),
+      ]);
+      cache.configText = configText;
+      // The original file contains a malformed XML declaration (`<?xmlversion`).
+      // Browsers reject it; the shipped copy is valid, but this keeps the loader
+      // tolerant for re-opened original files too.
+      const repaired = configText.replace(/<\?xmlversion/i, '<?xml version');
+      const doc = parseXml(repaired, 'config.xml');
+      const root = doc.documentElement;
+      if (!root || root.nodeName !== 'config') throw new Error('Neplatný config.xml');
 
-    classicData.config = doc;
-    classicData.maps = mapsJson;
-    classicData.mapByKey = new Map(mapsJson.map((m) => [m.key, m]));
-    classicData.ready = true;
-    listeners.forEach((fn) => fn(classicData));
-    return classicData;
+      classicData.config = doc;
+      classicData.maps = mapsJson;
+      classicData.mapByKey = new Map(mapsJson.map((m) => [m.key, m]));
+      classicData.ready = true;
+      listeners.forEach((fn) => fn(classicData));
+      return classicData;
+    })();
+    try {
+      return await initPromise;
+    } catch (error) {
+      initPromise = null;
+      throw error;
+    }
   },
 
   onReady(fn) {
