@@ -407,6 +407,11 @@
     background: linear-gradient(#243a5a, #192a43);
   }
 
+  .stepper {
+    background: #0d1a2b;
+    border-color: #344863;
+  }
+
   .step-value {
     background: #0d1a2b;
     border-color: #344863;
