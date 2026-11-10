@@ -3,10 +3,14 @@
   "version": "2.0.0",
   "private": true,
   "type": "module",
-  "description": "Editor máp 2 — kompletná webová reimplementácia: Vyskúšaj sa!, Traf sa!, Poskladaj!, editor máp, 8 pôvodných máp a atlas 74 slovenských miest.",
+  "description": "Editor máp 2 — kompletná webová reimplementácia: Vyskúšaj sa!, Traf sa!, Poskladaj!, editor máp, 8 pôvodných máp a atlas 74 slovenských miest. Slovak and English UI.",
   "scripts": {
     "start": "node server.mjs",
-    "test": "node --test \"tests/*.test.mjs\""
+    "preview": "node server.mjs",
+    "lint:js": "node scripts/check.mjs",
+    "test": "node --test \"tests/*.test.mjs\"",
+    "test:watch": "node --test --watch \"tests/*.test.mjs\"",
+    "verify": "npm run lint:js && npm test"
   },
   "engines": {
     "node": ">=18"

@@ -5,7 +5,8 @@ Live application: **https://em.adriansliacky.sk/**
 A non-commercial, static web reimplementation of the original Slovak game
 **Editor máp 2** (2010). It preserves the original eight maps, 1,982 geographic
 objects, tests, difficulty levels and scoring, and adds a modern editor, a city
-atlas, responsive touch controls and a curated dark theme.
+atlas, responsive touch controls, a curated dark theme and a complete English
+interface alongside the original Slovak.
 
 The project is plain HTML, CSS and JavaScript. There is no framework, no
 database, no backend and no build step.
@@ -29,6 +30,17 @@ database, no backend and no build step.
 
 All activities support the original question counts, levels, timer and result
 messages. The result card can be closed and reopened without leaving the game.
+
+### Languages
+
+- Slovak and English UI, including game messages, result cards, editor labels,
+  help and accessibility labels.
+- **Automatic** language detection on the first visit: Slovak browsers get
+  Slovak, every other browser gets English.
+- A language selector is available from the **⚙ Settings** button on the home
+  header. The choice is stored locally.
+- Original map object names remain in their original Slovak form; the map data
+  itself is unchanged.
 
 ### Map editor
 
@@ -82,10 +94,12 @@ LAN address for testing on a phone on the same Wi-Fi network.
 Do not open `index.html` through `file://`; ES modules, fetches and SVG scenes
 require an HTTP server.
 
-Run the test suite from `webapp/`:
+Run the test suite and the syntax check from `webapp/`:
 
 ```bash
-npm test
+npm test          # Node test suite
+npm run lint:js   # parse every JavaScript module
+npm run verify    # lint + tests
 ```
 
 ---
@@ -111,6 +125,9 @@ webapp/
 │  ├─ classic-data.js         – config.xml, .mef and XML helpers
 │  ├─ classic-ui.js           – overlays, toasts and confirmations
 │  ├─ classic-activities.js   – the three original activities
+│  ├─ quiz-selection.js       – original group cycling, targets and candidates
+│  ├─ i18n.js                 – language detection, DOM localizer and helpers
+│  ├─ translations.js         – Slovak → English UI, help and config messages
 │  └─ editor.js               – tree, colours, marks, drawing, files, export
 ├─ data/
 │  ├─ config.xml              – original activity/test configuration
@@ -123,8 +140,9 @@ webapp/
 │  ├─ slovakia-map-vuc.svg    – map with regional boundaries
 │  ├─ editormap-logo.png
 │  └─ icon.svg
-├─ help/                      – original help pages
+├─ help/                      – original help pages (Slovak)
 ├─ tests/                     – Node test suite
+├─ scripts/check.mjs          – JavaScript syntax verification
 ├─ .nojekyll                  – disables Jekyll for Pages
 ├─ server.mjs                 – local/LAN preview server
 ├─ manifest.webmanifest
@@ -134,6 +152,7 @@ webapp/
 The repository root also contains:
 
 - `README.md` — bilingual, layperson-friendly project overview
+- `DEVELOPMENT.md` — local preview, verification and approval-based release flow
 - `DEPLOYMENT.md` — GitHub Pages deployment guide
 - `CUSTOM_DOMAIN.md` — custom-domain guide for `adriansliacky.sk`
 - `screenshots/` — README illustrations
@@ -181,9 +200,11 @@ only after the user zooms in.
 
 - **Portrait** — compact one-row HUD: target, points and question. Average and
   time are hidden. The map controls remain bottom-right.
-- **Landscape** — the HUD moves to a left side rail and the map gets the full
-  remaining height. This applies to classic activities, the quick game and the
-  editor (which compacts its toolbar).
+- **Landscape** — the HUD moves to a compact left side rail
+  (`clamp(156px, 20vw, 196px)`) and the map gets the full remaining height. The
+  mission, points/question counters and controls stay readable at 568×320.
+  This applies to classic activities, the quick game and the editor (which
+  compacts its toolbar).
 - **Safe areas** — controls respect `env(safe-area-inset-*)`.
 
 ---
@@ -210,7 +231,33 @@ open.
 
 ---
 
-## 7. Deep links
+## 7. Languages
+
+The source language is Slovak. English is applied by
+[`js/i18n.js`](js/i18n.js) and the dictionary in
+[`js/translations.js`](js/translations.js).
+
+- The stored preference is `auto`, `sk` or `en` in
+  `localStorage` under `editorMap2.language`.
+- **Auto** resolves to Slovak only when the browser language starts with `sk`;
+  all other languages get English.
+- Static markup is localised through exact source-string keys and, for mixed
+  inline markup, `data-i18n-html` attributes.
+- Dynamically generated game/editor text is translated by the same dictionary,
+  with a small set of patterns and `t()` templates for sentences containing
+  numbers or names.
+- Original `config.xml` game messages have explicit English equivalents in
+  `GAME_MESSAGES_EN`; the original map data and object names are never modified.
+- The `<html lang>`, document title, meta description, ARIA labels and control
+  tooltips all follow the selected language.
+
+To add a new UI string, put the exact Slovak source in `EN` (or a mixed-markup
+version in `EN_HTML`). If it contains a number or a name, add a pattern in
+`translateCore()` or an `EN_TEMPLATES` entry and call `t()`.
+
+---
+
+## 8. Deep links
 
 - `/?mode=test` — open the setup for **Vyskúšaj sa!**
 - `/?mode=distance&map=svet` — open the setup for **Traf sa!** on the world map
@@ -224,7 +271,7 @@ Supported map keys: `slovensko`, `svet`, `europa`, `afrika`, `azia`,
 
 ---
 
-## 8. Persistence and privacy
+## 9. Persistence and privacy
 
 - Activity setup, the last editor map and quick-game statistics are stored in
   `localStorage` in the browser.
@@ -234,7 +281,7 @@ Supported map keys: `slovensko`, `svet`, `europa`, `afrika`, `azia`,
 
 ---
 
-## 9. Accessibility, themes and responsive design
+## 10. Accessibility, themes and responsive design
 
 - Semantic landmarks, visible focus rings and keyboard operation.
 - `prefers-color-scheme` light/dark themes; the dark theme uses a dark map
@@ -250,15 +297,17 @@ Supported map keys: `slovensko`, `svet`, `europa`, `afrika`, `azia`,
 
 ---
 
-## 10. Tests and QA
+## 11. Tests and QA
 
 ```bash
 npm test
 ```
 
-Current status: **69 tests, 69 passing**. Coverage includes:
+Current status: **92 tests, 92 passing**. Coverage includes:
 
-- original scoring, feedback thresholds and puzzle tolerance;
+- original scoring, per-map maximum distance and puzzle tolerance;
+- original quiz group cycling, unused targets and candidate sampling;
+- byte-for-byte `.mef` parity and semantic `config.xml` parity with `software/`;
 - question selection and difficulty pools;
 - pinch/zoom/pan mathematics and the locked fitted map;
 - map dimensions and all eight maps;
@@ -266,6 +315,7 @@ Current status: **69 tests, 69 passing**. Coverage includes:
 - map picker and activity presets;
 - recenter controls;
 - statistics and city training;
+- Slovak/English detection, exact translations, plurals and dynamic sentences;
 - relative paths, manifest, help pages and GitHub Pages workflow;
 - the `em.adriansliacky.sk` CNAME and custom-domain deployment;
 - responsive and dark-theme source guards.
@@ -277,7 +327,7 @@ pinch anchoring, panning in both directions, inertia and the fixed fitted view.
 
 ---
 
-## 11. Deployment
+## 12. Deployment
 
 The project is deployed with GitHub Actions to GitHub Pages. The workflow is
 [`../.github/workflows/pages.yml`](../.github/workflows/pages.yml) and publishes
@@ -289,9 +339,12 @@ See [`DEPLOYMENT.md`](../DEPLOYMENT.md) for the complete deployment guide and
 A push to `master` or `main` triggers a new deployment. The site remains a
 plain static site; no server is required.
 
+Local changes are previewed first and deployed only after approval. The full
+loop is documented in [`../DEVELOPMENT.md`](../DEVELOPMENT.md).
+
 ---
 
-## 12. Credits and licence
+## 13. Credits and licence
 
 Original application: **Editor máp 2.0** (mxm.blindmaps), 2010.
 
@@ -302,5 +355,5 @@ Original application: **Editor máp 2.0** (mxm.blindmaps), 2010.
 This is a non-commercial educational reimplementation. Original names, map
 data and trademarks remain the property of their respective authors. The
 original application and its outputs are subject to the original educational
-licence; see the in-app **O aplikácii** section and the original help pages for
+licence; see the in-app **About** section and the original help pages for
 details.

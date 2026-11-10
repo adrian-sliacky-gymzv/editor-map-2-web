@@ -32,8 +32,9 @@ The green button on the homepage starts a recommended game immediately: **Traf s
 - **Eight original maps** and 1,982 geographic objects.
 - **Map editor** with layers, colours, custom labels, freehand and shape drawing, `.mef` save/open, PNG/JPEG export and printing.
 - **City atlas** of all 74 Slovak cities with search, filters, statistics and quick training.
+- **Bilingual interface**: Slovak and English, automatic browser-language detection on the first visit and a language selector in Settings.
 - **Mobile-first controls**: pinch zoom, one-finger pan after zooming, double-tap zoom, inertia, a dedicated recenter button and a locked full-map view.
-- **Portrait and landscape layouts**: in landscape the game controls move to a side panel and the map gets the full height.
+- **Portrait and landscape layouts**: in landscape the game controls move to a compact side rail (156–196 px) and the map gets the full height.
 - **Light and dark themes**, keyboard shortcuts and an accessible focus order.
 - **Static site** — no backend, database, tracking or build server.
 
@@ -61,6 +62,7 @@ The green button on the homepage starts a recommended game immediately: **Traf s
 - The site is deployed from the `webapp/` folder with GitHub Actions to GitHub Pages.
 - Node.js 18+ is only needed for local development.
 - Full technical documentation: [`webapp/README.md`](webapp/README.md) (English).
+- Development and preview workflow: [`DEVELOPMENT.md`](DEVELOPMENT.md).
 - Deployment guide: [`DEPLOYMENT.md`](DEPLOYMENT.md) (English).
 - Custom domain guide: [`CUSTOM_DOMAIN.md`](CUSTOM_DOMAIN.md) (English).
 
@@ -100,8 +102,9 @@ Zelené tlačidlo na domovskej stránke hneď spustí odporúčanú hru: **Traf 
 - **Osem pôvodných máp** a 1 982 geografických objektov.
 - **Editor máp** s vrstvami, farbami, vlastnými popiskami, kreslením, ukladaním `.mef`, exportom PNG/JPEG a tlačou.
 - **Atlas 74 slovenských miest** s hľadaním, filtrami, štatistikami a rýchlym tréningom.
+- **Dvojjazyčné rozhranie**: slovenčina a angličtina, automatické rozpoznanie jazyka prehliadača pri prvej návšteve a výber jazyka v nastaveniach.
 - **Ovládanie na mobil**: pinch zoom, posun po priblížení, dvojité ťuknutie, zotrvačnosť, tlačidlo na vycentrovanie a pevná mapa pri predvolenom oddialení.
-- **Portrait aj landscape**: v landscape sa ovládanie presunie do bočného panelu a mapa dostane celú výšku.
+- **Portrait aj landscape**: v landscape sa ovládanie presunie do kompaktného bočného panelu (156–196 px) a mapa dostane celú výšku.
 - **Svetlá a tmavá téma**, klávesové skratky a prístupný fokus.
 - **Statická stránka** — bez servera, databázy, sledovania a bez build kroku.
 
@@ -115,6 +118,7 @@ Rovnaká galéria ako v anglickej časti je v priečinku [`screenshots/`](screen
 - Nasadenie z priečinka `webapp/` cez GitHub Actions na GitHub Pages.
 - Node.js 18+ je potrebný len na lokálny vývoj.
 - Technická dokumentácia: [`webapp/README.md`](webapp/README.md) (anglicky).
+- Vývoj a lokálny náhľad: [`DEVELOPMENT.md`](DEVELOPMENT.md).
 - Návod na nasadenie: [`DEPLOYMENT.md`](DEPLOYMENT.md) (anglicky).
 - Vlastná doména: [`CUSTOM_DOMAIN.md`](CUSTOM_DOMAIN.md) (anglicky).
 

@@ -1,7 +1,7 @@
 {
   "name": "Editor máp 2 — kompletná webová verzia",
   "short_name": "Editor máp 2",
-  "description": "Vyskúšaj sa!, Traf sa!, Poskladaj! a plnohodnotný editor na všetkých ôsmich pôvodných mapách. Plus atlas 74 slovenských miest.",
+  "description": "Vyskúšaj sa!, Traf sa!, Poskladaj! a plnohodnotný editor na všetkých ôsmich pôvodných mapách. / Test yourself!, Aim!, Assemble! and a full editor on all eight original maps. Plus an atlas of 74 Slovak cities.",
   "lang": "sk",
   "start_url": "./",
   "scope": "./",

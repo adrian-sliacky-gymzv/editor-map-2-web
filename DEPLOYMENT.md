@@ -19,6 +19,9 @@ across deployments.
 
 ## Updating the live site
 
+Changes are first verified and previewed locally. Push only after the preview
+has been approved; see [`DEVELOPMENT.md`](DEVELOPMENT.md).
+
 Every push to `master` (or `main`) rebuilds and redeploys the site:
 
 ```bash
