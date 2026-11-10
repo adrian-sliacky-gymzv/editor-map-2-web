@@ -1158,6 +1158,8 @@ function clampView(view) {
   const viewport = dom.mapViewport.getBoundingClientRect();
   const displayWidth = state.stage.w * zoom;
   const displayHeight = state.stage.h * zoom;
+  // The fitted map is fixed. Panning becomes available only after zooming in.
+  if (zoom <= 1.001) return { zoom, panX: 0, panY: 0 };
   // Keep a generous part of the map reachable in every direction so a pan
   // never stops just because a pinch left the anchor near an edge.
   const keepX = Math.min(140, displayWidth * 0.4, viewport.width * 0.3);
@@ -1177,6 +1179,7 @@ function elasticView(view) {
   const viewport = dom.mapViewport.getBoundingClientRect();
   const displayWidth = state.stage.w * zoom;
   const displayHeight = state.stage.h * zoom;
+  if (zoom <= 1.001) return { zoom, panX: 0, panY: 0 };
   const keepX = Math.min(140, displayWidth * 0.4, viewport.width * 0.3);
   const keepY = Math.min(140, displayHeight * 0.4, viewport.height * 0.3);
   const maxPanX = Math.max(0, (displayWidth + viewport.width) / 2 - keepX);

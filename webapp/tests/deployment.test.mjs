@@ -142,7 +142,10 @@ test('every map exposes a recenter control', () => {
   assert.match(read('js/editor.js'), /zoomCenter\?\.addEventListener/);
   const mapView = read('js/map-view.js');
   assert.match(mapView, /center\(\)\s*\{[\s\S]*?this\.zoom = 1;[\s\S]*?this\.panX = 0;/);
-  assert.match(read('js/app.js'), /function recenterView\(\)[\s\S]*?zoom: 1[\s\S]*?panX: 0/);
+  assert.match(mapView, /this\.zoom <= 1\.001\) return \{ maxX: 0, maxY: 0 \}/);
+  const app = read('js/app.js');
+  assert.match(app, /function recenterView\(\)[\s\S]*?zoom: 1[\s\S]*?panX: 0/);
+  assert.match(app, /if \(zoom <= 1\.001\) return \{ zoom, panX: 0, panY: 0 \}/);
 });
 
 test('the hero starts Traf sa on hard with ten questions', () => {

@@ -1078,6 +1078,16 @@ export class MapView {
       this.panning.lastTime = now;
     }
     if (this.panning.moved && this.interaction !== 'draw') {
+      if (this.zoom <= 1.001) {
+        // The fitted map is a fixed plate. Keep the tap/drag guard active so
+        // the gesture cannot count as an answer, but do not move the map.
+        this.panX = 0;
+        this.panY = 0;
+        this._velocityX = 0;
+        this._velocityY = 0;
+        this._requestRender();
+        return;
+      }
       const beforeX = this.panX;
       const beforeY = this.panY;
       const elapsed = Math.max(8, now - (this.panning.lastTime || now - 16));
@@ -1383,6 +1393,8 @@ export class MapView {
 
   _panLimits() {
     if (!this.lastLayout.w) return { maxX: 0, maxY: 0 };
+    // The default fitted view is fixed; panning starts only after zooming in.
+    if (this.zoom <= 1.001) return { maxX: 0, maxY: 0 };
     const scale = this.fitScale * this.zoom;
     const mapW = this.W * scale;
     const mapH = this.H * scale;

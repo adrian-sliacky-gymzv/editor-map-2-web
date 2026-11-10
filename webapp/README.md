@@ -184,10 +184,10 @@ mapa. Kliknutím na oko meníš viditeľnosť, na pin viditeľnosť značky, na 
 
 Mapy sa ovládajú rovnako v hrách aj v editore:
 
-- **Jeden prst / ťahanie myšou** posúva mapu pri každom priblížení. Pri mierke
-  „celá mapa“ sa môže pohybovať v inom voľnom priestore výrezu, takže sa dá
-  dostať bližšie k okraju aj bez zoomu; tlačidlo **domov** ju vráti do stredu.
-  Posun sa nikdy nezasekne o falošný 60 px limit.
+- **Jeden prst / ťahanie myšou** posúva mapu až po priblížení. Predvolená
+  mierka „celá mapa“ je pevná a vycentrovaná — posun sa v nej vôbec nespustí.
+  Po priblížení sa mapa posúva plynulo; tlačidlo **◎** alebo **⌂** ju vráti
+  do stredu a obnoví celú mapu. Posun sa nikdy nezasekne o falošný 60 px limit.
 - **Dva prsty** plynulo približujú a zároveň posúvajú mapu. Zoom je ukotvený
   na stred medzi prstami, takže obsah pod prstami neujíde. Pinch funguje aj
   vtedy, keď jeden alebo oba prsty začnú priamo na značke, výsledkovom markere
@@ -420,7 +420,7 @@ Následný mobilný a gestový audit pridal:
 
 - plynulý dvojprstový pinch s posunom stredu a ukotvením zoomu,
 - pinch/pan začínajúci priamo na mapových značkách bez straty gesta,
-- elastický posun pri mierke celej mapy, ktorý sa po pustení vráti do stredu,
+- pevná predvolená mapa bez posunu a elastický posun až po priblížení,
 - odstránenie skoku o dotykovú toleranciu pri prvom pan frame a presné
   hranice posunu,
 - minimálny zoom = celá mapa,
@@ -456,8 +456,8 @@ Posledný redizajn a oprava zoomu pridali:
 
 - **vycentrovaný transform** mapy: priblíženie už neposúva mapu doprava/dole
   a hranice posunu sú symetrické v oboch smeroch,
-- veľkorysý posun s okrajovou elasticitou a zotrvačnosťou, takže po pinchi
-  nezostane mapa zaseknutá pri okraji; domov ju kedykoľvek vycentruje,
+- veľkorysý posun až po priblížení, s okrajovou elasticitou a zotrvačnosťou,
+  takže po pinchi nezostane mapa zaseknutá pri okraji; **◎**/⌂ ju vycentruje,
 - tlačidlá `+`/`−` zoomujú okolo stredu výrezu, nie okolo ľavého horného rohu,
 - reálne dotykové overenie: ukotvenie pinchu s odchýlkou **0,000025 mapovej
   jednotky**, posun dole **294 px** a hore **316 px** po tom istom pinchi,
