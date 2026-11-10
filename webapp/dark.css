@@ -857,27 +857,32 @@
     box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.35);
   }
 
-  .classic-game-meta {
+  .score-title {
     border-bottom-color: #364a66;
-  }
-
-  .classic-game-label {
     color: #9aadc7;
   }
 
-  .classic-game-meta strong {
-    color: #d9e7ff;
+  .classic-score {
+    border-color: #344863;
+    background: rgba(15, 26, 43, 0.94);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  }
+
+  .classic-score .score-title {
+    color: #9aadc7;
+  }
+
+  .classic-score .lcd {
+    color: #e8eefb;
+  }
+
+  .classic-score .score-row-clock .lcd {
+    color: #b7c9e8;
   }
 
   .lcd {
     color: #dce8f8;
     text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
-  }
-
-  .lcd-badge {
-    border-color: #4b7650;
-    background: #08150c;
-    color: #9aff72;
   }
 
   .clock {
@@ -1228,9 +1233,42 @@
     stroke: #9fb3d1;
   }
 
+  .distance-legend {
+    border-color: #344863;
+    background: rgba(15, 26, 43, 0.96);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.42);
+    color: #dbe7ff;
+  }
+
+  .distance-legend-guess .distance-legend-swatch {
+    border-color: #ef4444;
+    background: #35171d;
+    color: #ff9a9a;
+  }
+
+  .distance-legend-correct .distance-legend-swatch {
+    border-color: #22c55e;
+    background: #10291c;
+    color: #86efac;
+  }
+
+  .distance-legend-copy b {
+    color: #9aadc7;
+  }
+
   .map-mark[data-state="edit"] .mark-halo,
   .map-mark[data-state="user"] .mark-halo {
     fill: #15233b;
+  }
+
+  .map-mark[data-state="correct"] .mark-label-bg {
+    fill: #0d2a1a;
+    stroke: #22c55e;
+  }
+
+  .map-mark[data-state="incorrect"] .mark-label-bg {
+    fill: #35171d;
+    stroke: #ef4444;
   }
 
   .puzzle-handle circle {

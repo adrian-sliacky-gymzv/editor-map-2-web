@@ -116,10 +116,12 @@ dostupných objektov v zvolenom teste.
 ### Traf sa!
 
 Ťukni alebo klikni na mapu tam, kde si myslíš, že objekt leží. Ihneď sa zobrazí
-červený tip, zelená správna poloha, spojnica a oba názvy. Body sa počítajú
-pôvodnou formulou; skóre pod 5 bodov sa mení na 0. Hra nevyžaduje potvrdenie
-tipu, takže tok zostáva rýchly; náhodné odpovede pri pinchi alebo posune
-zachytáva gestový filter.
+**červený bodkovaný kruh** pre tvoj tip, **zelený krúžok s fajkou** pre správnu
+polohu a tenká spojnica. Vpravo hore je samostatná legenda „Tvoj tip“ /
+„Správna poloha“ aj s názvom hľadaného objektu, takže sa štítky pri sebe
+neprekrývajú. Body sa počítajú pôvodnou formulou; skóre pod 5 bodov sa mení
+na 0. Hra nevyžaduje potvrdenie tipu, takže tok zostáva rýchly; náhodné
+odpovede pri pinchi alebo posune zachytáva gestový filter.
 
 ### Poskladaj!
 
@@ -331,6 +333,10 @@ Následný mobilný a gestový audit pridal:
 - mobilné plávajúce **Ďalej** a reset výrezu na celú mapu pri novej otázke,
 - automatické oddialenie Traf-sa výsledku, ak je tip alebo cieľ mimo obrazovky,
 - tap-safe puzzle drag (samotné ťuknutie objekt neodošle),
+- jasné výsledkové značky Traf-sa: červený bodkovaný kruh pre tip, zelený
+  krúžok s fajkou pre správnu polohu, spojnica a legenda s názvom objektu,
+- moderne prepracovaný score panel „Body / Výsledok“ namiesto nejasného
+  bloku „Aktivita Traf sa!“ a záhadného údaja 9.8,
 - opravu svetlých štítkov značiek, ktoré predtým v svetlom režime splývali
   s pozadím,
 - kompatibilitu s Dark Readerom cez `revert-layer` pre SVG štítky,

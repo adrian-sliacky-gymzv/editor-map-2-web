@@ -1610,6 +1610,17 @@ label {
   pointer-events: none;
 }
 
+.score-title {
+  display: block;
+  margin: 0 1px 3px;
+  padding: 0 1px 3px;
+  border-bottom: 1px solid #bdbdbd;
+  color: #4b5563;
+  font: 800 8.5px/1.2 var(--font);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
 .score-row {
   display: flex;
   align-items: center;
@@ -1619,20 +1630,6 @@ label {
 
 .score-row + .score-row {
   margin-top: 2px;
-}
-
-.lcd-badge {
-  display: inline-grid;
-  place-items: center;
-  width: 30px;
-  height: 16px;
-  border: 1px solid #2c3b2c;
-  background: #071a07;
-  color: #86ff3a;
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.6px;
-  text-shadow: 0 0 4px rgba(134, 255, 58, 0.55);
 }
 
 .lcd {
@@ -1875,6 +1872,82 @@ label {
   stroke-dasharray: 6 5;
   opacity: 0.8;
   vector-effect: non-scaling-stroke;
+}
+
+.distance-legend {
+  position: absolute;
+  top: 8px;
+  right: max(10px, env(safe-area-inset-right));
+  z-index: 7;
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  max-width: min(230px, calc(100% - 146px));
+  padding: 8px 10px;
+  border: 1px solid #d4dbea;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 6px 18px rgba(21, 31, 66, 0.14);
+  color: #334155;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+}
+
+.distance-legend:not([hidden]) {
+  display: flex;
+}
+
+.distance-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+.distance-legend-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.distance-legend-copy b {
+  max-width: 146px;
+  overflow: hidden;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+}
+
+.distance-legend-swatch {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid;
+  border-radius: 50%;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.distance-legend-guess .distance-legend-swatch {
+  border-color: #dc2626;
+  border-style: dashed;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.distance-legend-correct .distance-legend-swatch {
+  border-color: #16a34a;
+  background: #f0fdf4;
+  color: #15803d;
 }
 
 .guess-label-text {
@@ -2606,11 +2679,6 @@ label {
 
   .score-counts .lcd {
     font-size: 15px;
-  }
-
-  .lcd-badge {
-    width: 27px;
-    font-size: 9px;
   }
 
   .result-stats {

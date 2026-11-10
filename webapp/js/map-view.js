@@ -29,6 +29,8 @@ const MARK_ICONS = {
   reservation: '<path fill="currentColor" d="M8 0.8 14 5v6L8 15.2 2 11V5Z"/><path d="M8 4v7M5.7 6.2 8 8.6l2.3-2.4" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>',
   geo: '<path fill="currentColor" d="m8 1.4 7 12.6H1Z"/>',
   legend: '<path fill="currentColor" d="m8 1 2 4.3 4.7.6-3.5 3.3.9 4.7L8 11.6 3.9 13.9l.9-4.7L1.3 5.9 6 5.3Z"/>',
+  guess: '<circle cx="8" cy="8" r="6.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-dasharray="2.2 2.1" stroke-linecap="round"/>',
+  target: '<circle cx="8" cy="8" r="5.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m5.2 8.2 1.8 1.9 3.9-4.2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>',
   default: '<circle cx="8" cy="8" r="5.6" fill="currentColor"/>',
 };
 
@@ -43,6 +45,8 @@ const MARK_COLORS = {
   reservation: '#15803d',
   geo: '#a16207',
   legend: '#475569',
+  guess: '#dc2626',
+  target: '#15803d',
   default: '#334155',
 };
 

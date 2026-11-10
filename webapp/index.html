@@ -272,8 +272,8 @@
 
       <div class="game-body">
         <div class="score-panel" aria-label="Skóre a čas">
+          <span class="score-title">Skóre</span>
           <div class="score-row score-distance" id="scoreDistanceRow">
-            <span class="lcd-badge" aria-hidden="true">9.8</span>
             <span class="lcd" id="scoreValue">000</span>
           </div>
           <div class="score-row score-counts" id="scoreCountsRow" hidden>
@@ -357,12 +357,8 @@
 
       <div class="game-body classic-body">
         <aside class="score-panel classic-score" aria-label="Skóre a čas">
-          <div class="classic-game-meta">
-            <span class="classic-game-label">Aktivita</span>
-            <strong id="classicGameMeta">Traf sa!</strong>
-          </div>
+          <span class="score-title" id="classicScoreTitle">Body</span>
           <div class="score-row score-distance" id="classicScoreDistanceRow">
-            <span class="lcd-badge" aria-hidden="true">9.8</span>
             <span class="lcd" id="classicScoreValue">000</span>
           </div>
           <div class="score-row score-counts" id="classicScoreCountsRow" hidden>
@@ -380,6 +376,19 @@
         <div id="classicMapViewport" class="map-viewport classic-map-viewport">
           <div id="classicMapHost" class="map-host"></div>
           <div class="map-hint" id="classicMapHint">Klikni na mapu</div>
+          <div class="distance-legend" id="classicDistanceLegend" role="group" aria-label="Vysvetlenie značiek" hidden>
+            <span class="distance-legend-item distance-legend-guess">
+              <span class="distance-legend-swatch" aria-hidden="true"></span>
+              <span>Tvoj tip</span>
+            </span>
+            <span class="distance-legend-item distance-legend-correct">
+              <span class="distance-legend-swatch" aria-hidden="true">✓</span>
+              <span class="distance-legend-copy">
+                <span>Správna poloha</span>
+                <b id="classicDistanceTarget"></b>
+              </span>
+            </span>
+          </div>
           <div class="zoom-controls" role="group" aria-label="Ovládanie mapy">
             <button type="button" id="classicZoomIn" class="zoom-btn" aria-label="Priblížiť">+</button>
             <button type="button" id="classicZoomOut" class="zoom-btn" aria-label="Oddialiť">−</button>

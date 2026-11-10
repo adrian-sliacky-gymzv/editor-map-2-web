@@ -175,7 +175,7 @@ function cacheDom() {
   dom.classicScreen = $('#classicScreen');
   dom.titleGame = $('#classicGameTitle');
   dom.context = $('#classicContext');
-  dom.gameMeta = $('#classicGameMeta');
+  dom.scoreTitle = $('#classicScoreTitle');
   dom.homeBtn = $('#classicHomeBtn');
   dom.qnum = $('#classicQnum');
   dom.question = $('#classicQuestion');
@@ -193,6 +193,8 @@ function cacheDom() {
   dom.mapViewportWrap = $('#classicMapViewport');
   dom.hint = $('#classicMapHint');
   dom.mapTag = $('#classicMapTag');
+  dom.distanceLegend = $('#classicDistanceLegend');
+  dom.distanceTarget = $('#classicDistanceTarget');
   dom.zoomIn = $('#classicZoomIn');
   dom.zoomOut = $('#classicZoomOut');
   dom.zoomFit = $('#classicZoomFit');
@@ -565,7 +567,7 @@ export async function startActivityGame(params) {
   showClassicScreen();
   setLoading(true, 'Načítavam mapu…');
   dom.titleGame.textContent = classicData.cfg(mode.titleKey) || mode.fallbackTitle;
-  if (dom.gameMeta) dom.gameMeta.textContent = dom.titleGame.textContent;
+  if (dom.scoreTitle) dom.scoreTitle.textContent = params.mode === 'distance' ? 'Body' : 'Výsledok';
   dom.context.textContent = `${displayMapLabel(mapEl, mapDef)} · ${testEl.getAttribute('label') || ''}`;
   dom.mapTag.textContent = `${displayMapLabel(mapEl, mapDef)} · ${level.label}`;
   dom.qnum.textContent = '';
@@ -582,6 +584,7 @@ export async function startActivityGame(params) {
   dom.scoreCounts.hidden = params.mode === 'distance';
   dom.zoomValue.textContent = '100%';
   dom.mapViewportWrap.classList.remove('is-answered');
+  hideDistanceLegend();
   showMapHint();
   syncNextFloat();
 
@@ -677,6 +680,14 @@ function showMapHint() {
 
 function hideMapHint() {
   if (dom.hint) dom.hint.hidden = true;
+}
+
+function showDistanceLegend() {
+  if (dom.distanceLegend) dom.distanceLegend.hidden = false;
+}
+
+function hideDistanceLegend() {
+  if (dom.distanceLegend) dom.distanceLegend.hidden = true;
 }
 
 function syncNextFloat() {
@@ -889,6 +900,7 @@ function nextTestQuestion() {
   hideCandidates();
   GAME.candidates = [];
   dom.mapViewportWrap.classList.remove('is-answered');
+  hideDistanceLegend();
   showMapHint();
   GAME.mapView.fit();
 
@@ -1006,6 +1018,7 @@ function clearMarks() {
   if (!GAME.mapView) return;
   for (const mark of GAME.marks) GAME.mapView.removeMark(mark);
   GAME.marks = [];
+  GAME.mapView.clearGuides();
 }
 
 function showTestFinal() {
@@ -1063,6 +1076,7 @@ function nextDistanceQuestion() {
   GAME.questionIndex += 1;
   clearMarks();
   dom.mapViewportWrap.classList.remove('is-answered');
+  hideDistanceLegend();
   showMapHint();
   GAME.mapView.fit();
   const targetIndex = GAME.distanceSeq[GAME.questionIndex - 1];
@@ -1102,24 +1116,32 @@ function onDistanceClick(point) {
   }
   recordAttemptForNode(target, 'distance', success, score, 100);
 
-  GAME.mapView.addMark({
+  // Draw the target first, then the guess. The guess glyph is a large red
+  // crosshair with no white fill, so both remain readable when the points
+  // nearly coincide. The legend carries the labels, avoiding collisions.
+  const targetMark = GAME.mapView.addMark({
+    x: targetX,
+    y: targetY,
+    label: 'Správna poloha',
+    symbol: 'target',
+    state: 'correct',
+    labelVisible: false,
+  });
+  const guessMark = GAME.mapView.addMark({
     x: point.x,
     y: point.y,
     label: 'Tvoj tip',
-    symbol: 'town',
+    symbol: 'guess',
     state: 'incorrect',
-    labelVisible: true,
+    labelVisible: false,
   });
-  GAME.mapView.addMark({
-    x: targetX,
-    y: targetY,
-    label: target.getAttribute('markLabel') || nodeLabel(target),
-    symbol: target.getAttribute('markSymbol') || 'default',
-    state: 'correct',
-    labelVisible: true,
-  });
+  GAME.marks.push(targetMark, guessMark);
+  if (dom.distanceTarget) {
+    dom.distanceTarget.textContent = target.getAttribute('markLabel') || nodeLabel(target);
+  }
   GAME.mapView.addGuide({ x1: point.x, y1: point.y, x2: targetX, y2: targetY });
   GAME.mapView.ensurePointsVisible([point, { x: targetX, y: targetY }]);
+  showDistanceLegend();
 
   const answer = distanceAnswerFor(score);
   setQuestionHtml(answer.html);
@@ -1164,6 +1186,7 @@ function showDistanceFinal() {
   GAME.active = false;
   stopClock();
   hideMapHint();
+  hideDistanceLegend();
   // Keep the final guess and correct position visible for review.
   setQuestionNumber(0);
   const percent = Math.round(GAME.totalScore / GAME.numQ);
@@ -1214,6 +1237,7 @@ function nextPuzzleQuestion() {
   removePuzzleHandle();
   clearMarks();
   dom.mapViewportWrap.classList.remove('is-answered');
+  hideDistanceLegend();
   showMapHint();
   GAME.mapView.fit();
 
