@@ -175,6 +175,8 @@ function cacheDom() {
   dom.classicScreen = $('#classicScreen');
   dom.titleGame = $('#classicGameTitle');
   dom.context = $('#classicContext');
+  dom.scorePanel = $('#classicScreen .classic-score');
+  dom.scoreActivity = $('#classicScoreActivity');
   dom.scoreTitle = $('#classicScoreTitle');
   dom.homeBtn = $('#classicHomeBtn');
   dom.qnum = $('#classicQnum');
@@ -195,6 +197,7 @@ function cacheDom() {
   dom.mapTag = $('#classicMapTag');
   dom.distanceLegend = $('#classicDistanceLegend');
   dom.distanceTarget = $('#classicDistanceTarget');
+  dom.distanceValue = $('#classicDistanceValue');
   dom.zoomIn = $('#classicZoomIn');
   dom.zoomOut = $('#classicZoomOut');
   dom.zoomFit = $('#classicZoomFit');
@@ -576,6 +579,7 @@ export async function startActivityGame(params) {
   showClassicScreen();
   setLoading(true, 'Načítavam mapu…');
   dom.titleGame.textContent = classicData.cfg(mode.titleKey) || mode.fallbackTitle;
+  if (dom.scoreActivity) dom.scoreActivity.textContent = dom.titleGame.textContent;
   if (dom.scoreTitle) dom.scoreTitle.textContent = params.mode === 'distance' ? 'Body' : 'Výsledok';
   dom.context.textContent = `${displayMapLabel(mapEl, mapDef)} · ${testEl.getAttribute('label') || ''}`;
   dom.mapTag.textContent = `${displayMapLabel(mapEl, mapDef)} · ${level.label}`;
@@ -589,6 +593,7 @@ export async function startActivityGame(params) {
   dom.correctValue.textContent = '0';
   dom.wrongValue.textContent = '0';
   dom.timeValue.textContent = '00:00';
+  if (dom.distanceValue) dom.distanceValue.textContent = '—';
   dom.scoreDistance.hidden = params.mode !== 'distance';
   dom.scoreCounts.hidden = params.mode === 'distance';
   dom.zoomValue.textContent = '100%';
@@ -610,6 +615,9 @@ export async function startActivityGame(params) {
       interaction: params.mode === 'distance' ? 'click' : 'pan',
       paddingX: 24,
       paddingY: 24,
+      labelObstacles: () => [dom.scorePanel, dom.distanceLegend]
+        .filter((el) => el && !el.hidden)
+        .map((el) => el.getBoundingClientRect()),
       onZoom: () => {
         dom.zoomValue.textContent = `${GAME.mapView ? GAME.mapView.percent() : 100}%`;
       },
@@ -720,7 +728,20 @@ function positionNextFloat() {
   const bottomZone = rect.bottom - Math.min(170, rect.height * 0.32);
   const nearTop = points.filter((point) => point.y < topZone).length;
   const nearBottom = points.filter((point) => point.y > bottomZone).length;
-  dom.nextFloat.classList.toggle('is-top', nearBottom > nearTop);
+  const isTop = nearBottom > nearTop;
+  dom.nextFloat.classList.toggle('is-top', isTop);
+  if (isTop) {
+    // Keep the floating action clear of the score card and marker legend.
+    const hudBottom = Math.max(
+      dom.scorePanel ? dom.scorePanel.getBoundingClientRect().bottom : rect.top,
+      dom.distanceLegend && !dom.distanceLegend.hidden
+        ? dom.distanceLegend.getBoundingClientRect().bottom
+        : rect.top
+    );
+    dom.nextFloat.style.top = `${Math.max(16, Math.round(hudBottom - rect.top + 10))}px`;
+  } else {
+    dom.nextFloat.style.top = '';
+  }
 }
 
 function watchNextState() {
@@ -1125,16 +1146,18 @@ function onDistanceClick(point) {
   }
   recordAttemptForNode(target, 'distance', success, score, 100);
 
-  // Draw the target first, then the guess. The guess glyph is a large red
-  // crosshair with no white fill, so both remain readable when the points
-  // nearly coincide. The legend carries the labels, avoiding collisions.
+  // The target is a solid green pin, the guess a hollow red crosshair. The
+  // higher point always gets the upper callout and the lower point the lower
+  // one, so the two chips stay apart even when the glyphs overlap.
+  const targetAbove = targetY <= point.y;
   const targetMark = GAME.mapView.addMark({
     x: targetX,
     y: targetY,
     label: 'Správna poloha',
     symbol: 'target',
     state: 'correct',
-    labelVisible: false,
+    labelPlacement: targetAbove ? 'above' : 'below',
+    labelVisible: true,
   });
   const guessMark = GAME.mapView.addMark({
     x: point.x,
@@ -1142,12 +1165,21 @@ function onDistanceClick(point) {
     label: 'Tvoj tip',
     symbol: 'guess',
     state: 'incorrect',
-    labelVisible: false,
+    labelPlacement: targetAbove ? 'below' : 'above',
+    labelVisible: true,
   });
   GAME.marks.push(targetMark, guessMark);
   if (dom.distanceTarget) {
     dom.distanceTarget.textContent = target.getAttribute('markLabel') || nodeLabel(target);
   }
+  if (dom.distanceValue) dom.distanceValue.textContent = `${Math.round(dist)} j.`;
+  GAME.mapView.addGuide({
+    x1: point.x,
+    y1: point.y,
+    x2: targetX,
+    y2: targetY,
+    className: 'map-guide-underlay',
+  });
   GAME.mapView.addGuide({ x1: point.x, y1: point.y, x2: targetX, y2: targetY });
   GAME.mapView.ensurePointsVisible([point, { x: targetX, y: targetY }]);
   showDistanceLegend();

@@ -861,6 +861,14 @@
     background: linear-gradient(#233954, #182942);
   }
 
+  #classicNextBtn:not(:disabled),
+  #nextBtn:not(:disabled) {
+    border-color: #5a7fe8;
+    background: linear-gradient(#24406e, #1a2d4d);
+    box-shadow: 0 0 0 2px rgba(90, 127, 232, 0.24);
+    color: #eaf1ff;
+  }
+
   .game-progress {
     background: rgba(119, 158, 228, 0.16);
   }
@@ -882,7 +890,19 @@
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
   }
 
-  .classic-score .score-title {
+  .classic-score .score-activity {
+    border-bottom-color: #2f425a;
+    background: linear-gradient(180deg, rgba(79, 130, 255, 0.14), rgba(79, 130, 255, 0.04));
+    color: #a9c2ff;
+  }
+
+  .classic-score .score-activity::before {
+    background: #7ba2ff;
+    box-shadow: 0 0 0 3px rgba(123, 162, 255, 0.14);
+  }
+
+  .classic-score .score-title,
+  .classic-score .score-main .score-title {
     color: #9aadc7;
   }
 
@@ -890,8 +910,17 @@
     color: #e8eefb;
   }
 
+  .classic-score .score-row-clock {
+    border-top-color: #2f425a;
+  }
+
   .classic-score .score-row-clock .lcd {
     color: #b7c9e8;
+  }
+
+  .classic-score .score-caption,
+  .classic-score .score-count-label {
+    color: #8fa3bf;
   }
 
   .lcd {
@@ -1270,6 +1299,15 @@
     color: #9aadc7;
   }
 
+  .distance-legend-foot {
+    border-top-color: #2f425a;
+    color: #9aadc7;
+  }
+
+  .distance-legend-foot b {
+    color: #dbe7ff;
+  }
+
   .map-mark[data-state="edit"] .mark-halo,
   .map-mark[data-state="user"] .mark-halo {
     fill: #15233b;
@@ -1280,9 +1318,17 @@
     stroke: #22c55e;
   }
 
+  .map-mark[data-state="correct"] .mark-label-text {
+    fill: #bbf7d0;
+  }
+
   .map-mark[data-state="incorrect"] .mark-label-bg {
     fill: #35171d;
     stroke: #ef4444;
+  }
+
+  .map-mark[data-state="incorrect"] .mark-label-text {
+    fill: #fecaca;
   }
 
   .puzzle-handle circle {

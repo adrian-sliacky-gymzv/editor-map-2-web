@@ -115,13 +115,14 @@ dostupných objektov v zvolenom teste.
 
 ### Traf sa!
 
-Ťukni alebo klikni na mapu tam, kde si myslíš, že objekt leží. Ihneď sa zobrazí
-**červený bodkovaný kruh** pre tvoj tip, **zelený krúžok s fajkou** pre správnu
-polohu a tenká spojnica. Vpravo hore je samostatná legenda „Tvoj tip“ /
-„Správna poloha“ aj s názvom hľadaného objektu, takže sa štítky pri sebe
-neprekrývajú. Body sa počítajú pôvodnou formulou; skóre pod 5 bodov sa mení
-na 0. Hra nevyžaduje potvrdenie tipu, takže tok zostáva rýchly; náhodné
-odpovede pri pinchi alebo posune zachytáva gestový filter.
+Ťukni alebo klikni na mapu tam, kde si myslíš, že objekt leží. Správna poloha
+sa označí **zeleným pinom s fajkou**, tvoj tip **červeným zameriavacím krížom**.
+Štítky „Správna poloha“ a „Tvoj tip“ sú vždy na opačných stranách (vyšší bod
+hore, nižší dole), takže zostanú čitateľné aj pri tesnom zásahu alebo prekrytí
+ikôn. Vpravo hore je legenda s názvom hľadaného objektu a vzdialenosťou tipu od
+cieľa. Body sa počítajú pôvodnou formulou; skóre pod 5 bodov sa mení na 0. Hra
+nevyžaduje potvrdenie tipu, takže tok zostáva rýchly; náhodné odpovede pri
+pinchi alebo posune zachytáva gestový filter.
 
 ### Poskladaj!
 
@@ -258,7 +259,7 @@ Počas vývoja bolo overené:
 npm test
 ```
 
-Aktuálne **62 testov, 62 passing**. Testy pokrývajú:
+Aktuálne **63 testov, 63 passing**. Testy pokrývajú:
 
 - pôvodné bodovanie a prahy,
 - výber otázok bez opakovania,
@@ -266,6 +267,7 @@ Aktuálne **62 testov, 62 passing**. Testy pokrývajú:
 - atlas, štatistiky a tréning slabých miest,
 - matematiku pinchu, dvojitého ťuknutia, kolieska a ukotvenia zoomu,
 - dokumentáciu a `aria-keyshortcuts` pre klávesové skratky,
+- prehľadný Traf-sa HUD, legendu a čitateľné štítky markerov,
 - prítomnosť všetkých 8 máp a presnú zhodu objektov medzi `.mef` a scénami,
 - existenciu všetkých testovacích skupín z `config.xml`,
 - zoznamy máp pre jednotlivé aktivity,
@@ -357,10 +359,11 @@ Následný mobilný a gestový audit pridal:
 - mobilné plávajúce **Ďalej** a reset výrezu na celú mapu pri novej otázke,
 - automatické oddialenie Traf-sa výsledku, ak je tip alebo cieľ mimo obrazovky,
 - tap-safe puzzle drag (samotné ťuknutie objekt neodošle),
-- jasné výsledkové značky Traf-sa: červený bodkovaný kruh pre tip, zelený
-  krúžok s fajkou pre správnu polohu, spojnica a legenda s názvom objektu,
-- moderne prepracovaný score panel „Body / Výsledok“ namiesto nejasného
-  bloku „Aktivita Traf sa!“ a záhadného údaja 9.8,
+- jasné výsledkové značky Traf-sa: zelený pin s fajkou pre správnu polohu,
+  červený zameriavač pre tip, spojnica, štítky na opačných stranách a legenda
+  s názvom objektu aj vzdialenosťou,
+- prehľadný HUD „Traf sa! / Body / Čas“ s popismi a počítadlom správnych
+  odpovedí namiesto nejasného bloku „Aktivita Traf sa!“ a údaja 9.8,
 - opravu svetlých štítkov značiek, ktoré predtým v svetlom režime splývali
   s pozadím,
 - kompatibilitu s Dark Readerom cez `revert-layer` pre SVG štítky,

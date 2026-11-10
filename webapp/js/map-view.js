@@ -29,8 +29,8 @@ const MARK_ICONS = {
   reservation: '<path fill="currentColor" d="M8 0.8 14 5v6L8 15.2 2 11V5Z"/><path d="M8 4v7M5.7 6.2 8 8.6l2.3-2.4" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>',
   geo: '<path fill="currentColor" d="m8 1.4 7 12.6H1Z"/>',
   legend: '<path fill="currentColor" d="m8 1 2 4.3 4.7.6-3.5 3.3.9 4.7L8 11.6 3.9 13.9l.9-4.7L1.3 5.9 6 5.3Z"/>',
-  guess: '<circle cx="8" cy="8" r="6.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-dasharray="2.2 2.1" stroke-linecap="round"/>',
-  target: '<circle cx="8" cy="8" r="5.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m5.2 8.2 1.8 1.9 3.9-4.2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>',
+  guess: '<circle cx="8" cy="8" r="6.2" fill="none" stroke="#ffffff" stroke-width="3.4"/><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 1.1v2.4M8 12.5v2.4M1.1 8h2.4M12.5 8h2.4" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round"/><path d="M8 1.1v2.4M8 12.5v2.4M1.1 8h2.4M12.5 8h2.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="8" cy="8" r="1.7" fill="currentColor"/>',
+  target: '<path fill="currentColor" d="M8 0.7c-3.5 0-6.3 2.7-6.3 6.1 0 4.5 6.3 8.7 6.3 8.7s6.3-4.2 6.3-8.7C14.3 3.4 11.5 0.7 8 0.7Z"/><path d="m5.1 6.9 2 2 3.8-4.1" fill="none" stroke="#ffffff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>',
   default: '<circle cx="8" cy="8" r="5.6" fill="currentColor"/>',
 };
 
@@ -412,6 +412,7 @@ export class MapView {
     el.setAttribute('data-mark-id', id);
     el.setAttribute('data-symbol', data.symbol || 'default');
     el.setAttribute('data-state', data.state || 'ask');
+    el.setAttribute('data-label-placement', data.labelPlacement || 'right');
     el.style.color = MARK_COLORS[data.symbol] || MARK_COLORS.default;
     el.style.pointerEvents = 'all';
 
@@ -423,6 +424,8 @@ export class MapView {
 
     const label = svgEl('g');
     label.classList.add('mark-label');
+    const stem = svgEl('line');
+    stem.classList.add('mark-label-stem');
     const bg = svgEl('rect');
     bg.classList.add('mark-label-bg');
     bg.setAttribute('x', '13');
@@ -437,7 +440,7 @@ export class MapView {
     text.setAttribute('y', '0');
     text.setAttribute('fill', '#0f172a');
     text.textContent = data.label || '';
-    label.append(bg, text);
+    label.append(stem, bg, text);
     el.append(label);
 
     const mark = {
@@ -445,11 +448,13 @@ export class MapView {
       el,
       icon,
       labelGroup: label,
+      labelStem: stem,
       labelBg: bg,
       labelText: text,
       x: Number(data.x) || 0,
       y: Number(data.y) || 0,
       label: data.label || '',
+      labelPlacement: data.labelPlacement || 'right',
       symbol: data.symbol || 'default',
       state: data.state || 'ask',
       labelVisible: data.labelVisible !== false,
@@ -601,9 +606,71 @@ export class MapView {
   _measureMarkLabel(mark) {
     if (!mark.labelVisible) return;
     const length = mark.labelText.getComputedTextLength?.() || Math.max(0, mark.label.length * 6.2);
-    const width = Math.max(20, length + 14);
+    const width = Math.max(24, length + 18);
+    const height = 21;
+    const placement = mark.labelPlacement || 'right';
     mark.labelBg.setAttribute('width', String(width));
+    mark.labelBg.setAttribute('height', String(height));
+    mark.labelBg.setAttribute('rx', '7');
+
+    if (placement === 'above' || placement === 'below') {
+      const above = placement === 'above';
+      const bgY = above ? -44 : 23;
+      // Above/below callouts are centred on the point. Shift only the chip
+      // when it would leave the viewport, so edge markers stay readable.
+      const rect = this.viewport.getBoundingClientRect();
+      const point = this.mapToScreen(mark.x, mark.y);
+      const margin = 8;
+      let offsetX = 0;
+      if (point.x - width / 2 < rect.left + margin) {
+        offsetX = rect.left + margin - (point.x - width / 2);
+      } else if (point.x + width / 2 > rect.right - margin) {
+        offsetX = rect.right - margin - (point.x + width / 2);
+      }
+
+      // Avoid placing a callout under the game HUD or result legend. The
+      // chip can slide sideways while its stem keeps pointing at the spot.
+      const obstacles = (this.options.labelObstacles?.() || []).filter(Boolean);
+      const intersects = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+      const chipTop = point.y + bgY;
+      const chipAt = (dx) => ({
+        left: point.x + dx - width / 2,
+        right: point.x + dx + width / 2,
+        top: chipTop,
+        bottom: chipTop + height,
+      });
+      if (obstacles.length && obstacles.some((obstacle) => intersects(chipAt(offsetX), obstacle))) {
+        const candidates = [];
+        for (const obstacle of obstacles) {
+          candidates.push(obstacle.right + 8 - (point.x - width / 2));
+          candidates.push(obstacle.left - 8 - (point.x + width / 2));
+        }
+        for (const candidate of candidates) {
+          const chip = chipAt(candidate);
+          const insideViewport = chip.left >= rect.left + margin && chip.right <= rect.right - margin;
+          if (insideViewport && !obstacles.some((obstacle) => intersects(chip, obstacle))) {
+            offsetX = candidate;
+            break;
+          }
+        }
+      }
+      mark.labelBg.setAttribute('x', String(offsetX - width / 2));
+      mark.labelBg.setAttribute('y', String(bgY));
+      mark.labelText.setAttribute('x', String(offsetX));
+      mark.labelText.setAttribute('y', String(bgY + height / 2));
+      mark.labelText.setAttribute('text-anchor', 'middle');
+      mark.labelStem?.setAttribute('x1', '0');
+      mark.labelStem?.setAttribute('x2', String(offsetX));
+      mark.labelStem?.setAttribute('y1', above ? '-11' : '11');
+      mark.labelStem?.setAttribute('y2', above ? '-24' : '24');
+      return;
+    }
+
+    mark.labelBg.setAttribute('x', '13');
+    mark.labelBg.setAttribute('y', '-10');
     mark.labelText.setAttribute('x', '20');
+    mark.labelText.setAttribute('y', '0');
+    mark.labelText.setAttribute('text-anchor', 'start');
   }
 
   updateMark(markOrId, patch = {}) {
@@ -623,6 +690,10 @@ export class MapView {
     if (patch.labelVisible != null) {
       mark.labelVisible = !!patch.labelVisible;
       mark.labelGroup.style.display = mark.labelVisible ? '' : 'none';
+    }
+    if (patch.labelPlacement != null) {
+      mark.labelPlacement = patch.labelPlacement;
+      mark.el.setAttribute('data-label-placement', patch.labelPlacement);
     }
     this._positionMark(mark);
     this._measureMarkLabel(mark);
@@ -667,6 +738,15 @@ export class MapView {
   updateMarkScale() {
     this.markScale = 1 / Math.max(0.001, this.fitScale * this.zoom);
     for (const mark of this.marks.values()) this._positionMark(mark);
+    this._refreshPlacedLabels();
+  }
+
+  _refreshPlacedLabels() {
+    for (const mark of this.marks.values()) {
+      if (mark.labelPlacement === 'above' || mark.labelPlacement === 'below') {
+        this._measureMarkLabel(mark);
+      }
+    }
   }
 
   beginLabelEdit(markOrId) {
@@ -1011,6 +1091,7 @@ export class MapView {
     this.canvas.style.transform = `translate(${this.baseX + this.panX}px, ${this.baseY + this.panY}px) scale(${scale})`;
     const markScale = 1 / Math.max(0.001, scale);
     if (Math.abs(markScale - this.markScale) > 0.0001) this.updateMarkScale();
+    else this._refreshPlacedLabels();
     this.options.onTransform?.(this);
   }
 

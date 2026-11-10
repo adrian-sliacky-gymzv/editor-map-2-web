@@ -2016,6 +2016,32 @@ kbd {
   color: #15803d;
 }
 
+.distance-legend-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 1px;
+  padding-top: 5px;
+  border-top: 1px solid #e2e8f0;
+  color: #64748b;
+  font-size: 9.5px;
+  font-weight: 700;
+}
+
+.distance-legend-foot span {
+  font-size: 8.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.distance-legend-foot b {
+  margin-left: auto;
+  color: #1e293b;
+  font-family: var(--lcd);
+  font-size: 12px;
+  letter-spacing: 0.3px;
+}
+
 .guess-label-text {
   font-family: Tahoma, Arial, sans-serif;
   font-size: 10.5px;

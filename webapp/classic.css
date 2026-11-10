@@ -276,11 +276,35 @@ html[data-darkreader-mode] .marker-correct .label-text {
   filter: drop-shadow(0 2px 3px rgba(15, 23, 42, 0.12));
 }
 
+.map-mark .mark-label-stem {
+  display: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-dasharray: 2 2;
+  stroke-linecap: round;
+}
+
+.map-mark[data-label-placement="above"] .mark-label-stem,
+.map-mark[data-label-placement="below"] .mark-label-stem {
+  display: block;
+}
+
+.map-mark[data-symbol="guess"] .mark-halo {
+  display: none;
+}
+
 .map-guide {
   stroke: #3f4f66;
   stroke-width: 2;
   stroke-dasharray: 6 5;
   opacity: 0.82;
+}
+
+.map-guide-underlay {
+  stroke: rgba(255, 255, 255, 0.92);
+  stroke-width: 4.5;
+  stroke-dasharray: none;
+  opacity: 1;
 }
 
 .map-mark[data-state="correct"] {
@@ -291,12 +315,34 @@ html[data-darkreader-mode] .marker-correct .label-text {
   stroke-width: 2.5;
 }
 
+.map-mark[data-state="correct"] .mark-label-bg {
+  fill: #f0fdf4;
+  stroke: #16a34a;
+  stroke-width: 1.25;
+}
+
+.map-mark[data-state="correct"] .mark-label-text {
+  fill: #14532d;
+  font-weight: 700;
+}
+
 .map-mark[data-state="incorrect"] {
   color: #dc2626 !important;
 }
 
 .map-mark[data-state="incorrect"] .mark-halo {
   stroke-width: 2.5;
+}
+
+.map-mark[data-state="incorrect"] .mark-label-bg {
+  fill: #fef2f2;
+  stroke: #dc2626;
+  stroke-width: 1.25;
+}
+
+.map-mark[data-state="incorrect"] .mark-label-text {
+  fill: #991b1b;
+  font-weight: 700;
 }
 
 .map-mark[data-state="edit"] {
@@ -422,24 +468,54 @@ html[data-darkreader-mode] .marker-correct .label-text {
 }
 
 .classic-score {
-  top: 8px;
-  left: 8px;
-  width: auto;
-  min-width: 116px;
-  padding: 7px 10px 8px;
-  border: 1px solid rgba(148, 163, 184, 0.55);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.93);
-  box-shadow: 0 6px 18px rgba(21, 31, 66, 0.12);
-  backdrop-filter: blur(6px);
+  top: 10px;
+  left: 10px;
+  width: 148px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 8px 24px rgba(21, 31, 66, 0.14);
+  backdrop-filter: blur(8px);
   font-family: var(--font);
 }
 
-.classic-score .score-title {
-  margin: 0 0 3px;
+.classic-score .score-activity {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 11px 7px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.26);
+  background: linear-gradient(180deg, rgba(47, 111, 237, 0.1), rgba(47, 111, 237, 0.02));
+  color: #3357d6;
+  font: 800 9px/1.2 var(--font);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.classic-score .score-activity::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #2f6fed;
+  box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.13);
+}
+
+.classic-score .score-main {
+  padding: 8px 11px 7px;
+}
+
+.classic-score .score-main .score-title {
+  display: block;
+  margin: 0 0 2px;
   padding: 0;
-  border-bottom: 0;
+  border: 0;
   color: #64748b;
+  font: 800 8.5px/1.2 var(--font);
+  letter-spacing: 0.08em;
 }
 
 .classic-score .score-row {
@@ -454,13 +530,64 @@ html[data-darkreader-mode] .marker-correct .label-text {
   text-shadow: none;
 }
 
-.classic-score .score-row-clock .lcd {
-  color: #475569;
-  font-size: 16px;
+.classic-score .score-main .lcd {
+  display: block;
+  font-size: 27px;
+  line-height: 1;
+  letter-spacing: 1.3px;
 }
 
-.classic-score .score-row + .score-row {
-  margin-top: 3px;
+.classic-score .score-counts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  min-height: 0;
+  height: auto;
+  padding: 9px 11px 7px;
+}
+
+.classic-score .score-count {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0 4px;
+}
+
+.classic-score .score-count .lcd {
+  font-size: 19px;
+}
+
+.classic-score .score-count-label {
+  grid-column: 1 / -1;
+  color: #64748b;
+  font: 800 7.5px/1.2 var(--font);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.classic-score .score-row-clock {
+  height: auto;
+  padding: 7px 11px 8px;
+  border-top: 1px solid rgba(148, 163, 184, 0.24);
+}
+
+.classic-score .score-row-clock .lcd {
+  margin-left: auto;
+  color: #475569;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+}
+
+.classic-score .score-caption {
+  color: #64748b;
+  font: 800 8px/1 var(--font);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.classic-score .clock {
+  width: 15px;
+  height: 15px;
 }
 
 .classic-map-viewport {
