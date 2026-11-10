@@ -96,6 +96,7 @@ export class MapView {
     this.pointerDragged = false;
     this.suppressClickUntil = 0;
     this.lastTap = null;
+    this._settleTimer = 0;
     this.lastLayout = { w: 0, h: 0 };
     this.mapClickHandler = options.onMapClick || null;
     this.markScale = 1;
@@ -107,6 +108,7 @@ export class MapView {
   destroy() {
     this._eventAbort?.abort();
     this._resizeObserver?.disconnect();
+    clearTimeout(this._settleTimer);
     if (this._labelEditor) {
       this._labelEditor.remove();
       this._labelEditor = null;
@@ -504,8 +506,14 @@ export class MapView {
       });
       el.addEventListener('click', (event) => {
         event.stopPropagation();
-        if (tapGuard?.moved) {
-          tapGuard.moved = false;
+        const pointerClick = event.detail > 0;
+        const gestureBlocked = pointerClick && (
+          tapGuard?.moved
+          || this.pointerDragged
+          || performance.now() < this.suppressClickUntil
+        );
+        if (gestureBlocked) {
+          if (tapGuard) tapGuard.moved = false;
           event.preventDefault();
           return;
         }
@@ -752,24 +760,35 @@ export class MapView {
     this._eventAbort = new AbortController();
     const { signal } = this._eventAbort;
     this.viewport.addEventListener('pointerdown', (event) => this._onPointerDown(event), { signal });
-    this.viewport.addEventListener('pointermove', (event) => this._onPointerMove(event), { signal });
-    this.viewport.addEventListener('pointerup', (event) => this._onPointerUp(event), { signal });
-    this.viewport.addEventListener('pointercancel', (event) => this._onPointerCancel(event), { signal });
+    // Window-level move/up keeps a drag alive when the finger leaves the map
+    // or when a touch started on a marker. Markers must remain part of pinch
+    // and pan gestures instead of swallowing them.
+    window.addEventListener('pointermove', (event) => this._onPointerMove(event), { signal });
+    window.addEventListener('pointerup', (event) => this._onPointerUp(event), { signal });
+    window.addEventListener('pointercancel', (event) => this._onPointerCancel(event), { signal });
+    window.addEventListener('blur', () => this._onPointerCancel(), { signal });
     this.viewport.addEventListener('wheel', (event) => this._onWheel(event), { passive: false, signal });
     this.viewport.addEventListener('dblclick', (event) => this._onDoubleClick(event), { signal });
     this.viewport.addEventListener('contextmenu', (event) => {
-      if (event.target.closest('.map-mark')) return;
+      // Always suppress the browser menu while working with the map. Editor
+      // markers install their own contextmenu handler and open the app menu.
       event.preventDefault();
     }, { signal });
   }
 
   _onPointerDown(event) {
-    if (event.target.closest('.map-mark, .zoom-controls, button, a, input, select, textarea, label, [role="button"]')) return;
+    if (event.target.closest('.zoom-controls, button, a, input, select, textarea, label')) return;
     if (event.pointerType === 'mouse' && event.button !== 0) return;
+    this._clearSettleAnimation();
+    // A fresh contact after every finger was lifted is a deliberate new tap;
+    // do not make the user wait for the previous gesture's safety window.
+    if (this.pointers.size === 0) this.suppressClickUntil = 0;
+    const startedOnMark = Boolean(event.target.closest('.map-mark'));
     this.pointers.set(event.pointerId, {
       x: event.clientX,
       y: event.clientY,
       pointerType: event.pointerType || 'mouse',
+      startedOnMark,
     });
     if (this.pointers.size === 1) {
       this.panning = {
@@ -780,13 +799,11 @@ export class MapView {
         moved: false,
         slop: tapSlop(event.pointerType),
         pointerType: event.pointerType || 'mouse',
+        startedOnMark,
+        offsetX: 0,
+        offsetY: 0,
       };
       this.pointerDragged = false;
-      if (this.interaction !== 'draw') {
-        try {
-          this.viewport.setPointerCapture?.(event.pointerId);
-        } catch {}
-      }
     } else if (this.pointers.size === 2) {
       this.panning = null;
       const [a, b] = [...this.pointers.values()];
@@ -806,20 +823,16 @@ export class MapView {
       this.pointerDragged = true;
       this.suppressClickUntil = performance.now() + 220;
       this.lastTap = null;
-      try {
-        this.viewport.setPointerCapture?.(event.pointerId);
-      } catch {}
     }
   }
 
   _onPointerMove(event) {
-    if (this.pointers.has(event.pointerId)) {
-      this.pointers.set(event.pointerId, {
-        x: event.clientX,
-        y: event.clientY,
-        pointerType: event.pointerType || this.pointers.get(event.pointerId)?.pointerType || 'mouse',
-      });
-    }
+    if (!this.pointers.has(event.pointerId)) return;
+    this.pointers.set(event.pointerId, {
+      x: event.clientX,
+      y: event.clientY,
+      pointerType: event.pointerType || this.pointers.get(event.pointerId)?.pointerType || 'mouse',
+    });
     if (this.pinch && this.pointers.size >= 2) {
       const [a, b] = [...this.pointers.values()];
       const distance = Math.hypot(a.x - b.x, a.y - b.y);
@@ -852,21 +865,32 @@ export class MapView {
     if (!this.panning) return;
     const dx = event.clientX - this.panning.startX;
     const dy = event.clientY - this.panning.startY;
-    if (!this.panning.moved && Math.hypot(dx, dy) > (this.panning.slop ?? 6)) {
+    const distance = Math.hypot(dx, dy);
+    if (!this.panning.moved && distance > (this.panning.slop ?? 6)) {
       this.panning.moved = true;
+      // Remove the touch-slop dead zone from the first pan frame so the map
+      // starts moving from zero instead of jumping 10–12 px.
+      const scale = (this.panning.slop ?? 6) / distance;
+      this.panning.offsetX = dx * scale;
+      this.panning.offsetY = dy * scale;
       this.pointerDragged = true;
       this.suppressClickUntil = performance.now() + 180;
+      this.lastTap = null;
     }
     if (this.panning.moved && this.interaction !== 'draw') {
-      this.panX = this.panning.panX + dx;
-      this.panY = this.panning.panY + dy;
-      this._clampPan();
+      const rawX = this.panning.panX + dx - this.panning.offsetX;
+      const rawY = this.panning.panY + dy - this.panning.offsetY;
+      const { maxX, maxY } = this._panLimits();
+      // Axes where the map already fits get a gentle rubber band instead of
+      // feeling frozen; it settles back to centre when the finger is lifted.
+      this.panX = maxX > 0 ? clamp(rawX, -maxX, maxX) : clamp(rawX * 0.22, -48, 48);
+      this.panY = maxY > 0 ? clamp(rawY, -maxY, maxY) : clamp(rawY * 0.22, -48, 48);
       this._applyTransform();
     }
   }
 
   _onPointerUp(event) {
-    const had = this.pointers.has(event.pointerId);
+    if (!this.pointers.has(event.pointerId)) return;
     const wasPinching = Boolean(this.pinch);
     const pointerType = this.pointers.get(event.pointerId)?.pointerType || event.pointerType || 'mouse';
     this.pointers.delete(event.pointerId);
@@ -884,17 +908,18 @@ export class MapView {
           moved: false,
           slop: tapSlop(remaining.pointerType),
           pointerType: remaining.pointerType,
+          offsetX: 0,
+          offsetY: 0,
         };
       }
     }
     if (this.panning) {
       const wasDrag = this.panning.moved;
+      const startedOnMark = this.panning.startedOnMark;
       this.panning = null;
-      try {
-        this.viewport.releasePointerCapture?.(event.pointerId);
-      } catch {}
+      if (wasDrag) this._settlePan();
       const now = performance.now();
-      if (had && !wasPinching && !wasDrag && !this.pointerDragged && now >= this.suppressClickUntil) {
+      if (!startedOnMark && !wasPinching && !wasDrag && !this.pointerDragged && now >= this.suppressClickUntil) {
         if (this.interaction === 'click') {
           const pt = this.toMapPoint(event.clientX, event.clientY);
           this.mapClickHandler?.(pt, event);
@@ -917,11 +942,17 @@ export class MapView {
   }
 
   _onPointerCancel(event) {
-    this.pointers.delete(event.pointerId);
+    if (event?.pointerId != null) {
+      if (!this.pointers.has(event.pointerId)) return;
+      this.pointers.delete(event.pointerId);
+    } else {
+      this.pointers.clear();
+    }
     this.panning = null;
     this.pinch = null;
     this.pointerDragged = true;
     this.suppressClickUntil = performance.now() + 220;
+    this._settlePan();
   }
 
   _onWheel(event) {
@@ -989,6 +1020,7 @@ export class MapView {
   setZoom(zoom, anchorClient = null, { silent = false } = {}) {
     const next = clamp(zoom, MIN_MAP_ZOOM, MAX_MAP_ZOOM);
     if (Math.abs(next - this.zoom) < 0.0001) return;
+    this._clearSettleAnimation();
     if (anchorClient) {
       const rect = this.viewport.getBoundingClientRect();
       const oldScale = this.fitScale * this.zoom;
@@ -1017,6 +1049,7 @@ export class MapView {
   }
 
   fit() {
+    this._clearSettleAnimation();
     this.zoom = 1;
     this.panX = 0;
     this.panY = 0;
@@ -1024,16 +1057,41 @@ export class MapView {
     this._notifyZoom();
   }
 
-  _clampPan() {
-    if (!this.lastLayout.w) return;
+  _panLimits() {
+    if (!this.lastLayout.w) return { maxX: 0, maxY: 0 };
     const scale = this.fitScale * this.zoom;
     const mapW = this.W * scale;
     const mapH = this.H * scale;
-    const rect = this.lastLayout;
-    const maxX = Math.max(0, (mapW - rect.w) / 2);
-    const maxY = Math.max(0, (mapH - rect.h) / 2);
+    return {
+      maxX: Math.max(0, (mapW - this.lastLayout.w) / 2),
+      maxY: Math.max(0, (mapH - this.lastLayout.h) / 2),
+    };
+  }
+
+  _clampPan() {
+    const { maxX, maxY } = this._panLimits();
     this.panX = clamp(this.panX, -maxX, maxX);
     this.panY = clamp(this.panY, -maxY, maxY);
+  }
+
+  _clearSettleAnimation() {
+    clearTimeout(this._settleTimer);
+    this._settleTimer = 0;
+    this.canvas.style.transition = '';
+  }
+
+  _settlePan() {
+    const beforeX = this.panX;
+    const beforeY = this.panY;
+    this._clampPan();
+    if (Math.abs(beforeX - this.panX) < 0.1 && Math.abs(beforeY - this.panY) < 0.1) return;
+    this.canvas.style.transition = 'transform 180ms cubic-bezier(0.2, 0.7, 0.3, 1)';
+    this._applyTransform();
+    clearTimeout(this._settleTimer);
+    this._settleTimer = setTimeout(() => {
+      this.canvas.style.transition = '';
+      this._settleTimer = 0;
+    }, 220);
   }
 
   toMapPoint(clientX, clientY) {

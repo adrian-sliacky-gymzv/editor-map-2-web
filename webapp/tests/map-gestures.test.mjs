@@ -70,7 +70,8 @@ test('pinch clamps zoom but still anchors the final zoom level', () => {
   assert.equal(result.panY + 20 + 60 * MAX_MAP_ZOOM, 140);
 });
 
-test('pinch never zooms below the minimum', () => {
+test('pinch never zooms below the fit view', () => {
+  assert.equal(MIN_MAP_ZOOM, 1);
   const result = pinchView({
     startZoom: 1,
     startDistance: 200,
@@ -81,7 +82,7 @@ test('pinch never zooms below the minimum', () => {
     anchorMapX: 0,
     anchorMapY: 0,
   });
-  assert.equal(result.zoom, MIN_MAP_ZOOM);
+  assert.equal(result.zoom, 1);
 });
 
 test('double tap detection honours time and distance windows', () => {

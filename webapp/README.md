@@ -140,9 +140,13 @@ mapa. Kliknutím na oko meníš viditeľnosť, na pin viditeľnosť značky, na 
 Mapy sa ovládajú rovnako v hrách aj v editore:
 
 - **Jeden prst / ťahanie myšou** posúva mapu, keď je priblížená. Pri mierke
-  „celá mapa“ sa mapa neposúva, takže sa nič nehýbe omylom.
+  „celá mapa“ má jemný elastický odpor a po pustení sa vráti do stredu, takže
+  hneď vidíš, že aplikácia gesto zachytila, ale mapa neostane mimo výrezu.
+  Posun sa nikdy nezasekne o falošný 60 px limit.
 - **Dva prsty** plynulo približujú a zároveň posúvajú mapu. Zoom je ukotvený
-  na stred medzi prstami, takže obsah pod prstami neujíde.
+  na stred medzi prstami, takže obsah pod prstami neujíde. Pinch funguje aj
+  vtedy, keď jeden alebo oba prsty začnú priamo na značke.
+- **Minimálny zoom je celá mapa**; pod ňu sa už nedá omylom oddialiť.
 - **Dvojité ťuknutie alebo dvojklik** priblíži mapu na približne 2,4× v mieste
   dotyku. Druhé dvojité ťuknutie vráti celú mapu.
 - **Koliesko myši / trackpad** zoomuje plynulo okolo kurzora; `Ctrl` + koliesko
@@ -153,7 +157,9 @@ Mapy sa ovládajú rovnako v hrách aj v editore:
 - Po pinchi, posune alebo dvojitom ťuknutí sa koncový dotyk **nikdy
   nevyhodnotí ako odpoveď**. Ťuknutie na ovládací prvok mapy tiež nikdy
   neodpovedá. Pri testovacích značkách musí byť dotyk skutočný tap, nie
-  potiahnutie.
+  potiahnutie; ťahanie začaté na značke mapu posúva a odpoveď nespustí.
+- Panning začína plynule bez skoku o veľkosť dotykovej tolerancie a používa
+  presné hranice mapy, nie umelý posun.
 - Každá nová otázka začne na celom výreze mapy; pri „Traf sa!“ sa výsledok
   automaticky oddiali, ak by tip alebo správna poloha boli mimo obrazovky.
 
@@ -312,6 +318,11 @@ Počas testu boli opravené konkrétne problémy:
 Následný mobilný a gestový audit pridal:
 
 - plynulý dvojprstový pinch s posunom stredu a ukotvením zoomu,
+- pinch/pan začínajúci priamo na mapových značkách bez straty gesta,
+- elastický posun pri mierke celej mapy, ktorý sa po pustení vráti do stredu,
+- odstránenie skoku o dotykovú toleranciu pri prvom pan frame a presné
+  hranice posunu,
+- minimálny zoom = celá mapa,
 - ochranu proti náhodnej odpovedi po pinchi, posune, dvojitom ťuknutí aj
   ťuknutí na ovládanie mapy,
 - dvojité ťuknutie/dvojklik na priblíženie a návrat celej mapy,

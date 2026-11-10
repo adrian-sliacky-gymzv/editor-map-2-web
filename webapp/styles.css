@@ -1711,9 +1711,11 @@ label {
   overflow: hidden;
   background: #ffffff;
   touch-action: none;
+  overscroll-behavior: none;
   cursor: crosshair;
   user-select: none;
   -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .map-viewport.is-answered {

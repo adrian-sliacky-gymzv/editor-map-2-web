@@ -6,7 +6,7 @@
 /* Node and keeps the pointer handlers short.                                */
 /* ------------------------------------------------------------------------- */
 
-export const MIN_MAP_ZOOM = 0.6;
+export const MIN_MAP_ZOOM = 1;
 export const MAX_MAP_ZOOM = 10;
 
 export function clampNumber(value, min, max) {
