@@ -1,42 +1,123 @@
-# Editor máp 2 — webová verzia
+# Editor máp 2 — web version
 
-Kartografická webová reimplementácia pôvodnej hry **Editor máp 2** (2010):
-osem pôvodných máp, tri aktivity, atlas 74 slovenských miest a plnohodnotný
-editor máp — všetko bez registrácie a bez serverovej logiky.
+### ▶ Play it now: **https://adrian-sliacky-gymzv.github.io/editor-map-2-web/**
 
-## Rýchly štart
+A free browser game for learning the map of Slovakia and the world, built around the original Slovak school game **Editor máp 2** (2010). It works on a phone, tablet or computer. There is nothing to install and no account to create.
 
-```bash
-cd webapp
-npm start
-```
+---
 
-Otvor <http://localhost:8124/>. Aplikácia nepotrebuje `npm install` ani build
-krok; stačí Node.js 18+.
+## English
 
-## Čo je vo vnútri
+### What is it?
 
-- **Vyskúšaj sa!**, **Traf sa!** a **Poskladaj!** na pôvodných mapách a s
-  pôvodnými testami, obtiažnosťami a bodovaním.
-- **Traf sa!** z hrdinu domovskej stránky štartuje rovno: ťažká obtiažnosť,
-  10 otázok, Slovensko.
-- **Editor máp** s vrstvami, farbami, vlastnými značkami, kreslením,
-  ukladaním `.mef`, exportom PNG/JPEG a tlačou.
-- **Atlas 74 miest** s hľadaním, filtrami, štatistikami a rýchlym tréningom.
-- Vycentrovaný zoom, presné pinch ukotvenie, plynulý posun so zotrvačnosťou
-  a tmavá mapová tabuľa.
+**Editor máp 2** is a small geography arcade. You can play three map games, browse an atlas of 74 Slovak cities, or open a full map editor and change the original maps yourself.
 
-## Dokumentácia
+The project recreates the original game’s eight maps and 1,982 objects: Slovakia, Europe, the world, Africa, Asia, Australia, North America and South America. The original tests, difficulty levels and scoring rules are preserved. The interface and the map editor are a modern web rebuild.
 
-- [Používateľská a technická dokumentácia](webapp/README.md)
-- [Nasadenie na GitHub Pages](DEPLOYMENT.md)
+### How to play
 
-## Nasadenie
+1. Open **https://adrian-sliacky-gymzv.github.io/editor-map-2-web/**.
+2. Choose an activity:
+   - **Vyskúšaj sa!** — a place name is shown and several pins appear. Pick the correct pin.
+   - **Traf sa!** — click where you think the place is. The closer you are, the more points you get.
+   - **Poskladaj!** — drag the object from the middle of the map to its real location.
+3. On a phone, pinch to zoom, drag with one finger to move the map after zooming, and use **◎** to return to the full map. **⌂** also shows the whole map.
+4. No registration, download, or payment is required.
 
-Repozitár obsahuje hotový GitHub Actions workflow, ktorý publikuje `webapp/`
-ako statickú stránku. Postup na tvojej strane je v [DEPLOYMENT.md](DEPLOYMENT.md).
+The green button on the homepage starts a recommended game immediately: **Traf sa! — hard — 10 questions — Slovakia**.
 
-## Licencia a pôvod
+### Features
 
-Nekomerčná edukatívna reimplementácia. Pôvodná hra a mapové podklady patria
-ich autorom; podrobnosti sú v aplikácii v časti **O aplikácii**.
+- **Three complete games** with the original maps, tests, difficulty levels and scoring.
+- **Eight original maps** and 1,982 geographic objects.
+- **Map editor** with layers, colours, custom labels, freehand and shape drawing, `.mef` save/open, PNG/JPEG export and printing.
+- **City atlas** of all 74 Slovak cities with search, filters, statistics and quick training.
+- **Mobile-first controls**: pinch zoom, one-finger pan after zooming, double-tap zoom, inertia, a dedicated recenter button and a locked full-map view.
+- **Portrait and landscape layouts**: in landscape the game controls move to a side panel and the map gets the full height.
+- **Light and dark themes**, keyboard shortcuts and an accessible focus order.
+- **Static site** — no backend, database, tracking or build server.
+
+### Screenshots
+
+| Homepage | A game |
+| --- | --- |
+| ![Homepage](screenshots/home.png) | ![Traf sa game](screenshots/game.png) |
+
+| Map editor | City atlas |
+| --- | --- |
+| ![Map editor](screenshots/editor.png) | ![City atlas](screenshots/atlas.png) |
+
+| Activity setup | Mobile |
+| --- | --- |
+| ![Activity setup](screenshots/setup.png) | ![Mobile homepage](screenshots/mobile.png) |
+
+| Dark theme | Landscape game |
+| --- | --- |
+| ![Dark theme](screenshots/dark-home.png) | ![Landscape game](screenshots/landscape.png) |
+
+### Technical information
+
+- Pure HTML, CSS and JavaScript; no framework and no build step.
+- The site is deployed from the `webapp/` folder with GitHub Actions to GitHub Pages.
+- Node.js 18+ is only needed for local development.
+- Full technical documentation: [`webapp/README.md`](webapp/README.md) (English).
+- Deployment guide: [`DEPLOYMENT.md`](DEPLOYMENT.md) (English).
+- Custom domain guide: [`CUSTOM_DOMAIN.md`](CUSTOM_DOMAIN.md) (English).
+
+### Credits
+
+Original game: **RNDr. Štefan Karolčík, PhD** (author), **Ing. Juraj Hrabovec — MAX MEDIA** (design and programming), **RNDr. Daniel Gurňák, PhD** (map data), © 2010. This is a non-commercial educational reimplementation. The original names and map data remain the property of their authors.
+
+---
+
+# Slovenčina
+
+### ▶ Zahraj si teraz: **https://adrian-sliacky-gymzv.github.io/editor-map-2-web/**
+
+Bezplatná webová hra na učenie sa mapy Slovenska a sveta, postavená na pôvodnej slovenskej školskej hre **Editor máp 2** (2010). Funguje na telefóne, tablete aj počítači. Netreba nič inštalovať ani si vytvárať účet.
+
+### Čo to je?
+
+**Editor máp 2** je malá geografická arkáda. Môžeš hrať tri mapové hry, prezerať atlas 74 slovenských miest alebo si otvoriť plnohodnotný editor a upraviť pôvodné mapy podľa seba.
+
+Projekt obsahuje všetkých osem pôvodných máp a 1 982 objektov: Slovensko, Európu, svet, Afriku, Áziu, Austráliu, Severnú a Južnú Ameriku. Pôvodné testy, obtiažnosti a bodovanie zostali zachované. Rozhranie a editor sú modernou webovou reimplementáciou.
+
+### Ako hrať
+
+1. Otvor **https://adrian-sliacky-gymzv.github.io/editor-map-2-web/**.
+2. Vyber aktivitu:
+   - **Vyskúšaj sa!** — zobrazí sa názov miesta a niekoľko značiek. Vyber tú správnu.
+   - **Traf sa!** — klikni tam, kde si myslíš, že miesto leží. Čím bližšie, tým viac bodov.
+   - **Poskladaj!** — pretiahni objekt zo stredu mapy na jeho skutočné miesto.
+3. Na telefóne priblížiš mapu štipcom, po priblížení ju posúvaš jedným prstom a tlačidlom **◎** sa vrátiš na celú mapu. **⌂** tiež zobrazí celú mapu.
+4. Bez registrácie, inštalácie alebo platby.
+
+Zelené tlačidlo na domovskej stránke hneď spustí odporúčanú hru: **Traf sa! — ťažká — 10 otázok — Slovensko**.
+
+### Funkcie
+
+- **Tri kompletné hry** s pôvodnými mapami, testami, obtiažnosťami a bodovaním.
+- **Osem pôvodných máp** a 1 982 geografických objektov.
+- **Editor máp** s vrstvami, farbami, vlastnými popiskami, kreslením, ukladaním `.mef`, exportom PNG/JPEG a tlačou.
+- **Atlas 74 slovenských miest** s hľadaním, filtrami, štatistikami a rýchlym tréningom.
+- **Ovládanie na mobil**: pinch zoom, posun po priblížení, dvojité ťuknutie, zotrvačnosť, tlačidlo na vycentrovanie a pevná mapa pri predvolenom oddialení.
+- **Portrait aj landscape**: v landscape sa ovládanie presunie do bočného panelu a mapa dostane celú výšku.
+- **Svetlá a tmavá téma**, klávesové skratky a prístupný fokus.
+- **Statická stránka** — bez servera, databázy, sledovania a bez build kroku.
+
+### Obrázky
+
+Rovnaká galéria ako v anglickej časti je v priečinku [`screenshots/`](screenshots/).
+
+### Technické informácie
+
+- Čisté HTML, CSS a JavaScript; bez frameworku a bez build kroku.
+- Nasadenie z priečinka `webapp/` cez GitHub Actions na GitHub Pages.
+- Node.js 18+ je potrebný len na lokálny vývoj.
+- Technická dokumentácia: [`webapp/README.md`](webapp/README.md) (anglicky).
+- Návod na nasadenie: [`DEPLOYMENT.md`](DEPLOYMENT.md) (anglicky).
+- Vlastná doména: [`CUSTOM_DOMAIN.md`](CUSTOM_DOMAIN.md) (anglicky).
+
+### Autori
+
+Pôvodná hra: **RNDr. Štefan Karolčík, PhD** (autor), **Ing. Juraj Hrabovec — MAX MEDIA** (dizajn a programovanie), **RNDr. Daniel Gurňák, PhD** (mapové podklady), © 2010. Ide o nekomerčnú edukačnú reimplementáciu. Pôvodné názvy a mapové podklady patria ich autorom.
