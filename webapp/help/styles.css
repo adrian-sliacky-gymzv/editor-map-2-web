@@ -1,135 +1,235 @@
 @charset "utf-8";
-/* CSS Document */
+/* Editor máp 2 — help pages, cartographic editorial skin */
 
-html, body, table, td, th, h1, h2, h3, p , ul, li, img{
-	margin:0px;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 12px;
-	font-weight: normal;
-	text-align: left;
-	clear: left;
-	padding: 0px;
+:root {
+  --ink: #17211b;
+  --ink-2: #2c3a31;
+  --muted: #5b685f;
+  --paper: #f3eee2;
+  --paper-2: #ebe4d6;
+  --card: #fbf8f0;
+  --line: #d7cdbb;
+  --line-2: #bfb29d;
+  --forest: #1e4a36;
+  --amber: #a87424;
+  --display: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, serif;
+  --mono: "Cascadia Mono", Consolas, "Lucida Console", monospace;
+  color-scheme: light dark;
 }
+
+* { box-sizing: border-box; }
+
+html { background: var(--paper); }
+
 body {
-	margin: 12px;
-	max-width: 960px;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 28px clamp(16px, 4vw, 48px) 70px;
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(rgba(23, 33, 27, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(23, 33, 27, 0.035) 1px, transparent 1px);
+  background-size: 30px 30px;
+  color: var(--ink);
+  font: 14px/1.65 "Segoe UI", Aptos, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
-p , ul, h3{
-	margin-bottom: 8px;
-	margin-left: 12px;
+
+h1,
+h2,
+h3 {
+  clear: both;
+  color: var(--ink);
+  font-family: var(--display);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  margin: 26px 0 14px;
+  font-size: clamp(34px, 5vw, 52px);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+}
+
+h2 {
+  margin: 30px 0 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+  color: var(--forest);
+  font-size: 26px;
+  line-height: 1.1;
 }
 
 h3 {
-	font-weight: bold;
-	color: #004C7F;
-	margin-top: 12px;
-}
-h2 {
-	font-weight: bold;
-	color: #004C7F;
-	margin-top: 12px;
-	margin-bottom: 6px;
-	font-size: 14px;
+  margin: 20px 0 6px;
+  color: var(--forest);
+  font-size: 19px;
+  line-height: 1.15;
 }
 
+p,
+ul,
+ol {
+  margin: 0 0 13px;
+}
 
-h1 {
-	font-size: 16px;
-	font-weight: bold;
-	color: #990000;
-	margin-top: 20px;
-	margin-bottom: 12px;
+ul,
+ol {
+  padding-left: 1.3em;
 }
-li  {
-	margin-left: 32px;
-}
+
+li { margin: 0 0 4px; }
+
 a {
-	color: #004C7F;
-	text-decoration: underline;
+  color: var(--forest);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--amber) 55%, transparent);
+  text-underline-offset: 2px;
 }
+
 a:hover {
-	color: #004C7F;
-	text-decoration: none;
+  color: var(--amber);
 }
 
-.scrshot {
-	float: right;
-	clear: right;
-	border: 1px;
-	border-style: solid;
-	margin: 8px;
-	padding: 8px;
-	border-color: #999;
+strong { color: var(--ink); font-weight: 650; }
+em { color: var(--muted); }
+
+img {
+  max-width: 100%;
+  height: auto;
 }
 
-.scrshot p {
-	text-align: center;
-	font-size: 9px;
-	font-style: italic;
-	margin-bottom: 0px;
-	margin-left: 0px;
-	margin-top: 6px;
-}
-
-.toplogo {
-	float: right;
-	clear: right;
-	padding: 0px;
-	margin-left: 25px;
-	margin-bottom: 25px;
-	margin-right: 0px;
-	margin-top: 25px;
-}
-.toplogo p {
-	text-align: right;
-	color: #004C7F;
-	font-weight: bold;
-}
-.unbuletted {
-	list-style-type: none;
-}
 .topmenu {
-	border: 1px solid #004C7F;
-	text-align: center;
-	padding: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  padding: 10px 12px;
+  border: 1px solid var(--line-2);
+  background: var(--card);
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
+
 .topmenu a {
-	color: #900;
-	font-weight: bold;
-	text-decoration: none;
+  color: var(--ink-2);
+  text-decoration: none;
 }
 
 .topmenu a:hover {
-	color: #900;
-	text-decoration: underline;
-}
-.buttonref {
-	font-weight: bold;
-	color: #004C7F;
-	font-style: italic;
+  color: var(--amber);
+  text-decoration: underline;
 }
 
-/* Web app integration: responsive help + automatic dark mode */
-html { color-scheme: light dark; }
-body { color: #1f2937; background: #ffffff; }
-img { max-width: 100%; height: auto; }
+.toplogo {
+  float: right;
+  clear: right;
+  margin: 26px 0 22px 24px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  background: var(--card);
+}
+
+.toplogo img {
+  display: block;
+  width: 172px;
+  filter: saturate(0.72) sepia(0.06);
+}
+
+.toplogo p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.scrshot {
+  float: right;
+  clear: right;
+  margin: 8px 0 16px 20px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  box-shadow: 4px 4px 0 rgba(23, 33, 27, 0.06);
+}
+
+.scrshot p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 7px;
+  font-style: normal;
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.unbuletted {
+  padding-left: 0;
+  list-style: none;
+}
+
+.buttonref {
+  color: var(--forest);
+  font-family: var(--mono);
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
 
 @media (max-width: 700px) {
-	body { margin: 12px; }
-	.scrshot, .toplogo { float: none; max-width: 100%; margin: 10px 0; }
-	.scrshot p { text-align: left; }
-	.topmenu { line-height: 1.9; }
+  body { padding: 18px 14px 50px; }
+
+  .scrshot,
+  .toplogo {
+    float: none;
+    max-width: 100%;
+    margin: 10px 0;
+  }
+
+  .scrshot p { text-align: left; }
+
+  .topmenu { line-height: 1.7; }
 }
 
 @media (prefers-color-scheme: dark) {
-	html { color-scheme: dark; }
-	body { background: #0b1220; color: #c9d7e8; }
-	h1 { color: #ff9a9a; }
-	h2, h3 { color: #a9c4ff; }
-	a, .buttonref, .toplogo p { color: #9ab7ff; }
-	a:hover { color: #c4d6ff; }
-	.topmenu { border-color: #344966; background: #0f1b2c; }
-	.topmenu a { color: #ffb0b0; }
-	.topmenu a:hover { color: #ffd0d0; }
-	.scrshot { border-color: #3a4e6a; background: #0f1a2a; }
+  :root {
+    --ink: #ece6d8;
+    --ink-2: #cfc9bb;
+    --muted: #a2a89c;
+    --paper: #111914;
+    --paper-2: #1b261e;
+    --card: #18221b;
+    --line: #384338;
+    --line-2: #556252;
+    --forest: #8fbfa1;
+    --amber: #d6a84f;
+  }
+
+  html { background: var(--paper); }
+
+  body {
+    background-color: var(--paper);
+    background-image:
+      linear-gradient(rgba(236, 230, 216, 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(236, 230, 216, 0.035) 1px, transparent 1px);
+  }
+
+  .toplogo img,
+  .scrshot img {
+    filter: invert(0.88) hue-rotate(165deg) saturate(0.7) sepia(0.1);
+  }
+
+  .topmenu,
+  .toplogo,
+  .scrshot {
+    background: var(--card);
+  }
 }

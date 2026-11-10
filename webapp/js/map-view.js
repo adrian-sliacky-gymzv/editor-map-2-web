@@ -9,6 +9,7 @@ import { normalizeHex, hexFromValue } from './classic-data.js';
 import {
   MAX_MAP_ZOOM,
   MIN_MAP_ZOOM,
+  canvasPanLimits,
   doubleTapTargetZoom,
   isDoubleTap,
   pinchView,
@@ -103,6 +104,10 @@ export class MapView {
     this._settleTimer = 0;
     this._renderFrame = 0;
     this._gestureTimer = 0;
+    this._momentumFrame = 0;
+    this._velocityX = 0;
+    this._velocityY = 0;
+    this._lastMoveTime = 0;
     this.interactivePointer = null;
     this.lastLayout = { w: 0, h: 0 };
     this.mapClickHandler = options.onMapClick || null;
@@ -118,7 +123,9 @@ export class MapView {
     clearTimeout(this._settleTimer);
     clearTimeout(this._gestureTimer);
     if (this._renderFrame) cancelAnimationFrame(this._renderFrame);
+    if (this._momentumFrame) cancelAnimationFrame(this._momentumFrame);
     this._renderFrame = 0;
+    this._momentumFrame = 0;
     if (this._labelEditor) {
       this._labelEditor.remove();
       this._labelEditor = null;
@@ -789,9 +796,10 @@ export class MapView {
   focusPoint(cx, cy, zoomAtLeast = 2.2) {
     if (this.zoom < zoomAtLeast) this.setZoom(zoomAtLeast);
     const scale = this.fitScale * this.zoom;
-    const rect = this.viewport.getBoundingClientRect();
-    this.panX = rect.width / 2 - this.baseX - cx * scale;
-    this.panY = rect.height / 2 - this.baseY - cy * scale;
+    // Pan is measured from the centred view. Moving map point (cx, cy) to the
+    // centre means offsetting the centred map by half its size in map units.
+    this.panX = (this.W / 2 - cx) * scale;
+    this.panY = (this.H / 2 - cy) * scale;
     this._clampPan();
     this._applyTransform();
   }
@@ -933,6 +941,7 @@ export class MapView {
     if (event.target.closest('.zoom-controls, button, a, input, select, textarea, label')) return;
     if (event.pointerType === 'mouse' && event.button !== 0) return;
     if (event.pointerType !== 'mouse') event.preventDefault();
+    this._stopMomentum();
     this._clearSettleAnimation();
     this._beginGesture();
     // A fresh contact after every finger was lifted is a deliberate new tap;
@@ -964,8 +973,12 @@ export class MapView {
           startedOnMark,
           offsetX: 0,
           offsetY: 0,
+          lastTime: performance.now(),
         };
         this.pointerDragged = false;
+        this._velocityX = 0;
+        this._velocityY = 0;
+        this._lastMoveTime = performance.now();
       }
     } else if (this.pointers.size === 2) {
       this.panning = null;
@@ -985,8 +998,6 @@ export class MapView {
         anchorMapY: anchor.y,
         fitScale: this.fitScale,
         viewportRect: this.viewport.getBoundingClientRect(),
-        baseX: this.baseX,
-        baseY: this.baseY,
       };
       this.pointerDragged = true;
       this.suppressClickUntil = performance.now() + 220;
@@ -1020,8 +1031,6 @@ export class MapView {
           anchorMapY: anchor.y,
           fitScale: this.fitScale,
           viewportRect: this.viewport.getBoundingClientRect(),
-          baseX: this.baseX,
-          baseY: this.baseY,
         };
         return;
       }
@@ -1034,8 +1043,10 @@ export class MapView {
         currentMidpoint: midpoint,
         viewportLeft: this.pinch.viewportRect.left,
         viewportTop: this.pinch.viewportRect.top,
-        baseX: this.pinch.baseX,
-        baseY: this.pinch.baseY,
+        mapWidth: this.W,
+        mapHeight: this.H,
+        viewportWidth: this.lastLayout.w,
+        viewportHeight: this.lastLayout.h,
         anchorMapX: this.pinch.anchorMapX,
         anchorMapY: this.pinch.anchorMapY,
         minZoom: MIN_MAP_ZOOM,
@@ -1053,6 +1064,7 @@ export class MapView {
     const dx = event.clientX - this.panning.startX;
     const dy = event.clientY - this.panning.startY;
     const distance = Math.hypot(dx, dy);
+    const now = performance.now();
     if (!this.panning.moved && distance > (this.panning.slop ?? 6)) {
       this.panning.moved = true;
       // Remove the touch-slop dead zone from the first pan frame so the map
@@ -1061,19 +1073,89 @@ export class MapView {
       this.panning.offsetX = dx * scale;
       this.panning.offsetY = dy * scale;
       this.pointerDragged = true;
-      this.suppressClickUntil = performance.now() + 180;
+      this.suppressClickUntil = now + 180;
       this.lastTap = null;
+      this.panning.lastTime = now;
     }
     if (this.panning.moved && this.interaction !== 'draw') {
+      const beforeX = this.panX;
+      const beforeY = this.panY;
+      const elapsed = Math.max(8, now - (this.panning.lastTime || now - 16));
       const rawX = this.panning.panX + dx - this.panning.offsetX;
       const rawY = this.panning.panY + dy - this.panning.offsetY;
-      const { maxX, maxY } = this._panLimits();
-      // Axes where the map already fits get a gentle rubber band instead of
-      // feeling frozen; it settles back to centre when the finger is lifted.
-      this.panX = maxX > 0 ? clamp(rawX, -maxX, maxX) : clamp(rawX * 0.22, -48, 48);
-      this.panY = maxY > 0 ? clamp(rawY, -maxY, maxY) : clamp(rawY * 0.22, -48, 48);
+      // Follow the finger one-to-one inside the map. At the edge, and on an
+      // axis where the map is smaller than the viewport, use a short elastic
+      // overscroll that snaps back on release — the photos-app behaviour.
+      this.panX = this._elasticClamp(rawX, this._panLimits().maxX, this.lastLayout.w);
+      this.panY = this._elasticClamp(rawY, this._panLimits().maxY, this.lastLayout.h);
+      const vx = (this.panX - beforeX) / elapsed;
+      const vy = (this.panY - beforeY) / elapsed;
+      // Blend a little so a single jittery frame does not decide the throw.
+      this._velocityX = this._velocityX * 0.55 + vx * 0.45;
+      this._velocityY = this._velocityY * 0.55 + vy * 0.45;
+      this.panning.lastTime = now;
       this._requestRender();
     }
+  }
+
+  _elasticClamp(value, max, viewportSize) {
+    const limit = Math.max(0, Number(max) || 0);
+    const bound = Math.min(96, Math.max(42, viewportSize * 0.16));
+    if (limit === 0) return clamp(value * 0.3, -bound, bound);
+    const magnitude = Math.abs(value);
+    if (magnitude <= limit) return value;
+    return Math.sign(value) * Math.min(limit + (magnitude - limit) * 0.16, limit + bound);
+  }
+
+  _stopMomentum() {
+    if (this._momentumFrame) cancelAnimationFrame(this._momentumFrame);
+    this._momentumFrame = 0;
+    this._velocityX = 0;
+    this._velocityY = 0;
+  }
+
+  _startMomentum() {
+    const speed = Math.hypot(this._velocityX, this._velocityY);
+    const { maxX, maxY } = this._panLimits();
+    const outOfBounds = Math.abs(this.panX) > maxX + 0.5 || Math.abs(this.panY) > maxY + 0.5;
+    if (speed < 0.08 || outOfBounds) {
+      this._settlePan();
+      return;
+    }
+    this._beginGesture();
+    let last = performance.now();
+    const step = (now) => {
+      const dt = Math.min(34, Math.max(0, now - last));
+      last = now;
+      if (dt === 0 || !this.scene) {
+        this._momentumFrame = 0;
+        return;
+      }
+      const beforeX = this.panX;
+      const beforeY = this.panY;
+      this.panX += this._velocityX * dt;
+      this.panY += this._velocityY * dt;
+      this._clampPan();
+      const clampedX = Math.abs(this.panX - beforeX - this._velocityX * dt) > 0.5;
+      const clampedY = Math.abs(this.panY - beforeY - this._velocityY * dt) > 0.5;
+      if (clampedX) this._velocityX = 0;
+      if (clampedY) this._velocityY = 0;
+      // 0.94 per 16.7 ms gives a short, predictable glide.
+      const friction = Math.pow(0.94, dt / 16.7);
+      this._velocityX *= friction;
+      this._velocityY *= friction;
+      this._applyTransform();
+      if (Math.hypot(this._velocityX, this._velocityY) < 0.015) {
+        this._momentumFrame = 0;
+        this._velocityX = 0;
+        this._velocityY = 0;
+        this._endGestureSoon();
+        this._settlePan();
+        return;
+      }
+      this._momentumFrame = requestAnimationFrame(step);
+    };
+    this._momentumFrame = requestAnimationFrame(step);
   }
 
   _onPointerUp(event) {
@@ -1088,6 +1170,8 @@ export class MapView {
       this.pinch = null;
       this.pointerDragged = true;
       this.suppressClickUntil = performance.now() + 220;
+      this._velocityX = 0;
+      this._velocityY = 0;
       const remaining = [...this.pointers.values()][0];
       if (remaining) {
         this.panning = {
@@ -1100,14 +1184,17 @@ export class MapView {
           pointerType: remaining.pointerType,
           offsetX: 0,
           offsetY: 0,
+          lastTime: performance.now(),
         };
+      } else {
+        this._settlePan();
       }
     }
     if (this.panning) {
       const wasDrag = this.panning.moved;
       const startedOnMark = this.panning.startedOnMark;
       this.panning = null;
-      if (wasDrag) this._settlePan();
+      if (wasDrag) this._startMomentum();
       const now = performance.now();
       if (!startedOnMark && !wasPinching && !wasDrag && !this.pointerDragged && now >= this.suppressClickUntil) {
         if (this.interaction === 'click') {
@@ -1140,6 +1227,7 @@ export class MapView {
       this.pointers.clear();
       this.interactivePointer = null;
     }
+    this._stopMomentum();
     this.panning = null;
     this.pinch = null;
     this.pointerDragged = true;
@@ -1152,6 +1240,7 @@ export class MapView {
   _onWheel(event) {
     if (this.interaction === 'draw') return;
     event.preventDefault();
+    this._stopMomentum();
     this._beginGesture();
     this._endGestureSoon();
     const factor = wheelZoomFactor(
@@ -1203,8 +1292,15 @@ export class MapView {
       this._renderFrame = 0;
     }
     const scale = this.fitScale * this.zoom;
+    const w = this.lastLayout.w || this.viewport.clientWidth || 0;
+    const h = this.lastLayout.h || this.viewport.clientHeight || 0;
+    // Keep the map centred at every zoom level. `panX`/`panY` are offsets
+    // from that centre, so zero always means "whole map centred" and the
+    // pan limits are symmetric and reachable in both directions.
+    const originX = (w - this.W * scale) / 2;
+    const originY = (h - this.H * scale) / 2;
     this.canvas.style.transformOrigin = '0 0';
-    this.canvas.style.transform = `translate(${this.baseX + this.panX}px, ${this.baseY + this.panY}px) scale(${scale})`;
+    this.canvas.style.transform = `translate(${originX + this.panX}px, ${originY + this.panY}px) scale(${scale})`;
     const markScale = 1 / Math.max(0.001, scale);
     if (Math.abs(markScale - this.markScale) > 0.0001) this.updateMarkScale();
     else this._refreshPlacedLabels();
@@ -1222,20 +1318,28 @@ export class MapView {
     const next = clamp(zoom, MIN_MAP_ZOOM, MAX_MAP_ZOOM);
     if (Math.abs(next - this.zoom) < 0.0001) return;
     this._clearSettleAnimation();
-    if (anchorClient) {
+    if (!anchorClient) {
+      // Buttons and programmatic zooms behave like every map viewer: the
+      // point under the middle of the viewport stays put.
       const rect = this.viewport.getBoundingClientRect();
-      const oldScale = this.fitScale * this.zoom;
-      const px = anchorClient.x - rect.left;
-      const py = anchorClient.y - rect.top;
-      const mapX = (px - this.baseX - this.panX) / oldScale;
-      const mapY = (py - this.baseY - this.panY) / oldScale;
-      this.zoom = next;
-      const newScale = this.fitScale * this.zoom;
-      this.panX = px - this.baseX - mapX * newScale;
-      this.panY = py - this.baseY - mapY * newScale;
-    } else {
-      this.zoom = next;
+      anchorClient = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
     }
+    const rect = this.viewport.getBoundingClientRect();
+    const w = this.lastLayout.w || rect.width;
+    const h = this.lastLayout.h || rect.height;
+    const oldScale = this.fitScale * this.zoom;
+    const px = anchorClient.x - rect.left;
+    const py = anchorClient.y - rect.top;
+    const oldOriginX = (w - this.W * oldScale) / 2;
+    const oldOriginY = (h - this.H * oldScale) / 2;
+    const mapX = (px - oldOriginX - this.panX) / oldScale;
+    const mapY = (py - oldOriginY - this.panY) / oldScale;
+    this.zoom = next;
+    const newScale = this.fitScale * this.zoom;
+    const newOriginX = (w - this.W * newScale) / 2;
+    const newOriginY = (h - this.H * newScale) / 2;
+    this.panX = px - newOriginX - mapX * newScale;
+    this.panY = py - newOriginY - mapY * newScale;
     this._clampPan();
     this._applyTransform();
     if (!silent) this._notifyZoom();
@@ -1272,16 +1376,17 @@ export class MapView {
     const scale = this.fitScale * this.zoom;
     const mapW = this.W * scale;
     const mapH = this.H * scale;
-    // At low zoom the map is smaller than the viewport. Allow it to move
-    // inside that free space so a pinch can keep the map point under the
-    // fingers instead of always zooming around the viewport centre. A
-    // controlled overscroll keeps that anchor natural near an edge, while
-    // most of the map stays visible and the home button can recentre it.
-    const factor = this.lastLayout.w <= 700 ? 0.4 : 0.2;
-    return {
-      maxX: Math.max(Math.abs(mapW - this.lastLayout.w) / 2, this.lastLayout.w * factor),
-      maxY: Math.max(Math.abs(mapH - this.lastLayout.h) / 2, this.lastLayout.h * factor),
-    };
+    // Keep a generous part of the map reachable in every direction. This is
+    // intentionally closer to a map canvas than a photo viewer: a pan must
+    // never stop just because a pinch left the anchor near an edge. The home
+    // button recentres the table, and at least a slice of the map always stays
+    // visible so it cannot be lost.
+    return canvasPanLimits({
+      mapWidth: mapW,
+      mapHeight: mapH,
+      viewportWidth: this.lastLayout.w,
+      viewportHeight: this.lastLayout.h,
+    });
   }
 
   _clampPan() {
@@ -1297,6 +1402,7 @@ export class MapView {
   }
 
   _settlePan() {
+    this._stopMomentum();
     const beforeX = this.panX;
     const beforeY = this.panY;
     this._clampPan();

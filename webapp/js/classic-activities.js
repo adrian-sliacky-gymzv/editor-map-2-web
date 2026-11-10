@@ -233,7 +233,11 @@ export async function initActivities() {
     const trigger = event.target.closest('[data-classic-mode]');
     if (trigger) {
       event.preventDefault();
-      openActivitySetup(trigger.dataset.classicMode);
+      if (trigger.dataset.classicPreset === 'hero') {
+        startHeroGame();
+      } else {
+        openActivitySetup(trigger.dataset.classicMode);
+      }
     }
     const editorTrigger = event.target.closest('[data-editor-open]');
     if (editorTrigger) {
@@ -241,6 +245,21 @@ export async function initActivities() {
       document.dispatchEvent(new CustomEvent('editor:open'));
     }
   });
+}
+
+async function startHeroGame() {
+  try {
+    await startActivityGame({
+      mode: 'distance',
+      mapKey: 'slovensko',
+      testIndex: 0,
+      levelIndex: 2,
+      numQ: 10,
+    });
+  } catch (error) {
+    console.error(error);
+    toast('Hru sa nepodarilo spustiť.', 'error');
+  }
 }
 
 function cacheDom() {

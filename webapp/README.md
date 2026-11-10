@@ -9,9 +9,32 @@ farbami, značkami, kreslením, ukladaním, exportom a tlačou.
 Ako bonus zostal zachovaný aj moderný **atlas 74 slovenských miest** s hľadaním,
 filtrami, štatistikami a rýchlym tréningom.
 
+Domovská stránka štartuje hrdinovým tlačidlom **Traf sa! — ťažká obtiažnosť,
+10 otázok, Slovensko**; ostatné aktivity si nastavíš v ich vlastných dialógoch.
+
 ![Domovská obrazovka webovej verzie](screenshot-home.png)
 
 ![Editor máp s pôvodnou mapou Európy](screenshot-editor.png)
+
+![Atlas slovenských miest](screenshot-atlas.png)
+
+![Mobilná domovská stránka](screenshot-mobile.png)
+
+## Vizuálny systém
+
+Rozhranie je postavené ako **kartografický redakčný ateliér**, nie ako generická
+karta s gradientom:
+
+- teplý papier, tmavozelený atrament a okrové akcenty namiesto modrofialových
+  gradientov a farebných pruhov na kartách,
+- nadpisy v serifovom písme (Georgia / Palatino), technické štítky a čísla
+  v monospace písme,
+- jemné pravidlá, číslované riadky aktivít, rámované mapové listy a súradnicové
+  popisky namiesto jednotnej mriežky zaoblených boxov,
+- mapové plátno je položené na milimetrovom papieri, takže prázdny priestor
+  okolo mapy pôsobí ako pracovná plocha, nie ako chýbajúci obsah,
+- tmavá téma je samostatná kurátorovaná paleta, nie automatické prevrátenie
+  stránky.
 
 ## Čo je súčasťou
 
@@ -89,20 +112,32 @@ aplikáciu otvoríš aj z telefónu na rovnakej Wi-Fi; adresu vypíše do konzol
 
 ### GitHub Pages
 
-Repozitár obsahuje hotový workflow `.github/workflows/pages.yml`, ktorý
-publikuje obsah priečinka `webapp/` ako statickú stránku:
+Repozitár je pripravený na statické nasadenie bez build kroku. Podrobný návod
+vrátane riešenia problémov je v [`../DEPLOYMENT.md`](../DEPLOYMENT.md).
 
-1. V GitHub repozitári otvor **Settings → Pages**.
-2. Ako **Source** vyber **GitHub Actions**.
-3. Pushni do vetvy `master` alebo `main`; workflow `Deploy to GitHub Pages`
-   nahrá `webapp/` a zverejní ho.
+Čo musíš urobiť na svojej strane:
 
-Všetky cesty sú relatívne, `manifest.webmanifest` používa `start_url: "./"`,
-priečinok obsahuje `.nojekyll` a `404.html`. Aplikácia preto funguje aj pod
-repozitárovou podcestou, napríklad
-`https://používateľ.github.io/Editor_map_GEG/`. Overené aj servovaním z
-`/Editor_map_GEG/webapp/`: všetky CSS, JS, dáta, mapy, manifest aj pomoc sa
-načítajú s HTTP 200 a hry fungujú. GitHub Pages nepotrebuje `server.mjs`.
+1. Vytvor **verejný** GitHub repozitár (privátne Pages vyžadujú platený plán).
+2. Pridaj remote a pushni vetvu:
+
+   ```bash
+   git remote add origin https://github.com/<používateľ>/<repo>.git
+   git push -u origin master
+   ```
+
+   (alebo `git branch -M main` a `git push -u origin main`).
+3. V repozitári otvor **Settings → Pages** a ako **Source** vyber
+   **GitHub Actions**.
+4. Počkaj na zelený workflow **Deploy to GitHub Pages**; adresa bude
+   `https://<používateľ>.github.io/<repo>/`.
+
+Workflow `.github/workflows/pages.yml` nahrá iba `webapp/`. Všetky cesty sú
+relatívne, `manifest.webmanifest` používa `start_url: "./"`, priečinok obsahuje
+`.nojekyll` a `404.html`. Aplikácia preto funguje aj pod repozitárovou
+podcestou, napríklad `https://používateľ.github.io/Editor_map_GEG/`. Overené aj
+servovaním z `/Editor_map_GEG/webapp/`: všetky CSS, JS, dáta, mapy, manifest aj
+pomoc sa načítajú s HTTP 200 a hry fungujú. GitHub Pages nepotrebuje
+`server.mjs`.
 
 ## Ako hrať
 
@@ -279,13 +314,14 @@ Počas vývoja bolo overené:
 npm test
 ```
 
-Aktuálne **63 testov, 63 passing**. Testy pokrývajú:
+Aktuálne **67 testov, 67 passing**. Testy pokrývajú:
 
 - pôvodné bodovanie a prahy,
 - výber otázok bez opakovania,
 - puzzle toleranciu,
 - atlas, štatistiky a tréning slabých miest,
-- matematiku pinchu, dvojitého ťuknutia, kolieska a ukotvenia zoomu,
+- matematiku pinchu, dvojitého ťuknutia, kolieska, ukotvenia zoomu a
+  vycentrovaného mapového plátna,
 - dokumentáciu a `aria-keyshortcuts` pre klávesové skratky,
 - prehľadný HUD úlohy s cieľom, bodmi, priemerom a číslom otázky v oboch
   herných obrazovkách, legendu a čitateľné štítky markerov,
@@ -321,8 +357,9 @@ aj tmavej téme.
   prehliadača na telefóne mení farbu spolu s témou.
 - Tmavý je celý aplikačný rám — domov, nastavenia, hra, výsledky, editor,
   strom, toolbary, export, atlas, dialógy, formuláre, scrollbary aj pomoc.
-  Mapové plátno zostáva zámerne na svetlom papieri (`#ece7db`), aby pôvodné
-  farby máp zostali čitateľné.
+  Mapové plátno prechádza do tmavej mapovej tabule; kresba sa invertuje na
+  svetlé hranice a bledomodré rieky, takže zostáva čitateľná a pôsobí ako
+  negatív klasickej mapy.
 - Pôvodné inline `<font color>` hodnoty z `config.xml` dostávajú v tmavom
   režime explicitné sémantické farby, inak by boli nečitateľné.
 - Všetkých šesť pôvodných help stránok je prepísaných do HTML5, má responzívny
@@ -400,6 +437,21 @@ Následný mobilný a gestový audit pridal:
 - kompaktný editor toolbar na 320 px a v krátkom landscape režime,
 - relatívne cesty, `.nojekyll`, `404.html` a GitHub Pages workflow.
 
+Posledný redizajn a oprava zoomu pridali:
+
+- **vycentrovaný transform** mapy: priblíženie už neposúva mapu doprava/dole
+  a hranice posunu sú symetrické v oboch smeroch,
+- veľkorysý posun s okrajovou elasticitou a zotrvačnosťou, takže po pinchi
+  nezostane mapa zaseknutá pri okraji; domov ju kedykoľvek vycentruje,
+- tlačidlá `+`/`−` zoomujú okolo stredu výrezu, nie okolo ľavého horného rohu,
+- reálne dotykové overenie: ukotvenie pinchu s odchýlkou **0,000025 mapovej
+  jednotky**, posun dole **294 px** a hore **316 px** po tom istom pinchi,
+- hero na domovskej stránke spúšťa **Traf sa! — ťažká — 10 otázok** priamo,
+- kartografický redizajn domova, hier, nastavení, výsledkov, atlasu, editora,
+  dialógov, 404 a pomocných stránok,
+- výsledkové akcie sú na telefóne v prehľadnej 2×2 mriežke,
+- čitateľné tmavé tlačidlá a mapa ako negatív na tmavej tabuli.
+
 Overených bolo **94 kombinácií aktivita × mapa × test** (61 test, 26 Traf sa!,
 7 Poskladaj!), 8 máp editora s pridaním značky, farbou, viditeľnosťou,
 všetkými nástrojmi kreslenia, uložením/otvorením `.mef`, PNG/JPEG exportom
@@ -418,6 +470,7 @@ webapp/
 ├─ styles.css                 – pôvodný moderný vizuál atlasu a rýchlej hry
 ├─ classic.css                – štýly klonu, editora a aktivít
 ├─ dark.css                   – automatická tmavá téma podľa systému
+├─ redesign.css               – kartografický redakčný vizuál celej aplikácie
 ├─ js/
 │  ├─ app.js                  – pôvodná mestská hra + atlas + štatistiky
 │  ├─ cities.js               – 74 miest s pôvodnými súradnicami
@@ -455,7 +508,8 @@ webapp/
 └─ README.md
 ```
 
-Deploy workflow je v `.github/workflows/pages.yml`.
+Deploy workflow je v `.github/workflows/pages.yml`; podrobný návod je
+v [`../DEPLOYMENT.md`](../DEPLOYMENT.md).
 
 ## Deep linky (bonus)
 

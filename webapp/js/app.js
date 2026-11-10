@@ -174,6 +174,7 @@ const state = {
   puzzle: null,
   markerGroups: [],
   view: { zoom: 1, panX: 0, panY: 0 },
+  viewSettleTimer: 0,
   stage: { w: 0, h: 0, left: 0, top: 0 },
   pointers: new Map(),
   drag: null,
@@ -1156,15 +1157,64 @@ function clampView(view) {
   const viewport = dom.mapViewport.getBoundingClientRect();
   const displayWidth = state.stage.w * zoom;
   const displayHeight = state.stage.h * zoom;
-  const factor = viewport.width <= 700 ? 0.4 : 0.2;
-  const maxPanX = Math.max(Math.abs(displayWidth - viewport.width) / 2, viewport.width * factor);
-  const maxPanY = Math.max(Math.abs(displayHeight - viewport.height) / 2, viewport.height * factor);
+  // Keep a generous part of the map reachable in every direction so a pan
+  // never stops just because a pinch left the anchor near an edge.
+  const keepX = Math.min(140, displayWidth * 0.4, viewport.width * 0.3);
+  const keepY = Math.min(140, displayHeight * 0.4, viewport.height * 0.3);
+  const maxPanX = Math.max(0, (displayWidth + viewport.width) / 2 - keepX);
+  const maxPanY = Math.max(0, (displayHeight + viewport.height) / 2 - keepY);
 
   return {
     zoom,
     panX: clamp(Number(view.panX) || 0, -maxPanX, maxPanX),
     panY: clamp(Number(view.panY) || 0, -maxPanY, maxPanY),
   };
+}
+
+function elasticView(view) {
+  const zoom = clamp(Number(view.zoom) || MIN_ZOOM, MIN_ZOOM, MAX_ZOOM);
+  const viewport = dom.mapViewport.getBoundingClientRect();
+  const displayWidth = state.stage.w * zoom;
+  const displayHeight = state.stage.h * zoom;
+  const keepX = Math.min(140, displayWidth * 0.4, viewport.width * 0.3);
+  const keepY = Math.min(140, displayHeight * 0.4, viewport.height * 0.3);
+  const maxPanX = Math.max(0, (displayWidth + viewport.width) / 2 - keepX);
+  const maxPanY = Math.max(0, (displayHeight + viewport.height) / 2 - keepY);
+  const boundX = Math.min(96, Math.max(42, viewport.width * 0.16));
+  const boundY = Math.min(96, Math.max(42, viewport.height * 0.16));
+  const elastic = (value, max, bound) => {
+    if (max === 0) return clamp(value * 0.3, -bound, bound);
+    const magnitude = Math.abs(value);
+    if (magnitude <= max) return value;
+    return Math.sign(value) * Math.min(max + (magnitude - max) * 0.16, max + bound);
+  };
+  return {
+    zoom,
+    panX: elastic(Number(view.panX) || 0, maxPanX, boundX),
+    panY: elastic(Number(view.panY) || 0, maxPanY, boundY),
+  };
+}
+
+function clearViewSettle() {
+  clearTimeout(state.viewSettleTimer);
+  state.viewSettleTimer = 0;
+  dom.mapStage.style.transition = '';
+}
+
+function settleView() {
+  const before = state.view;
+  state.view = clampView(state.view);
+  if (Math.abs(before.panX - state.view.panX) < 0.1 && Math.abs(before.panY - state.view.panY) < 0.1) {
+    clearViewSettle();
+    return;
+  }
+  dom.mapStage.style.transition = 'transform 200ms cubic-bezier(0.2, 0.7, 0.3, 1)';
+  applyView();
+  clearTimeout(state.viewSettleTimer);
+  state.viewSettleTimer = setTimeout(() => {
+    dom.mapStage.style.transition = '';
+    state.viewSettleTimer = 0;
+  }, 240);
 }
 
 function applyView() {
@@ -1174,6 +1224,7 @@ function applyView() {
 }
 
 function setView(view) {
+  clearViewSettle();
   state.view = clampView(view);
   applyView();
 }
@@ -1181,6 +1232,7 @@ function setView(view) {
 function zoomAt(clientX, clientY, factor) {
   const viewport = dom.mapViewport.getBoundingClientRect();
   if (viewport.width < 2 || viewport.height < 2) return;
+  clearViewSettle();
 
   const nextZoom = clamp(state.view.zoom * factor, MIN_ZOOM, MAX_ZOOM);
   if (Math.abs(nextZoom - state.view.zoom) < 0.0001) return;
@@ -1753,6 +1805,7 @@ function onPointerDown(event) {
   if (event.pointerType === 'mouse' && event.button !== 0) return;
 
   event.preventDefault();
+  clearViewSettle();
   try {
     dom.mapViewport.setPointerCapture(event.pointerId);
   } catch {
@@ -1832,7 +1885,7 @@ function onPointerMove(event) {
     }
 
     if (state.drag.moved) {
-      state.view = clampView({
+      state.view = elasticView({
         ...state.view,
         panX: state.view.panX + dx,
         panY: state.view.panY + dy,
@@ -1855,10 +1908,12 @@ function onPointerUp(event) {
     if (drag && drag.id === event.pointerId && !drag.moved && !state.suppressTap) {
       handleTap(event.clientX, event.clientY);
     }
+    const wasDragging = Boolean(drag?.moved);
     state.drag = null;
     state.pinch = null;
     state.suppressTap = false;
     dom.mapViewport.classList.remove('is-dragging');
+    if (wasDragging) settleView();
   } else if (state.pointers.size === 1) {
     state.drag = null;
     state.pinch = null;

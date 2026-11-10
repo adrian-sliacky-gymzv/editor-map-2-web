@@ -71,6 +71,10 @@ export function pinchView({
   viewportTop = 0,
   baseX = 0,
   baseY = 0,
+  mapWidth = null,
+  mapHeight = null,
+  viewportWidth = null,
+  viewportHeight = null,
   anchorMapX = 0,
   anchorMapY = 0,
   minZoom = MIN_MAP_ZOOM,
@@ -80,10 +84,43 @@ export function pinchView({
   const safeCurrent = Math.max(0.0001, Number(currentDistance) || 0.0001);
   const zoom = clampNumber(startZoom * (safeCurrent / safeStart), minZoom, maxZoom);
   const scale = fitScale * zoom;
+  // The canvas is always centred when pan is zero. Callers that know the map
+  // and viewport dimensions get the exact centre origin at the new scale;
+  // `baseX`/`baseY` remain as a fallback for callers working in a local frame.
+  const originX = mapWidth != null && viewportWidth != null
+    ? (viewportWidth - mapWidth * scale) / 2
+    : baseX;
+  const originY = mapHeight != null && viewportHeight != null
+    ? (viewportHeight - mapHeight * scale) / 2
+    : baseY;
   return {
     zoom,
-    panX: currentMidpoint.x - viewportLeft - baseX - anchorMapX * scale,
-    panY: currentMidpoint.y - viewportTop - baseY - anchorMapY * scale,
+    panX: currentMidpoint.x - viewportLeft - originX - anchorMapX * scale,
+    panY: currentMidpoint.y - viewportTop - originY - anchorMapY * scale,
+  };
+}
+
+/**
+ * Pan range for a finite map canvas. Unlike a strict photo viewer, a map may
+ * be moved a little past its edges; at least `keep` pixels of the map remain
+ * visible so it can always be recovered, and a pinch near an edge is never
+ * stopped immediately. Returns symmetric offsets from the centred view.
+ */
+export function canvasPanLimits({
+  mapWidth,
+  mapHeight,
+  viewportWidth,
+  viewportHeight,
+}) {
+  const safeMapW = Math.max(1, Number(mapWidth) || 1);
+  const safeMapH = Math.max(1, Number(mapHeight) || 1);
+  const safeViewW = Math.max(1, Number(viewportWidth) || 1);
+  const safeViewH = Math.max(1, Number(viewportHeight) || 1);
+  const keepX = Math.min(140, safeMapW * 0.4, safeViewW * 0.3);
+  const keepY = Math.min(140, safeMapH * 0.4, safeViewH * 0.3);
+  return {
+    maxX: Math.max(0, (safeMapW + safeViewW) / 2 - keepX),
+    maxY: Math.max(0, (safeMapH + safeViewH) / 2 - keepY),
   };
 }
 

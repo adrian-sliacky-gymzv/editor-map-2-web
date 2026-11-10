@@ -30,7 +30,9 @@ test('app entry point uses only relative asset paths', () => {
   assert.match(html, /<link rel="stylesheet" href="styles\.css">/);
   assert.match(html, /<link rel="stylesheet" href="classic\.css">/);
   assert.match(html, /<link rel="stylesheet" href="dark\.css">/);
+  assert.match(html, /<link rel="stylesheet" href="redesign\.css">/);
   assert.ok(html.indexOf('classic.css') < html.indexOf('dark.css'));
+  assert.ok(html.indexOf('dark.css') < html.indexOf('redesign.css'));
 });
 
 test('web manifest stays inside the repository subpath', () => {
@@ -83,7 +85,7 @@ test('GitHub Pages deployment files are present', () => {
   assert.ok(fs.existsSync(path.join(ROOT, '.nojekyll')));
   const fallback = read('404.html');
   assert.match(fallback, /href="\.\/"/);
-  assert.match(fallback, /Táto adresa neexistuje/);
+  assert.match(fallback, /Táto adresa na mape nie je/);
   const workflow = fs.readFileSync(path.join(REPO, '.github', 'workflows', 'pages.yml'), 'utf8');
   assert.match(workflow, /actions\/configure-pages@/);
   assert.match(workflow, /actions\/upload-pages-artifact@/);
@@ -111,7 +113,36 @@ test('keyboard shortcuts are documented and exposed to assistive technology', ()
   assert.match(html, /aria-keyshortcuts="\/"/);
   assert.match(html, /Klávesové skratky/);
   assert.match(html, /class="shortcut-list"/);
-  assert.match(html, /class="mode-kbd"/);
+  assert.match(html, /class="activity-row"/);
+  assert.match(html, /class="activity-num"/);
+  assert.match(html, /id="heroPlayBtn"/);
+  assert.match(html, /data-classic-preset="hero"/);
+});
+
+test('the hero starts Traf sa on hard with ten questions', () => {
+  const html = read('index.html');
+  assert.match(html, /id="heroPlayBtn"[^>]*data-classic-mode="distance"[^>]*data-classic-preset="hero"/);
+  assert.match(html, /Ťažká · 10 otázok/);
+  const classic = read('js/classic-activities.js');
+  assert.match(classic, /async function startHeroGame\(/);
+  assert.match(classic, /mode: 'distance'/);
+  assert.match(classic, /mapKey: 'slovensko'/);
+  assert.match(classic, /levelIndex: 2/);
+  assert.match(classic, /numQ: 10/);
+  assert.match(classic, /classicPreset/);
+});
+
+test('the redesign stays deployment-safe', () => {
+  const html = read('index.html');
+  const css = read('redesign.css');
+  assert.ok(css.length > 12000);
+  assert.match(css, /--display: Georgia/);
+  assert.match(css, /\.activity-row-studio/);
+  assert.match(css, /prefers-color-scheme: dark/);
+  assert.ok(!/#6d28d9|#7c3aed/i.test(css));
+  assert.match(html, /id="mapy"/);
+  assert.match(html, /class="map-shelf"/);
+  assert.match(html, /id="postup"/);
 });
 
 test('mission HUDs, legend and marker callouts stay explicit', () => {

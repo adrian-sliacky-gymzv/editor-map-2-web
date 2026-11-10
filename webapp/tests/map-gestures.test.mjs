@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   MAX_MAP_ZOOM,
   MIN_MAP_ZOOM,
+  canvasPanLimits,
   clientToMap,
   doubleTapTargetZoom,
   isDoubleTap,
@@ -46,6 +47,53 @@ test('pinch keeps the initial map point under the moving finger midpoint', () =>
   assert.equal(result.zoom, 3);
   const screenX = result.panX + 20 + 400 * (0.5 * 3);
   const screenY = result.panY + 10 + 300 * (0.5 * 3);
+  assert.ok(Math.abs(screenX - 220) < 1e-9);
+  assert.ok(Math.abs(screenY - 180) < 1e-9);
+});
+
+test('canvas pan limits keep a slice of the map reachable in every direction', () => {
+  const fit = canvasPanLimits({
+    mapWidth: 366,
+    mapHeight: 192,
+    viewportWidth: 390,
+    viewportHeight: 676,
+  });
+  assert.ok(fit.maxX > 120);
+  assert.ok(fit.maxY > 250);
+
+  const zoomed = canvasPanLimits({
+    mapWidth: 1320,
+    mapHeight: 692,
+    viewportWidth: 390,
+    viewportHeight: 676,
+  });
+  assert.ok(zoomed.maxX > (1320 - 390) / 2);
+  assert.ok(zoomed.maxY > 300, 'pinching near an edge must not leave a tiny vertical range');
+});
+
+test('pinch uses the centred canvas origin when map dimensions are known', () => {
+  const result = pinchView({
+    startZoom: 2,
+    startDistance: 100,
+    currentDistance: 150,
+    fitScale: 0.5,
+    startMidpoint: { x: 200, y: 200 },
+    currentMidpoint: { x: 220, y: 180 },
+    viewportLeft: 0,
+    viewportTop: 0,
+    mapWidth: 1000,
+    mapHeight: 600,
+    viewportWidth: 400,
+    viewportHeight: 800,
+    anchorMapX: 400,
+    anchorMapY: 300,
+  });
+  assert.equal(result.zoom, 3);
+  const scale = 0.5 * 3;
+  const originX = (400 - 1000 * scale) / 2;
+  const originY = (800 - 600 * scale) / 2;
+  const screenX = result.panX + originX + 400 * scale;
+  const screenY = result.panY + originY + 300 * scale;
   assert.ok(Math.abs(screenX - 220) < 1e-9);
   assert.ok(Math.abs(screenY - 180) < 1e-9);
 });
