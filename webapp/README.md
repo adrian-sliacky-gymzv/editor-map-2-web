@@ -168,6 +168,29 @@ Mapy sa ovládajú rovnako v hrách aj v editore:
 Pri hrách sa po odpovedi na telefóne objaví plávajúce tlačidlo **Ďalej** nad
 ovládaním mapy, takže sa nemusíš naťahovať na hornú lištu.
 
+## Klávesové skratky
+
+Skratky sú dostupné aj z nápovedy cez `?`:
+
+- **`1`–`5`** na domovskej obrazovke: Vyskúšaj sa!, Traf sa!, Poskladaj!,
+  Editor máp a Atlas. Čísla sú zobrazené priamo na kartách aktivít.
+- **`?`** otvorí alebo zavrie nápovedu s prehľadom všetkých skratiek.
+- **`Enter` / `Space`** po odpovedi posunie na ďalšiu otázku; v potvrdzovacích
+  dialógoch potvrdzuje. V hrách sa nepoužije, ak je fokus na tlačidle alebo
+  inom ovládacom prvku.
+- **`Esc`** zavrie dialóg, výsledkovú kartu alebo ukončí rozohranú aktivitu.
+  Pri výsledku prvé `Esc` zavrie kartu a druhé opustí hru.
+- **`+` / `−` / `0`** priblíži, oddiali a vráti celú mapu.
+- **Šípky** posúvajú mapu; so **`Shift`** sa krok zväčší.
+- **`/`** v atlase skočí do vyhľadávania. `Esc` vo vyhľadávaní najprv vymaže
+  text a potom ho opustí.
+- **`Ctrl` + `S`**, **`Ctrl` + `Shift` + `S`**, **`Ctrl` + `O`** a
+  **`Ctrl` + `N`** v editore uložia, uložia ako, otvoria alebo vytvoria mapu.
+
+Polia na písanie majú prednosť: kým je fokus v inpute, čísla, `/` ani `?`
+nespúšťajú skratky. Tlačidlá majú doplnené `aria-keyshortcuts` a nápoveda
+obsahuje vizuálny prehľad kláves.
+
 ## Bodovanie a pravidlá
 
 ### Traf sa! — presne ako originál
@@ -235,13 +258,14 @@ Počas vývoja bolo overené:
 npm test
 ```
 
-Aktuálne **61 testov, 61 passing**. Testy pokrývajú:
+Aktuálne **62 testov, 62 passing**. Testy pokrývajú:
 
 - pôvodné bodovanie a prahy,
 - výber otázok bez opakovania,
 - puzzle toleranciu,
 - atlas, štatistiky a tréning slabých miest,
 - matematiku pinchu, dvojitého ťuknutia, kolieska a ukotvenia zoomu,
+- dokumentáciu a `aria-keyshortcuts` pre klávesové skratky,
 - prítomnosť všetkých 8 máp a presnú zhodu objektov medzi `.mef` a scénami,
 - existenciu všetkých testovacích skupín z `config.xml`,
 - zoznamy máp pre jednotlivé aktivity,
@@ -340,13 +364,16 @@ Následný mobilný a gestový audit pridal:
 - opravu svetlých štítkov značiek, ktoré predtým v svetlom režime splývali
   s pozadím,
 - kompatibilitu s Dark Readerom cez `revert-layer` pre SVG štítky,
+- klávesové skratky na domove, v hrách, atlase a editore vrátane ochrany
+  pri písaní do polí,
 - kompaktný editor toolbar na 320 px a v krátkom landscape režime,
 - relatívne cesty, `.nojekyll`, `404.html` a GitHub Pages workflow.
 
 Overené bolo 22 kombinácií aktivita × mapa, 8 máp editora, reálne dotykové
 gestá cez CDP (`touchStart`/`touchMove`/`touchEnd`), šírky 320, 390, 568
-(landscape), 768, 1024 a 1280 px, Dark Reader 4.9.135, forced-dark Chromium,
-GitHub Pages podcesta a finálne Lighthouse audity.
+(landscape), 768, 1024 a 1280 px, klávesové skratky a ich fokusové guardy,
+Dark Reader 4.9.135, forced-dark Chromium, GitHub Pages podcesta a finálne
+Lighthouse audity.
 
 ## Štruktúra
 

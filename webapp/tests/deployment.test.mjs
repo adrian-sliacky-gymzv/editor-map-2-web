@@ -98,3 +98,18 @@ test('the test script runs every test file', () => {
   assert.ok(tests.includes('map-gestures.test.mjs'));
   assert.ok(tests.includes('practice-stats.test.mjs'));
 });
+
+test('keyboard shortcuts are documented and exposed to assistive technology', () => {
+  const html = read('index.html');
+  for (const key of ['1', '2', '3', '4', '5']) {
+    assert.match(html, new RegExp(`aria-keyshortcuts="${key}"`));
+  }
+  assert.match(html, /aria-keyshortcuts="Enter Space"/);
+  assert.match(html, /aria-keyshortcuts="Control\+S"/);
+  assert.match(html, /aria-keyshortcuts="Control\+Shift\+S"/);
+  assert.match(html, /aria-keyshortcuts="Shift\+\/"/);
+  assert.match(html, /aria-keyshortcuts="\/"/);
+  assert.match(html, /Klávesové skratky/);
+  assert.match(html, /class="shortcut-list"/);
+  assert.match(html, /class="mode-kbd"/);
+});

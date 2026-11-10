@@ -1757,6 +1757,19 @@ function bindAtlasEvents() {
     renderAtlas();
   });
 
+  dom.citySearch.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    event.preventDefault();
+    event.stopPropagation();
+    if (dom.citySearch.value) {
+      dom.citySearch.value = '';
+      state.atlas.query = '';
+      renderAtlas();
+    } else {
+      dom.citySearch.blur();
+    }
+  });
+
   dom.levelFilters.addEventListener('click', (event) => {
     const chip = event.target.closest('.chip');
     if (!chip) return;
@@ -2182,6 +2195,31 @@ function trapFocus(event) {
   }
 }
 
+function isTypingTarget(target) {
+  return Boolean(target?.closest?.('input, textarea, select, [contenteditable]'));
+}
+
+function hasBlockingOverlay() {
+  return Boolean(document.querySelector('.overlay.is-open'))
+    || !dom.helpOverlay.hidden
+    || !dom.resultOverlay.hidden
+    || !dom.confirmOverlay.hidden;
+}
+
+function isVisible(selector) {
+  const el = document.querySelector(selector);
+  return Boolean(el && !el.hidden);
+}
+
+function panLegacyMapBy(dx, dy) {
+  state.view = clampView({
+    ...state.view,
+    panX: state.view.panX + dx,
+    panY: state.view.panY + dy,
+  });
+  applyView();
+}
+
 function bindGlobalEvents() {
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
@@ -2191,6 +2229,8 @@ function bindGlobalEvents() {
         return;
       }
       if (!dom.helpOverlay.hidden) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
         closeOverlay(dom.helpOverlay);
         return;
       }
@@ -2209,6 +2249,77 @@ function bindGlobalEvents() {
 
     if (event.key === 'Tab' && anyOverlayOpen()) {
       trapFocus(event);
+    }
+
+    const typing = isTypingTarget(event.target);
+    const helpKey = event.key === '?'
+      || (event.key === '/' && event.shiftKey)
+      || (event.code === 'Slash' && event.shiftKey);
+    if (helpKey && !event.repeat && !typing && !event.ctrlKey && !event.metaKey && !event.altKey) {
+      event.preventDefault();
+      if (!dom.helpOverlay.hidden) closeOverlay(dom.helpOverlay);
+      else if (!hasBlockingOverlay()) openHelp();
+      return;
+    }
+
+    if (typing || hasBlockingOverlay() || event.ctrlKey || event.metaKey || event.altKey) return;
+
+    const homeVisible = isVisible('#homeScreen');
+    if (homeVisible && !event.repeat && /^[1-5]$/.test(event.key)) {
+      const destinations = {
+        1: '#homeScreen .mode-grid [data-classic-mode="test"]',
+        2: '#homeScreen .mode-grid [data-classic-mode="distance"]',
+        3: '#homeScreen .mode-grid [data-classic-mode="puzzle"]',
+        4: '#homeScreen .mode-grid [data-editor-open]',
+        5: '#atlasCardBtn',
+      };
+      const target = document.querySelector(destinations[event.key]);
+      if (target) {
+        event.preventDefault();
+        target.click();
+        return;
+      }
+    }
+
+    if (isVisible('#atlasScreen') && event.key === '/') {
+      event.preventDefault();
+      dom.citySearch.focus();
+      dom.citySearch.select();
+      return;
+    }
+
+    if (state.screen === 'game' && isVisible('#gameScreen')) {
+      const inControl = event.target.closest?.('button, a, input, select, textarea, [contenteditable]');
+      if (!inControl) {
+        if ((event.key === 'Enter' || event.key === ' ') && !dom.nextBtn.disabled) {
+          event.preventDefault();
+          dom.nextBtn.click();
+          return;
+        }
+        if (event.key === '+' || event.key === '=') {
+          event.preventDefault();
+          dom.zoomIn.click();
+          return;
+        }
+        if (event.key === '-') {
+          event.preventDefault();
+          dom.zoomOut.click();
+          return;
+        }
+        if (event.key === '0') {
+          event.preventDefault();
+          dom.zoomReset.click();
+          return;
+        }
+        if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) {
+          event.preventDefault();
+          const step = event.shiftKey ? 190 : 64;
+          if (event.key === 'ArrowLeft') panLegacyMapBy(step, 0);
+          else if (event.key === 'ArrowRight') panLegacyMapBy(-step, 0);
+          else if (event.key === 'ArrowUp') panLegacyMapBy(0, step);
+          else panLegacyMapBy(0, -step);
+        }
+      }
     }
   });
 }

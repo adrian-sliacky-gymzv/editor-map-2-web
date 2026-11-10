@@ -483,8 +483,17 @@ function bindSetupEvents() {
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
     if (document.querySelector('#classicConfirmOverlay.is-open, #classicPromptOverlay.is-open')) return;
-    if (!dom.overlay.hidden) closeOverlay(dom.overlay);
-    if (!dom.resultOverlay?.hidden) closeOverlay(dom.resultOverlay);
+    if (!dom.overlay.hidden) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      closeOverlay(dom.overlay);
+      return;
+    }
+    if (!dom.resultOverlay?.hidden) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      closeOverlay(dom.resultOverlay);
+    }
   });
 }
 
@@ -1533,20 +1542,31 @@ function bindGameEvents() {
   dom.zoomFit.addEventListener('click', () => GAME.mapView?.fit());
   document.addEventListener('keydown', (event) => {
     if (dom.classicScreen.hidden) return;
+    if (!document.querySelector('#helpOverlay')?.hidden) return;
     if (document.querySelector('.overlay.is-open')) return;
     const inControl = event.target.closest?.('button, a, input, select, textarea, [contenteditable]');
-    if (event.key === 'Enter' && !inControl && !dom.next.disabled && !dom.next.hidden) {
+    if ((event.key === 'Enter' || event.key === ' ') && !inControl && !dom.next.disabled && !dom.next.hidden) {
       event.preventDefault();
       dom.next.click();
     } else if (event.key === 'Escape') {
       event.preventDefault();
       endActivity();
     } else if (event.key === '+' || event.key === '=') {
+      event.preventDefault();
       GAME.mapView?.zoomIn();
     } else if (event.key === '-') {
+      event.preventDefault();
       GAME.mapView?.zoomOut();
     } else if (event.key === '0') {
+      event.preventDefault();
       GAME.mapView?.fit();
+    } else if (!inControl && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) {
+      event.preventDefault();
+      const step = event.shiftKey ? 190 : 64;
+      if (event.key === 'ArrowLeft') GAME.mapView?.panBy(step, 0);
+      else if (event.key === 'ArrowRight') GAME.mapView?.panBy(-step, 0);
+      else if (event.key === 'ArrowUp') GAME.mapView?.panBy(0, step);
+      else GAME.mapView?.panBy(0, -step);
     }
   });
 }

@@ -1052,6 +1052,15 @@ export class MapView {
     this.setZoom(this.zoom / 1.25, anchor);
   }
 
+  panBy(dx, dy) {
+    if (!this.scene) return;
+    this._clearSettleAnimation();
+    this.panX += Number(dx) || 0;
+    this.panY += Number(dy) || 0;
+    this._clampPan();
+    this._applyTransform();
+  }
+
   fit() {
     this._clearSettleAnimation();
     this.zoom = 1;

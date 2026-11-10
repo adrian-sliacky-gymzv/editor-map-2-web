@@ -1692,6 +1692,7 @@ function bindAbout() {
 function bindKeyboard() {
   document.addEventListener('keydown', (event) => {
     if (D.screen.hidden) return;
+    if (!document.querySelector('#helpOverlay')?.hidden) return;
     const inControl = event.target.closest?.('input, select, textarea, [contenteditable]');
     const mod = event.ctrlKey || event.metaKey;
     if (mod && event.key.toLowerCase() === 's') {
@@ -1741,7 +1742,16 @@ function bindKeyboard() {
       closeColorPopover();
     }
     if (!inControl) {
-      if (event.key === '0' && !mod) {
+      const inMapControl = event.target.closest?.('button, a, .tree-row');
+      const overlayOpen = Boolean(document.querySelector('.overlay.is-open'));
+      if (!inMapControl && !overlayOpen && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key) && !mod) {
+        event.preventDefault();
+        const step = event.shiftKey ? 190 : 64;
+        if (event.key === 'ArrowLeft') E.mapView?.panBy(step, 0);
+        else if (event.key === 'ArrowRight') E.mapView?.panBy(-step, 0);
+        else if (event.key === 'ArrowUp') E.mapView?.panBy(0, step);
+        else E.mapView?.panBy(0, -step);
+      } else if (event.key === '0' && !mod) {
         E.mapView?.fit();
       } else if ((event.key === '+' || event.key === '=') && !mod) {
         E.mapView?.zoomIn();

@@ -613,6 +613,20 @@
     color: #a9c2ff;
   }
 
+  kbd {
+    border-color: #3b4e68;
+    background: #17263d;
+    color: #dbe7ff;
+  }
+
+  .shortcut-keys > span {
+    color: #9aadc7;
+  }
+
+  .shortcut-row > span:last-child {
+    color: #b8c7dd;
+  }
+
   .record-badge {
     background: #1d7a37;
     color: #ecfff1;
