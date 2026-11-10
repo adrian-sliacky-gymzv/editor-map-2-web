@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Kreslenie</title>
+<link href="styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+<div class="topmenu"> <a href="index.html">Úvod</a> | <a href="mainwindow.html">Hlavné okno</a> | <a href="mapwindow.html">Okno mapy</a> | <a href="treewindow.html">Ovládanie objektov mapy</a> | <a href="drawing.html">Kreslenie</a> | <a href="export.html">Výstupy</a></div>
+<h1>Kreslenie</h1>
+<div class="scrshot"> <img src="img/drawingwindow.png" width="146" height="192" alt="plávajúce okno Kreslenie" />
+  <p>plávajúce okno Kreslenie</p>
+</div>
+<p>Editor máp umožňuje kresliť do mapy jednoduché geometrické tvary. Kresby sú uložené nad mapu a pod značky. Na kreslenie slúži paletka v plávajúcom okne <strong>Kreslenie</strong>, ktorú je možné otvoriť tlačidlom <span class="buttonref">Kreslenie</span> v lište <a href="mapwindow.html">mapového okna</a>.</p>
+<p>Paletka obsahuje tieto možnosti:</p>
+<ul>
+  <li><span class="buttonref">Nástroj</span> - stlačením niektorého zo štyroch tlačidiel sa vyberie jedna z možností kreslenia: <span class="buttonref">čiara</span>, <span class="buttonref">obdĺžnik</span>, <span class="buttonref">ovál</span>, <span class="buttonref">voľné kreslenie</span>. Tlačidlo zvoleného nástroja má červenú ikonu a je zatlačené. Opätovným stlačením tlačidla alebo zatvorením paletky sa výber nástroja zruší.</li>
+  <li><span class="buttonref">farba</span> - umožňuje vybrať si farbu obrysu (prípadne výplne) z preddefinovanej palety farieb.</li>
+  <li><span class="buttonref">obrys</span> - určuje hrúbku obrysu pri kreslení v rozmedzí 0 až 4 pixely. Hrúbka 0 je tenká čiara (tzv. hairline), ktorej hrúbka sa nemení ani počas zväčšovania mapy.</li>
+  <li><span class="buttonref">výplň</span> - pokiaľ je táto možnosť zakliknutá, obdĺžniky a ovály budú vyplnené</li>
+  <li><span class="buttonref">vymaž posledný</span> - umožňuje zmazať poslednú kresbu. Postupným stláčaním je možné zmazať všetky kresby.</li>
+</ul>
+<p>Pokiaľ je zvolený v paletke Kreslenie niektorý z kresliacich nástrojov, je možné začať kresliť kdekoľvek do práve otvorenej mapy. V takomto prípade sa pri pohybe kurzora myši nad mapou zmení kurzor a zobrazuje zvolený nástroj.</p>
+<p>Všetky kresby sa pri uložení mapy na disk ukladajú do súboru a pri opätovnom otvorení súboru sa zobrazia.</p>
+</body>
+</html>

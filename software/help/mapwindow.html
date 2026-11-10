@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Okno mapy</title>
+<link href="styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+<div class="topmenu"> <a href="index.html">Úvod</a> | <a href="mainwindow.html">Hlavné okno</a> | <a href="mapwindow.html">Okno mapy</a> | <a href="treewindow.html">Ovládanie objektov mapy</a> | <a href="drawing.html">Kreslenie</a> | <a href="export.html">Výstupy</a></div>
+<h1>Okno mapy</h1>
+<p>Po otvorení mapy sa zobrazí v editore okno mapy spolu s vlastnou lištou nástrojov. Okno obsahuje horizontálny a vertikálny scrollbar. Pomocou nich je možné posúvať mapu, pokiaľ je väčšia ako mapové okno. Mapu je tiež možné v takomto prípade posúvať ťahaním myšou za ľubovoľné miesto na mape s výnimkou značky a jej popisky (vtedy sa ťahá samotná značka). Ťahanie mapy je tiež neaktívne počas <a href="drawing.html">kreslenia</a> do mapy.</p>
+<p>Lišta nástrojov je rozdelená na tri časti:</p>
+<div class="scrshot"><img src="img/map_palettes.png" width="224" height="31" alt="ovládanie paletiek" /></div>
+<h3>Paletky
+</h3>
+<ul>
+  <li><span class="buttonref">Objekty</span> - otvára/zatvára plávajúce okno <span class="buttonref"><a href="treewindow.html">Ovládanie objektov mapy</a></span>, ktoré slúži na nastavenie viditeľnosti a farby objektov a značiek.</li>
+  <li><span class="buttonref">Kreslenie</span> - otvára/zatvára plávajúce okno s nástrojmi na <a href="drawing.html">kreslenie</a>.</li>
+</ul>
+<div class="scrshot"><img src="img/map_exports.png" alt="tlačidlá pre export a tlač mapy" width="224" height="31" /></div>
+<h3>Výstupy
+</h3>
+<ul>
+  <li><span class="buttonref">Export</span> - umožňuje <a href="export.html">export</a> celej mapy alebo zvoleného výseku do formátov JPEG a PNG.</li>
+  <li><span class="buttonref">Tlač</span> - umožňuje <a href="export.html">tlač</a> celej mapy alebo zvoleného výseku.</li>
+</ul>
+<div class="scrshot"><img src="img/map_view.png" width="362" height="31" alt="nastavenie zobrazenia mapy" /></div>
+<h3>Zobrazenie
+</h3>
+<ul>
+  <li><span class="buttonref">kresby</span> - zapne alebo vypne viditeľnosť užívateľských <a href="drawing.html">kresieb</a> v mape.</li>
+  <li><span class="buttonref">značky</span> - naraz zapne alebo vypne viditeľnosť všetkých <a href="#marks">značiek</a> v mape, bez ohľadu na ich nastavenie v okne <span class="buttonref"><a href="treewindow.html">Ovládanie objektov mapy</a></span>.</li>
+  <li>tlačidlo <span class="buttonref">Automatická veľkosť mapy</span> <img src="img/doc_resize.png" width="16" height="16" alt="tlačítko Automatická veľkosť mapy" /> - nastaví veľkosť mapy tak, aby sa presne vošla do okna mapy. Mapa automaticky mení svoje zväčšenie pri každej zmene veľkosti okna programu. Toto tlačidlo sa samo vypne pri ručnej zmene zväčšenia mapy.</li>
+  <li>slider <span class="buttonref">Zväčšenie</span> - umožňuje nastaviť zväčšenie mapy v rozmedzí 100% až 500% s krokom 10%. Textové políčko vpravo udáva aktuálnu číselnú hodnotu. Zväčšenie mapy je možné meniť aj pomocou rolovacieho kolieska myši s krokom 40%. Pri použití <span class="buttonref">Automatickej veľkosti mapy</span> sa tu zobrazuje aktuálne zväčšenie, ktoré v tomto prípade môže byť aj menšie ako 100%.<br />
+    Značky v mape sa nezväčšujú proporcionálne s mapou, ale s menším koeficientom, pričom stredom zväčšovania značky je symbol značky.</li>
+</ul>
+<p>Nastavenia zobrazenia nemajú žiaden vplyv na export alebo tlač mapy.</p>
+<h2>Práca s mapou</h2>
+<p>Mapa pozostáva z troch vrstiev (v tomto poradí):</p>
+<h3>Objekty</h3>
+<p>Zahŕňa všetky preddefinované geografické objekty (mestá, štáty, pohoria, moria, zemepisná sieť, mierka mapy atd.). Viditeľnosť a farba objektov v mape sa ovláda v okne <span class="buttonref"><a href="treewindow.html">Ovládanie objektov mapy</a></span>, a nie je možné ju meniť priamo v&nbsp;mapovom okne. Samotné objekty nie je možné presúvať ani inak editovať.</p>
+<h3>Kresby</h3>
+<p>Medzi mapou a značkami sa nachádzajú <a href="drawing.html">užívateľské kresby</a> (ak existujú).</p>
+<h3><a name="marks" id="marks"></a>Značky</h3>
+<p>Každému objektu prislúcha práve jedna značka, ktorá pozostáva zo symbolu značky a textovej popisky. Textová popiska je podfarbená polopriesvitným bielym obdĺžnikom, aby bola lepšie čitateľná na pozadí tmavých objektov. Poloha a text popisky je preddefinovaná, ale dá sa ľubovoľne meniť. Text popisky je v novej mape rovnaký ako názov objektu v okne <span class="buttonref"><a href="treewindow.html">Ovládanie objektov mapy</a></span>. Viditeľnosť značky sa primárne ovláda v okne <span class="buttonref"><a href="treewindow.html">Ovládanie objektov mapy</a></span> a je nezávislá od viditeľnosti samotného objektu.</p>
+<p>Symbol značky vyjadruje typ objektu:</p>
+<ul class="unbuletted">
+  <li><img src="img/mapmark0001.png" width="12" height="12" alt="symbol jazera" /> jazero, vodná nádrž</li>
+  <li><img src="img/mapmark0002.png" width="12" height="12" alt="symbol rieky" /> rieka, vodopád</li>
+  <li><img src="img/mapmark0003.png" width="12" height="12" alt="symbol štátu" /> VÚC (mapa Slovenska), štát (ostatné mapy)</li>
+  <li><img src="img/mapmark0004.png" width="12" height="12" alt="symbol okresu" /> okres (mapa Slovenska)</li>
+  <li><img src="img/mapmark0005.png" width="12" height="12" alt="symbol rezervácie" /> chránené územie (CHKO alebo NP na mape Slovenska)</li>
+  <li><img src="img/mapmark0006.png" width="12" height="12" alt="symbol geocelku" /> geomorfologický celok (mapa Slovenska), pohoria, nížiny, púšte (ostatné mapy)</li>
+  <li><img src="img/mapmark0007.png" width="12" height="12" alt="symbol mesta" /> mesto</li>
+  <li><img src="img/mapmark0008.png" width="12" height="12" alt="symbol legendy" /> hranica SR (mapa Slovenska), hranica svetadiela (Ázia, Európa), zemepisná sieť, mierka mapy (všetky mapy)</li>
+  <li><img src="img/mapmark0009.png" width="12" height="12" alt="symbol ostrova" /> ostrov, polostrov (okrem Slovenska), svetadiel, kontinent (mapa sveta)</li>
+  <li><img src="img/mapmark0010.png" width="12" height="12" alt="symbol mora" /> more, oceán (okrem Slovenska)</li>
+</ul>
+<p>Ťahaním za symbol je možné značku presunúť na ľubovoľné miesto v rámci mapy. Kliknutím pravým tlačidlom myši na popiske sa objaví kontextové menu s možnosťou <span class="buttonref">Skryť značku</span>. Toto má rovnaký účinok ako skrytie značky prostredníctvom okna <span class="buttonref"><a href="treewindow.html">Ovládanie objektov mapy</a></span>.</p>
+<p>Kliknutím do popisky značky je možné editovať text popisky. Pri editovaní textu platia nasledovné pravidlá:</p>
+<ul>
+  <li>stlačením ENTER sa potvrdí zmena textu a ukončí sa editácia</li>
+  <li>stlačením ESC sa zrušia zmeny textu, popiska sa vráti do stavu pred editovaním a ukončí sa editácia</li>
+  <li>kliknutím do inej popisky sa ukončí editácia</li>
+  <li>popiska musí obsahovať aspoň jeden znak. Ak je pri ukončení editovania prázdna, zmeny sa zrušia a popiska sa vráti do stavu pred editovaním</li>
+</ul>
+<p>Šírka políčka popisky sa automaticky prispôsobuje vloženému textu.</p>
+</body>
+</html>

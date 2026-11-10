@@ -1,0 +1,789 @@
+<!doctype html>
+<html lang="sk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#dfe4fb">
+  <meta name="description" content="Editor máp 2 — kompletná webová verzia: Vyskúšaj sa!, Traf sa!, Poskladaj! a plnohodnotný editor máp na všetkých ôsmich pôvodných mapách.">
+  <title>Editor máp 2 — Vyskúšaj sa!, Traf sa!, Poskladaj! a editor</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="classic.css">
+</head>
+<body>
+  <main id="app" class="app">
+    <!-- ============================================================
+         HOME
+         ============================================================ -->
+    <section id="homeScreen" class="screen home-screen" aria-labelledby="homeTitle">
+      <div class="home-bg" aria-hidden="true"></div>
+
+      <div class="home-shell">
+        <header class="home-header">
+          <div class="brand">
+            <img class="brand-logo" src="assets/editormap-logo.png" alt="Logo Editor máp 2" width="46" height="46">
+            <div class="brand-copy">
+              <p class="brand-kicker">Pôvodná hra · 8 máp · editor</p>
+              <h1 id="homeTitle">Editor máp 2</h1>
+            </div>
+          </div>
+          <div class="home-header-actions">
+            <button type="button" id="homeHelpBtn" class="icon-btn" aria-label="Ako hrať" title="Ako hrať">?</button>
+          </div>
+        </header>
+
+        <section class="hero" aria-labelledby="heroTitle">
+          <div class="hero-copy">
+            <p class="eyebrow"><span class="dot" aria-hidden="true"></span> Kompletná webová verzia · 8 máp · 1 982 objektov</p>
+            <h2 id="heroTitle">Celá mapa. Celý editor. Na webe.</h2>
+            <p class="hero-lead">Vyskúšaj sa!, Traf sa! a Poskladaj! presne podľa pôvodnej hry — na Slovensku, svete, Európe, Afrike, Ázii, Austrálii a oboch Amerikách. K tomu plnohodnotný editor máp s vrstvami, farbami, značkami, kreslením a exportom.</p>
+            <div class="hero-actions">
+              <button type="button" class="btn-primary" data-classic-mode="distance">
+                <span class="ico ico-play" aria-hidden="true"></span>Hrať Traf sa!
+              </button>
+              <button type="button" class="btn-ghost" data-editor-open>Otvoriť editor</button>
+              <button type="button" id="heroAtlasBtn" class="btn-ghost btn-ghost-quiet">Atlas miest SR</button>
+            </div>
+          </div>
+          <div class="hero-map" aria-hidden="true">
+            <img src="assets/thumbs/svet.png" alt="">
+            <div class="hero-map-badge">
+              <span><b>8</b> máp</span>
+              <span><b>3</b> aktivity</span>
+              <span><b>1</b> editor</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="mode-grid" aria-label="Aktivity">
+          <article class="mode-card mode-card-quiz">
+            <div class="mode-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="2" fill="currentColor"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </div>
+            <div class="mode-body">
+              <span class="mode-tag">Poznávanie</span>
+              <h3>Vyskúšaj sa!</h3>
+              <p>Na mape sa objaví 3, 5 alebo 7 značiek. Jedna patrí zadanému objektu — klikni na tú správnu. Všetky pôvodné testy a obtiažnosti.</p>
+            </div>
+            <button type="button" class="btn-mode" data-classic-mode="test">Hrať</button>
+          </article>
+
+          <article class="mode-card mode-card-distance">
+            <div class="mode-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M6 21V4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M6 4.5c3.2-1.4 6.8 1.2 11.5-.3v8.2c-4.7 1.5-8.3-1.1-11.5.3Z" fill="currentColor"/><circle cx="6" cy="20" r="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+            </div>
+            <div class="mode-body">
+              <span class="mode-tag">Presnosť</span>
+              <h3>Traf sa!</h3>
+              <p>Klikni na mapu tam, kde si myslíš, že objekt leží. Pôvodné bodovanie podľa vzdialenosti — čím bližšie, tým viac bodov.</p>
+            </div>
+            <button type="button" class="btn-mode" data-classic-mode="distance">Hrať</button>
+          </article>
+
+          <article class="mode-card mode-card-puzzle">
+            <div class="mode-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M9 3h6v3.1a2.7 2.7 0 0 0 0 5.3V15h3.1a2.7 2.7 0 0 1 5.3 0v6h-6v-3.1a2.7 2.7 0 0 0-5.3 0V21H3v-6h3.1a2.7 2.7 0 0 0 0-5.3H3V3h6Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="mode-body">
+              <span class="mode-tag">Šikovnosť</span>
+              <h3>Poskladaj!</h3>
+              <p>Objekt sa objaví v strede mapy. Pretiahni ho na skutočné miesto. Pôvodná tolerancia 15 mapových jednotiek a presné vyhodnotenie.</p>
+            </div>
+            <button type="button" class="btn-mode" data-classic-mode="puzzle">Hrať</button>
+          </article>
+
+          <article class="mode-card mode-card-editor">
+            <div class="mode-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 20h16M6 16.5 17.2 5.3a2.1 2.1 0 0 1 3 3L9 19.5l-4.2.9Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="m15.5 7 3 3" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
+            </div>
+            <div class="mode-body">
+              <span class="mode-tag">Tvorba</span>
+              <h3>Editor máp</h3>
+              <p>Strom všetkých objektov, viditeľnosť, farby, vlastné značky, kreslenie, nové/otvoriť/uložiť, export PNG/JPEG a tlač.</p>
+            </div>
+            <button type="button" class="btn-mode btn-mode-editor" data-editor-open>Otvoriť</button>
+          </article>
+
+          <article class="mode-card mode-card-atlas">
+            <div class="mode-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M3 5.5 9 4l6 1.5L21 4v15l-6 1.5L9 19l-6 1.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 4v15M15 5.5v15" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".6"/></svg>
+            </div>
+            <div class="mode-body">
+              <span class="mode-tag">Bonus · atlas</span>
+              <h3>Mestá Slovenska</h3>
+              <p>Všetkých 74 miest v prehľadnom atlase s hľadaním, filtrami, štatistikami a rýchlym tréningom. Doplnok nad pôvodnú hru.</p>
+            </div>
+            <button type="button" id="atlasCardBtn" class="btn-mode btn-mode-atlas">Prezrieť</button>
+          </article>
+        </section>
+
+        <div class="home-grid">
+          <section class="panel feature-panel" aria-labelledby="featureTitle">
+            <div class="panel-head">
+              <h2 id="featureTitle">Čo je vo vnútri</h2>
+              <span class="panel-hint">všetko z pôvodnej hry</span>
+            </div>
+            <ul class="feature-list">
+              <li><span class="feature-dot"></span><div><b>8 pôvodných máp</b><span>Slovensko, svet, Európa, Afrika, Ázia, Austrália, Severná a Južná Amerika — 1 982 geografických objektov.</span></div></li>
+              <li><span class="feature-dot"></span><div><b>Všetky testy a obtiažnosti</b><span>Testové okruhy, levely, počty možností, bodovanie a časovače presne podľa config.xml a .mef dát.</span></div></li>
+              <li><span class="feature-dot"></span><div><b>Plný editor</b><span>Viditeľnosť vrstiev, farby, značky, kreslenie, ukladanie .mef, export a tlač.</span></div></li>
+              <li><span class="feature-dot"></span><div><b>Dotykové ovládanie</b><span>Zoom, posun, pinch-to-zoom a veľké klikacie plochy na mobile aj tablete.</span></div></li>
+            </ul>
+          </section>
+
+          <section class="panel progress-panel" aria-labelledby="progressTitle">
+            <div class="panel-head">
+              <h2 id="progressTitle">Rýchla hra · mestá SR</h2>
+              <button type="button" id="resetStatsBtn" class="link-btn">Resetovať</button>
+            </div>
+            <p class="progress-note progress-note-top">Štatistiky doplnkového tréningu 74 slovenských miest. Plné aktivity vyššie majú vlastné výsledky.</p>
+            <div class="progress-list" id="progressList"></div>
+            <p class="progress-note">Skóre sa ukladá len v tomto prehliadači.</p>
+          </section>
+        </div>
+
+        <footer class="home-footer">
+          <div class="footer-brand">
+            <img src="assets/editormap-logo.png" alt="" width="28" height="28">
+            <p>Nekomerčná edukatívna webová reimplementácia hry <i>Editor máp 2</i> (2010).</p>
+          </div>
+          <p class="footer-credits">© 2010 RNDr. Štefan Karolčík, PhD · dizajn a programovanie Ing. Juraj Hrabovec – MAX MEDIA · mapové podklady RNDr. Daniel Gurňák, PhD.</p>
+        </footer>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         CITY ATLAS
+         ============================================================ -->
+    <section id="atlasScreen" class="screen atlas-screen" hidden aria-labelledby="atlasTitle">
+      <header class="atlas-header">
+        <button type="button" id="atlasBackBtn" class="icon-btn" aria-label="Späť na úvod" title="Späť">←</button>
+        <div class="atlas-heading">
+          <h1 id="atlasTitle">Mestá Slovenska</h1>
+          <p>Atlas pôvodných 74 miest · zobrazených <span id="atlasCount" aria-live="polite">74 miest</span></p>
+        </div>
+        <button type="button" id="atlasHelpBtn" class="icon-btn" aria-label="Ako hrať" title="Ako hrať">?</button>
+      </header>
+
+      <div class="atlas-toolbar">
+        <label class="search-field">
+          <span class="search-icon" aria-hidden="true">⌕</span>
+          <span class="sr-only">Hľadať mesto</span>
+          <input id="citySearch" type="search" placeholder="Hľadať mesto (napr. Žilina)" autocomplete="off">
+        </label>
+        <div class="filter-chips" id="levelFilters" role="group" aria-label="Filtrovať mestá podľa obtiažnosti">
+          <button type="button" class="chip is-active" data-level-filter="all">Všetky (74)</button>
+          <button type="button" class="chip" data-level-filter="1">Ľahká (12)</button>
+          <button type="button" class="chip" data-level-filter="2">Stredná (49)</button>
+          <button type="button" class="chip" data-level-filter="3">Ťažká (74)</button>
+        </div>
+        <button type="button" id="trainFilterBtn" class="btn-primary btn-small">
+          <span class="ico ico-play" aria-hidden="true"></span>Trénovať zoznam
+        </button>
+      </div>
+
+      <div class="atlas-layout">
+        <section class="atlas-map-panel panel" aria-label="Mapa všetkých miest">
+          <div class="atlas-map" id="atlasMap">
+            <img class="atlas-map-img" src="assets/slovakia-map.svg" alt="Obrysová mapa Slovenska s riekami">
+            <div class="atlas-dots" id="atlasDots"></div>
+            <div class="atlas-selected-label" id="atlasSelectedLabel" aria-hidden="true" hidden></div>
+          </div>
+          <div class="atlas-map-footer">
+            <div class="atlas-legend" aria-label="Legenda obtiažnosti">
+              <span><i class="legend-dot level-1"></i>Ľahká</span>
+              <span><i class="legend-dot level-2"></i>Stredná</span>
+              <span><i class="legend-dot level-3"></i>Ťažká</span>
+            </div>
+            <div class="atlas-detail" id="atlasDetail">
+              <p class="atlas-empty">Vyber mesto na mape alebo v zozname.</p>
+            </div>
+          </div>
+          <div class="atlas-map-info">
+            <div class="atlas-distribution" aria-hidden="true">
+              <span class="dist level-1" style="flex:12"></span>
+              <span class="dist level-2" style="flex:37"></span>
+              <span class="dist level-3" style="flex:25"></span>
+            </div>
+            <div class="atlas-distribution-labels">
+              <span><b>12</b> ľahká</span>
+              <span><b>37</b> stredná</span>
+              <span><b>25</b> ťažká</span>
+            </div>
+            <p class="atlas-tip">Farba bodu zodpovedá úrovni mesta (testLevel). Filtrácia hore je kumulatívna ako v pôvodnej hre — „Ťažká“ zobrazí všetkých 74 miest.</p>
+          </div>
+        </section>
+
+        <section class="atlas-list-panel panel" aria-label="Zoznam miest">
+          <div class="atlas-list-head">
+            <span>Mesto</span>
+            <span>Obtiažnosť</span>
+            <button type="button" id="atlasCsvBtn" class="link-btn" aria-label="Stiahnuť zobrazené mestá ako CSV" title="Stiahnuť CSV">CSV</button>
+          </div>
+          <div class="atlas-list" id="cityList"></div>
+          <p class="atlas-empty-list" id="atlasEmpty" hidden>Žiadne mesto nevyhovuje filtru.</p>
+        </section>
+      </div>
+
+      <div id="atlasFloating" class="atlas-floating" hidden>
+        <div class="atlas-floating-copy">
+          <b id="atlasFloatingName"></b>
+          <span id="atlasFloatingLevel"></span>
+        </div>
+        <button type="button" id="atlasFloatingTrain" class="btn-primary btn-small">Trénovať</button>
+        <button type="button" id="atlasFloatingClear" class="btn-soft btn-small" aria-label="Zrušiť výber">×</button>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         LEGACY QUICK GAME (city training, kept as a bonus)
+         ============================================================ -->
+    <section id="gameScreen" class="screen game-screen" hidden tabindex="-1" aria-label="Rýchla hra">
+      <header class="game-topbar">
+        <div class="topbar-row">
+          <h1 class="game-title" id="gameTitle">Traf sa!</h1>
+          <div class="question-line">
+            <span id="qnum" class="qnum">Otázka č.<b>1</b>:</span>
+            <span id="questionText" class="question-text" aria-live="polite"></span>
+          </div>
+          <div class="topbar-actions">
+            <button type="button" id="nextBtn" class="win-btn" disabled>
+              <span class="ico ico-next" aria-hidden="true"></span><span>Ďalej</span>
+            </button>
+            <button type="button" id="endBtn" class="win-btn">
+              <span class="ico ico-x" aria-hidden="true"></span><span>Koniec</span>
+            </button>
+          </div>
+        </div>
+        <div class="game-progress" aria-hidden="true"><span id="progressFill"></span></div>
+      </header>
+
+      <div class="game-body">
+        <div class="score-panel" aria-label="Skóre a čas">
+          <div class="score-row score-distance" id="scoreDistanceRow">
+            <span class="lcd-badge" aria-hidden="true">9.8</span>
+            <span class="lcd" id="scoreValue">000</span>
+          </div>
+          <div class="score-row score-counts" id="scoreCountsRow" hidden>
+            <span class="count-icon count-correct" aria-hidden="true">✓</span>
+            <span class="lcd" id="correctValue">0</span>
+            <span class="count-icon count-wrong" aria-hidden="true">✕</span>
+            <span class="lcd" id="wrongValue">0</span>
+          </div>
+          <div class="score-row score-row-clock">
+            <span class="clock" aria-hidden="true"></span>
+            <span class="lcd" id="timeValue">00:00</span>
+          </div>
+          <span class="sr-only" id="scoreSr" aria-live="polite">Skóre 0 bodov, čas 00:00</span>
+        </div>
+
+        <div id="mapViewport" class="map-viewport">
+          <div id="mapStage" class="map-stage">
+            <img id="mapImg" class="map-img" src="assets/slovakia-map.svg" alt="Obrysová mapa Slovenska s riekami" draggable="false">
+            <svg id="markerLayer" class="marker-layer" viewBox="0 0 993 520" aria-hidden="true">
+              <defs>
+                <linearGradient id="flagRed" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#ff5757"></stop>
+                  <stop offset="0.5" stop-color="#e00000"></stop>
+                  <stop offset="1" stop-color="#900000"></stop>
+                </linearGradient>
+                <linearGradient id="flagGreen" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#57d61d"></stop>
+                  <stop offset="0.5" stop-color="#1f9c00"></stop>
+                  <stop offset="1" stop-color="#0d5a00"></stop>
+                </linearGradient>
+              </defs>
+              <g id="markers"></g>
+            </svg>
+          </div>
+
+          <div class="map-hint" id="mapHint">Klikni na mapu</div>
+
+          <div class="zoom-controls" role="group" aria-label="Ovládanie mapy">
+            <button type="button" id="zoomIn" class="zoom-btn" aria-label="Priblížiť">+</button>
+            <button type="button" id="zoomOut" class="zoom-btn" aria-label="Oddialiť">−</button>
+            <button type="button" id="zoomReset" class="zoom-btn zoom-btn-home" aria-label="Obnoviť celú mapu">⌂</button>
+            <button type="button" id="vucToggle" class="zoom-btn zoom-btn-vuc" aria-pressed="false" aria-label="Zobraziť hranice VÚC">VÚC</button>
+          </div>
+
+          <div class="map-tag" id="mapTag">Ťažká · Slovensko</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         CLASSIC ACTIVITIES
+         ============================================================ -->
+    <section id="classicScreen" class="screen classic-screen" hidden tabindex="-1" aria-labelledby="classicGameTitle">
+      <header class="game-topbar classic-topbar">
+        <div class="topbar-row">
+          <div class="classic-title-wrap">
+            <button type="button" id="classicHomeBtn" class="icon-btn" aria-label="Domov" title="Domov">←</button>
+            <div>
+              <h1 class="game-title" id="classicGameTitle">Traf sa!</h1>
+              <p class="classic-context" id="classicContext">Slovensko · mestá</p>
+            </div>
+          </div>
+          <div class="question-line">
+            <span id="classicQnum" class="qnum">Otázka č.<b>1</b>:</span>
+            <span id="classicQuestion" class="question-text" aria-live="polite"></span>
+          </div>
+          <div class="topbar-actions">
+            <button type="button" id="classicNextBtn" class="win-btn" disabled>
+              <span class="ico ico-next" aria-hidden="true"></span><span>Ďalej</span>
+            </button>
+            <button type="button" id="classicEndBtn" class="win-btn">
+              <span class="ico ico-x" aria-hidden="true"></span><span>Koniec</span>
+            </button>
+          </div>
+        </div>
+        <div class="game-progress" aria-hidden="true"><span id="classicProgressFill"></span></div>
+      </header>
+
+      <div class="game-body classic-body">
+        <aside class="score-panel classic-score" aria-label="Skóre a čas">
+          <div class="classic-game-meta">
+            <span class="classic-game-label">Aktivita</span>
+            <strong id="classicGameMeta">Traf sa!</strong>
+          </div>
+          <div class="score-row score-distance" id="classicScoreDistanceRow">
+            <span class="lcd-badge" aria-hidden="true">9.8</span>
+            <span class="lcd" id="classicScoreValue">000</span>
+          </div>
+          <div class="score-row score-counts" id="classicScoreCountsRow" hidden>
+            <span class="count-icon count-correct" aria-hidden="true">✓</span>
+            <span class="lcd" id="classicCorrectValue">0</span>
+            <span class="count-icon count-wrong" aria-hidden="true">✕</span>
+            <span class="lcd" id="classicWrongValue">0</span>
+          </div>
+          <div class="score-row score-row-clock">
+            <span class="clock" aria-hidden="true"></span>
+            <span class="lcd" id="classicTimeValue">00:00</span>
+          </div>
+        </aside>
+
+        <div id="classicMapViewport" class="map-viewport classic-map-viewport">
+          <div id="classicMapHost" class="map-host"></div>
+          <div class="map-hint" id="classicMapHint">Klikni na mapu</div>
+          <div class="zoom-controls" role="group" aria-label="Ovládanie mapy">
+            <button type="button" id="classicZoomIn" class="zoom-btn" aria-label="Priblížiť">+</button>
+            <button type="button" id="classicZoomOut" class="zoom-btn" aria-label="Oddialiť">−</button>
+            <button type="button" id="classicZoomFit" class="zoom-btn zoom-btn-home" aria-label="Obnoviť celú mapu">⌂</button>
+            <span class="zoom-value" id="classicZoomValue">100%</span>
+          </div>
+          <div class="map-tag" id="classicMapTag">Slovensko · mestá</div>
+        </div>
+      </div>
+
+      <div id="classicLoading" class="classic-loading" hidden>
+        <div class="loading-card">
+          <span class="spinner" aria-hidden="true"></span>
+          <p id="classicLoadingText">Načítavam mapu…</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         EDITOR
+         ============================================================ -->
+    <section id="editorScreen" class="screen editor-screen" hidden tabindex="-1" aria-labelledby="editorTitle">
+      <header class="editor-topbar">
+        <div class="editor-title-wrap">
+          <button type="button" id="editorBackBtn" class="icon-btn" aria-label="Späť na úvod" title="Späť">←</button>
+          <div>
+            <h1 id="editorTitle">Editor máp</h1>
+            <p id="editorFileLabel" class="editor-file-label">Slovensko.mef</p>
+          </div>
+        </div>
+        <div class="editor-actions" role="toolbar" aria-label="Súbor">
+          <button type="button" class="editor-btn" data-editor-action="new" title="Nová mapa (Ctrl+N)">Nová</button>
+          <button type="button" class="editor-btn" data-editor-action="open" title="Otvoriť .mef (Ctrl+O)">Otvoriť</button>
+          <button type="button" class="editor-btn" data-editor-action="save" title="Uložiť (Ctrl+S)">Ulož</button>
+          <button type="button" class="editor-btn" data-editor-action="saveas" title="Uložiť ako (Ctrl+Shift+S)">Ulož ako</button>
+          <button type="button" class="editor-btn" data-editor-action="export" title="Export obrázka">Export</button>
+          <button type="button" class="editor-btn" data-editor-action="print" title="Tlačiť">Tlač</button>
+          <button type="button" class="icon-btn" data-editor-action="help" aria-label="Pomocník" title="Pomocník">?</button>
+          <button type="button" class="icon-btn" data-editor-action="about" aria-label="O aplikácii" title="O aplikácii">i</button>
+          <button type="button" id="editorPanelToggle" class="icon-btn editor-panel-toggle" aria-label="Zobraziť objekty" aria-expanded="false">Objekty</button>
+        </div>
+      </header>
+
+      <div class="editor-body">
+        <aside class="editor-sidebar" id="editorTreePanel" aria-label="Strom objektov">
+          <div class="editor-sidebar-head">
+            <div>
+              <p class="editor-panel-kicker">Ovládanie objektov mapy</p>
+              <h2>Vrstvy a objekty</h2>
+            </div>
+            <div class="editor-sidebar-head-actions">
+              <button type="button" id="editorTreeClose" class="icon-btn editor-tree-close" title="Zavrieť strom" aria-label="Zavrieť strom">×</button>
+              <button type="button" id="editorAddMarkBtn" class="icon-btn" title="Pridať vlastnú značku" aria-label="Pridať vlastnú značku">+</button>
+            </div>
+          </div>
+          <label class="search-field editor-search">
+            <span class="search-icon" aria-hidden="true">⌕</span>
+            <span class="sr-only">Hľadať objekt</span>
+            <input id="editorTreeSearch" type="search" placeholder="Hľadať objekt alebo vrstvu" autocomplete="off">
+          </label>
+          <div class="editor-tree-tools">
+            <button type="button" id="editorExpandAll" class="link-btn">Rozbaliť</button>
+            <button type="button" id="editorCollapseAll" class="link-btn">Zbaliť</button>
+            <span class="editor-tree-count" id="editorTreeCount"></span>
+          </div>
+          <div id="editorTree" class="editor-tree" role="tree" aria-label="Strom objektov mapy"></div>
+          <div class="editor-sidebar-foot">
+            <p><b>Oko</b> = viditeľnosť objektu, <b>pin</b> = značka. Kliknutím na farbu zmeníš farbu vetvy alebo objektu.</p>
+            <p class="editor-file-meta" id="editorFileMeta">—</p>
+          </div>
+        </aside>
+
+        <div class="editor-map-column">
+          <div class="editor-map-toolbar">
+            <div class="editor-view-tools">
+              <button type="button" id="editorZoomOut" class="zoom-btn" aria-label="Oddialiť">−</button>
+              <span class="zoom-value" id="editorZoomValue">100%</span>
+              <button type="button" id="editorZoomIn" class="zoom-btn" aria-label="Priblížiť">+</button>
+              <button type="button" id="editorZoomFit" class="zoom-btn zoom-btn-home" aria-label="Prispôsobiť">⌂</button>
+            </div>
+            <div class="editor-view-toggles">
+              <label class="switch switch-small"><input type="checkbox" id="editorShowMarks" checked><span class="switch-track" aria-hidden="true"></span><span class="switch-label">Značky</span></label>
+              <label class="switch switch-small"><input type="checkbox" id="editorShowDrawings" checked><span class="switch-track" aria-hidden="true"></span><span class="switch-label">Kresby</span></label>
+              <button type="button" id="editorDrawToggle" class="editor-btn" aria-pressed="false">Kreslenie</button>
+            </div>
+          </div>
+          <div id="editorMapViewport" class="map-viewport editor-map-viewport">
+            <div id="editorMapHost" class="map-host"></div>
+            <div class="map-hint editor-map-hint" id="editorMapHint">Ťahaj značky, klikni na objekt alebo kresli</div>
+            <div class="map-tag" id="editorMapTag">Slovensko</div>
+          </div>
+          <div id="drawToolbar" class="draw-toolbar" hidden>
+            <div class="draw-tools" role="group" aria-label="Nástroje kreslenia">
+              <button type="button" class="draw-btn" data-draw-tool="line" title="Čiara" aria-label="Čiara">╱</button>
+              <button type="button" class="draw-btn" data-draw-tool="rect" title="Obdĺžnik" aria-label="Obdĺžnik">▭</button>
+              <button type="button" class="draw-btn" data-draw-tool="oval" title="Elipsa" aria-label="Elipsa">◯</button>
+              <button type="button" class="draw-btn" data-draw-tool="free" title="Voľná čiara" aria-label="Voľná čiara">〰</button>
+            </div>
+            <label class="draw-color-wrap" title="Farba">
+              <span>Farba</span>
+              <input type="color" id="drawColor" value="#ff0000">
+            </label>
+            <label class="draw-range-wrap" title="Hrúbka">
+              <span>Hrúbka</span>
+              <input type="range" id="drawThickness" min="0" max="4" step="1" value="1">
+              <output id="drawThicknessValue">1</output>
+            </label>
+            <label class="draw-check"><input type="checkbox" id="drawFill"> Vyplniť</label>
+            <button type="button" id="drawDeleteLast" class="editor-btn">Vymaž posledný</button>
+            <button type="button" id="drawClose" class="icon-btn" aria-label="Zavrieť kreslenie">×</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="editorLoading" class="classic-loading" hidden>
+        <div class="loading-card">
+          <span class="spinner" aria-hidden="true"></span>
+          <p id="editorLoadingText">Načítavam editor…</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============================================================
+       ACTIVITY SETUP
+       ============================================================ -->
+  <div id="activityOverlay" class="overlay" hidden>
+    <div class="dialog setup-dialog" role="dialog" aria-modal="true" aria-labelledby="activityTitle">
+      <div class="dialog-head setup-head">
+        <div>
+          <h2 id="activityTitle">Traf sa!</h2>
+          <p id="activitySubtitle" class="setup-subtitle"></p>
+        </div>
+        <button type="button" id="setupClose" class="dialog-x" aria-label="Zavrieť">×</button>
+      </div>
+      <div class="dialog-body setup-body">
+        <div class="setup-map-column">
+          <p class="setup-label">Mapa</p>
+          <div id="setupMaps" class="setup-maps" role="listbox" aria-label="Výber mapy"></div>
+        </div>
+        <div class="setup-options">
+          <label class="setup-field" for="setupTest">
+            <span class="setup-label">Test / okruh</span>
+            <select id="setupTest" class="setup-select"></select>
+          </label>
+          <div class="setup-field">
+            <span class="setup-label">Obtiažnosť</span>
+            <div id="setupLevels" class="segmented setup-levels" role="group" aria-label="Obtiažnosť"></div>
+          </div>
+          <div class="setup-field setup-count-field">
+            <div>
+              <span class="setup-label">Počet otázok</span>
+              <p class="setup-field-hint" id="setupNumHint">Podľa dostupných objektov</p>
+            </div>
+            <div class="stepper">
+              <button type="button" id="setupNumMinus" class="step-btn" aria-label="Ubrať otázku">−</button>
+              <input id="setupNumQ" class="step-value" type="text" inputmode="numeric" maxlength="3" value="3" aria-label="Počet otázok" aria-live="polite">
+              <button type="button" id="setupNumPlus" class="step-btn" aria-label="Pridať otázku">+</button>
+            </div>
+          </div>
+          <div id="setupSummary" class="setup-summary" aria-live="polite"></div>
+        </div>
+      </div>
+      <div class="dialog-actions setup-actions">
+        <button type="button" id="setupStart" class="btn-start"><span class="ico ico-play" aria-hidden="true"></span>Začni</button>
+        <button type="button" id="setupCancel" class="btn-soft">Zruš</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       CLASSIC RESULT
+       ============================================================ -->
+  <div id="classicResultOverlay" class="overlay" hidden>
+    <div class="dialog result-dialog classic-result-dialog" role="dialog" aria-modal="true" aria-labelledby="classicResultTitle">
+      <div class="dialog-head result-head">
+        <h2 id="classicResultTitle">Výsledok</h2>
+        <span id="classicResultBadge" class="record-badge" hidden>Výborné</span>
+        <button type="button" id="classicResultClose" class="dialog-x" aria-label="Zavrieť">×</button>
+      </div>
+      <div class="dialog-body">
+        <div class="result-stats">
+          <div class="stat"><span class="stat-value" id="classicResultPercent">0%</span><span class="stat-label">úspešnosť</span></div>
+          <div class="stat"><span class="stat-value" id="classicResultPrimary">0</span><span class="stat-label" id="classicResultPrimaryLabel">bodov</span></div>
+          <div class="stat"><span class="stat-value" id="classicResultTime">00:00</span><span class="stat-label">čas</span></div>
+        </div>
+        <p class="result-text" id="classicResultText"></p>
+        <div class="result-list-wrap">
+          <table class="result-list">
+            <thead><tr><th>Objekt</th><th>Odpoveď</th><th>Body</th></tr></thead>
+            <tbody id="classicResultRows"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" id="classicResultAgain" class="btn-start"><span class="ico ico-check" aria-hidden="true"></span>Hrať znova</button>
+        <button type="button" id="classicResultSetup" class="btn-soft">Nastavenia</button>
+        <button type="button" id="classicResultShare" class="btn-soft">Zdieľať</button>
+        <button type="button" id="classicResultHome" class="btn-soft">Domov</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       EDITOR NEW MAP
+       ============================================================ -->
+  <div id="editorNewOverlay" class="overlay" hidden>
+    <div class="dialog setup-dialog editor-new-dialog" role="dialog" aria-modal="true" aria-labelledby="editorNewTitle">
+      <div class="dialog-head setup-head">
+        <div>
+          <h2 id="editorNewTitle">Nová mapa</h2>
+          <p class="setup-subtitle">Vyber pôvodnú mapu. Vytvorí sa nový dokument z predvolených .mef dát.</p>
+        </div>
+        <button type="button" id="editorNewClose" class="dialog-x" aria-label="Zavrieť">×</button>
+      </div>
+      <div class="dialog-body">
+        <div id="editorNewMaps" class="setup-maps editor-new-maps" role="listbox" aria-label="Výber mapy"></div>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" id="editorNewCancel" class="btn-soft">Zruš</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       EDITOR EXPORT
+       ============================================================ -->
+  <div id="exportOverlay" class="overlay" hidden>
+    <div class="dialog export-dialog" role="dialog" aria-modal="true" aria-labelledby="exportTitle">
+      <div class="dialog-head">
+        <h2 id="exportTitle">Export obrázka</h2>
+        <button type="button" id="exportClose" class="dialog-x" aria-label="Zavrieť">×</button>
+      </div>
+      <div class="dialog-body export-body">
+        <fieldset class="export-fieldset">
+          <legend>Formát</legend>
+          <label class="radio-line"><input type="radio" name="exportFormat" value="png" checked> PNG <span>bezstratový, vhodný na tlač</span></label>
+          <label class="radio-line"><input type="radio" name="exportFormat" value="jpeg"> JPEG <span>menší súbor</span></label>
+        </fieldset>
+        <fieldset class="export-fieldset">
+          <legend>Rozlíšenie</legend>
+          <label class="radio-line"><input type="radio" name="exportResolution" value="0.5"> Nízke <span>0,5×</span></label>
+          <label class="radio-line"><input type="radio" name="exportResolution" value="1" checked> Stredné <span>1×</span></label>
+          <label class="radio-line"><input type="radio" name="exportResolution" value="2"> Vysoké <span>2×</span></label>
+        </fieldset>
+        <fieldset class="export-fieldset">
+          <legend>Výrez</legend>
+          <label class="radio-line"><input type="radio" name="exportCrop" value="all" checked> Celá mapa</label>
+          <label class="radio-line"><input type="radio" name="exportCrop" value="view"> Aktuálne zobrazenie</label>
+        </fieldset>
+        <label class="switch export-watermark"><input type="checkbox" id="exportWatermark" checked><span class="switch-track" aria-hidden="true"></span><span class="switch-label">Pridať vodoznak</span></label>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" id="exportOk" class="btn-start">Exportovať</button>
+        <button type="button" id="exportCancel" class="btn-soft">Zruš</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       ABOUT
+       ============================================================ -->
+  <div id="aboutOverlay" class="overlay" hidden>
+    <div class="dialog about-dialog" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+      <div class="dialog-head">
+        <h2 id="aboutTitle">O aplikácii</h2>
+        <button type="button" id="aboutClose" class="dialog-x" aria-label="Zavrieť">×</button>
+      </div>
+      <div class="dialog-body about-body">
+        <div class="about-brand">
+          <img src="assets/editormap-logo.png" alt="" width="64" height="64">
+          <div>
+            <h3>Editor máp 2 · webová verzia</h3>
+            <p>Kompletná reimplementácia pôvodnej aplikácie z roku 2010.</p>
+          </div>
+        </div>
+        <dl class="about-list">
+          <div><dt>Pôvodná aplikácia</dt><dd>Editor máp 2.0 (mxm.blindmaps)</dd></div>
+          <div><dt>Autori</dt><dd>RNDr. Štefan Karolčík, PhD · Ing. Juraj Hrabovec – MAX MEDIA</dd></div>
+          <div><dt>Mapové podklady</dt><dd>RNDr. Daniel Gurňák, PhD</dd></div>
+          <div><dt>Mapy</dt><dd>8 máp · 1 982 objektov · všetky pôvodné testy a editor</dd></div>
+          <div><dt>Dáta</dt><dd>config.xml a pôvodné .mef súbory sú súčasťou aplikácie</dd></div>
+        </dl>
+        <p class="fine">Nekomerčná edukatívna reimplementácia. Pôvodné ochranné známky a autorské práva patria ich vlastníkom.</p>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" id="aboutOk" class="btn-soft">Zavrieť</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       HELP (legacy city training)
+       ============================================================ -->
+  <div id="helpOverlay" class="overlay" hidden>
+    <div class="dialog help-dialog" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+      <div class="dialog-head">
+        <h2 id="helpTitle">Ako hrať</h2>
+        <button type="button" class="dialog-x" data-close="help" aria-label="Zavrieť">×</button>
+      </div>
+      <div class="dialog-body">
+        <p class="help-intro">Editor máp 2 na webe ponúka všetky pôvodné aktivity nad ôsmimi mapami a plnohodnotný editor. Dole je rýchla nápoveda.</p>
+
+        <h3 class="help-heading">Vyskúšaj sa!</h3>
+        <p>Na mape sa zobrazí niekoľko značiek. Jedna patrí zadanému objektu. Klikni na správnu značku. Počet možností určuje obtiažnosť: ľahká 3, stredná 5, ťažká 7. Testy a objekty sú presne z pôvodnej hry.</p>
+
+        <h3 class="help-heading">Traf sa!</h3>
+        <p>Klikni na mapu tam, kde si myslíš, že objekt leží. Ihneď uvidíš svoj tip a správnu polohu. Body sa počítajú pôvodným vzorcom zo vzdialenosti; výsledok pod 5 bodov sa počíta ako 0.</p>
+
+        <h3 class="help-heading">Poskladaj!</h3>
+        <p>Objekt sa objaví v strede mapy. Pretiahni ho na skutočné miesto. Ak je vzdialenosť od správnej polohy menšia ako 15 mapových jednotiek, bod získaš.</p>
+
+        <h3 class="help-heading">Editor máp</h3>
+        <p>Nová/Otvoriť/Ulož/Ulož ako pracujú s pôvodnými <b>.mef</b> súbormi. Strom vľavo ovláda viditeľnosť, značky a farby. Kreslenie ponúka čiary, obdĺžniky, elipsy a voľnú kresbu. Export vytvorí PNG alebo JPEG, prípadne môžeš mapu vytlačiť.</p>
+
+        <h3 class="help-heading">Ovládanie mapy</h3>
+        <p>Mapu priblížiš kolieskom myši, štipcom alebo tlačidlami <b>+</b> / <b>−</b>. Tlačidlom <b>⌂</b> obnovíš celú mapu. Posúvaš ju ťahaním prázdneho miesta.</p>
+
+        <h3 class="help-heading">Atlas miest SR</h3>
+        <p>Doplnkový atlas všetkých 74 slovenských miest s hľadaním, filtrami a rýchlym tréningom. Neovplyvňuje pôvodné aktivity.</p>
+
+        <p class="fine">Celú pôvodnú nápovedu editora nájdeš v dokumentácii aplikácie.</p>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" class="btn-soft" data-close="help">Rozumiem</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       LEGACY RESULT
+       ============================================================ -->
+  <div id="resultOverlay" class="overlay" hidden>
+    <div class="dialog result-dialog" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+      <div class="dialog-head result-head">
+        <h2 id="resultTitle">Traf sa! — výsledok</h2>
+        <span id="recordBadge" class="record-badge" hidden>Nový rekord</span>
+      </div>
+      <div class="dialog-body">
+        <div class="result-stats">
+          <div class="stat"><span class="stat-value" id="resultPercent">0%</span><span class="stat-label">úspešnosť</span></div>
+          <div class="stat"><span class="stat-value" id="resultScore">0</span><span class="stat-label" id="resultScoreLabel">bodov</span></div>
+          <div class="stat"><span class="stat-value" id="resultTime">00:00</span><span class="stat-label">čas</span></div>
+        </div>
+        <p class="result-text" id="resultText"></p>
+        <div class="result-list-wrap">
+          <table class="result-list">
+            <thead><tr id="resultTableHead"><th>Mesto</th><th>Body</th></tr></thead>
+            <tbody id="resultRows"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" id="playAgainBtn" class="btn-start"><span class="ico ico-check" aria-hidden="true"></span>Hrať znova</button>
+        <button type="button" id="shareResultBtn" class="btn-soft">Zdieľať</button>
+        <button type="button" id="menuBtn" class="btn-soft">Koniec</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       CONFIRM (legacy)
+       ============================================================ -->
+  <div id="confirmOverlay" class="overlay" hidden>
+    <div class="dialog confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+      <div class="dialog-head">
+        <h2 id="confirmTitle">Ukončiť hru?</h2>
+      </div>
+      <div class="dialog-body">
+        <p id="confirmMessage">Rozohraná hra sa neuloží. Naozaj chceš skončiť?</p>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" id="confirmOkBtn" class="btn-danger">Ukončiť</button>
+        <button type="button" id="confirmCancelBtn" class="btn-soft">Pokračovať</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       CLASSIC CONFIRM / PROMPT
+       ============================================================ -->
+  <div id="classicConfirmOverlay" class="overlay" hidden>
+    <div class="dialog confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="classicConfirmTitle">
+      <div class="dialog-head">
+        <h2 id="classicConfirmTitle">Potvrdenie</h2>
+      </div>
+      <div class="dialog-body">
+        <p id="classicConfirmMessage"></p>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" id="classicConfirmOk" class="btn-danger">OK</button>
+        <button type="button" id="classicConfirmCancel" class="btn-soft">Zrušiť</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="classicPromptOverlay" class="overlay" hidden>
+    <div class="dialog confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="classicPromptTitle">
+      <div class="dialog-head">
+        <h2 id="classicPromptTitle">Názov</h2>
+      </div>
+      <div class="dialog-body">
+        <label class="setup-field" for="classicPromptInput">
+          <span class="setup-label" id="classicPromptLabel">Názov súboru</span>
+          <input id="classicPromptInput" class="setup-select" type="text" autocomplete="off">
+        </label>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" id="classicPromptOk" class="btn-primary">Uložiť</button>
+        <button type="button" id="classicPromptCancel" class="btn-soft">Zrušiť</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="classicToast" class="toast classic-toast" hidden role="status"></div>
+  <span id="classicSr" class="sr-only" aria-live="polite"></span>
+
+  <script type="module" src="js/app.js"></script>
+  <script type="module" src="js/classic.js"></script>
+</body>
+</html>

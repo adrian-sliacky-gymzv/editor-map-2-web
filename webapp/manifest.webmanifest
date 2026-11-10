@@ -1,0 +1,20 @@
+{
+  "name": "Editor máp 2 — kompletná webová verzia",
+  "short_name": "Editor máp 2",
+  "description": "Vyskúšaj sa!, Traf sa!, Poskladaj! a plnohodnotný editor na všetkých ôsmich pôvodných mapách. Plus atlas 74 slovenských miest.",
+  "lang": "sk",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#eef2ff",
+  "theme_color": "#dfe4fb",
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

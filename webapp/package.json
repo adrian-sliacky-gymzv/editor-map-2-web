@@ -1,0 +1,14 @@
+{
+  "name": "editor-map-2-web",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Editor máp 2 — kompletná webová reimplementácia: Vyskúšaj sa!, Traf sa!, Poskladaj!, editor máp, 8 pôvodných máp a atlas 74 slovenských miest.",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test tests/scoring.test.mjs tests/modes.test.mjs tests/clone.test.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

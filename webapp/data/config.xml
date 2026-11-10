@@ -1,0 +1,557 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<config>
+	<windowTitle value="Editor máp 2.0"/>
+	<defaultNewDataDir value="newMapData"/>
+	<defaultNewObjectDir value="mapObjects"/>
+	<treeWindowName value="Ovládanie objektov mapy"/>
+	<drawWindowName value="Kreslenie"/>
+	<editableTreeLabels value="false"/>
+	<editableTreeLevels value="false"/>
+	<helpURL value="help/index.html"/>
+	<fileChangedAlert><b><font color="#990000">V otvorenom súbore boli vykonané zmeny.<br/>Chcete pokračovať?</font></b></fileChangedAlert>
+	
+	<testTitle value="Vyskúšaj sa!"/>
+	<testQuestion>Ukáž na mape ENTITYTYPE<b><font color="#000099">ENTITYNAME</font></b>.</testQuestion>
+	<correctTestAnswer><b><font color="#009900">Správne!</font></b></correctTestAnswer>
+	<incorrectTestAnswer><b><font color="#990000">Nesprávne!</font></b>%20Správna odpoveď je zobrazená v mape!</incorrectTestAnswer>
+	<nextTestQuestion>Klikni "Ďalej" pre ďalšiu otázku.</nextTestQuestion>
+	<lastTestQuestion>Klikni "Ďalej".</lastTestQuestion>
+	<testFinalScore>Zodpovedal si správne<b><font color="#990000">CORRECTQ</font></b>%20z<b><font color="#990000">TOTALQ</font></b>%20otázok v čase<b><font color="#990000">TOTALTIME</font></b>. Tvoja úspešnosť je<b><font color="#990000">PERCENT%</font></b>. Klikni "Koniec".</testFinalScore>
+	
+	<distanceTitle value="Traf sa!"/>
+	<distanceQuestion>Klikni kde sa nachádza ENTITYTYPE<b><font color="#000099">ENTITYNAME</font></b>.</distanceQuestion>
+	<distanceAnswer min="90" max="100"><b><font color="#009900">Výborne!</font></b>%20Získal si<b><font color="#009900">SCORE</font></b>%20bodov.</distanceAnswer>
+	<distanceAnswer min="70" max="89"><b><font color="#000099">Celkom dobre!</font></b>%20Získal si<b><font color="#000099">SCORE</font></b>%20bodov.</distanceAnswer>
+	<distanceAnswer min="1" max="69"><b><font color="#000099">To je bieda!</font></b>%20Získal si len<b><font color="#000099">SCORE</font></b>%20bodov.</distanceAnswer>
+	<distanceAnswer min="0" max="0"><b><font color="#990000">Úplne vedľa!</font></b>%20Nezískal si ani bod!</distanceAnswer>
+	<distanceFinalScore>Celkovo si získal<b><font color="#990000">TOTALSCORE</font></b>%20bodov v čase<b><font color="#990000">TOTALTIME</font></b>. Tvoja úspešnosť je<b><font color="#990000">PERCENT%</font></b>. Klikni "Koniec".</distanceFinalScore>
+	
+	<puzzleTitle value="Poskladaj!"/>
+	<puzzleTollerance value="15"/>
+	<puzzleQuestion>Ťahaním na mape ulož ENTITYTYPE<b><font color="#000099">ENTITYNAME</font></b>%20na správne miesto.</puzzleQuestion>
+	<puzzleMinSize value="20"/>
+	<correctPuzzleAnswer><b><font color="#009900">Výborne! To je správne miesto.</font></b></correctPuzzleAnswer>
+	<incorrectPuzzleAnswer><b><font color="#990000">Nie, ENTITYNAME tam nepatrí!</font></b></incorrectPuzzleAnswer>
+	<nextPuzzleQuestion>Klikni "Ďalej" pre ďalšiu otázku.</nextPuzzleQuestion>
+	<lastPuzzleQuestion>Klikni "Ďalej".</lastPuzzleQuestion>
+	<puzzleFinalScore>Uložil si správne<b><font color="#990000">CORRECTQ</font></b>%20z<b><font color="#990000">TOTALQ</font></b>%20ENTITYTYPE v čase<b><font color="#990000">TOTALTIME</font></b>. Tvoja úspešnosť je<b><font color="#990000">PERCENT%</font></b>. Klikni "Koniec".</puzzleFinalScore>
+
+	<defaultlevels>
+		<level label="ľahká" maxLevel="1" numTargets="3"/>
+		<level label="stredná" maxLevel="2" numTargets="5"/>
+		<level label="ťažká" maxLevel="3" numTargets="7"/>
+	</defaultlevels>
+
+	<globalMapList>
+		<map mapName="Slovensko" dataFileName="slovensko" objectFileName="slovensko" mapSymbol="mc_map_Slovensko"/>
+		<map mapName="Afrika" dataFileName="afrika" objectFileName="afrika" mapSymbol="mc_map_Afrika"/>
+		<map mapName="Austrália" dataFileName="australia" objectFileName="australia" mapSymbol="mc_map_Australia"/>
+		<map mapName="Ázia" dataFileName="azia" objectFileName="azia" mapSymbol="mc_map_Azia"/>
+		<map mapName="Európa" dataFileName="europa" objectFileName="europa" mapSymbol="mc_map_Europa"/>
+		<map mapName="Južná Amerika" dataFileName="juzna_amerika" objectFileName="juzna_amerika" mapSymbol="mc_map_Juzna_Amerika"/>
+		<map mapName="Severná Amerika" dataFileName="severna_amerika" objectFileName="severna_amerika" mapSymbol="mc_map_Severna_Amerika"/>
+		<map mapName="svet" dataFileName="svet" objectFileName="svet" mapSymbol="mc_map_svet"/>
+	</globalMapList>
+	
+	<newFileMapList>
+		<map label="Slovensko" mapName="Slovensko"/>
+		<map label="Afrika" mapName="Afrika"/>
+		<map label="Austrália" mapName="Austrália"/>
+		<map label="Ázia" mapName="Ázia"/>
+		<map label="Európa" mapName="Európa"/>
+		<map label="Južná Amerika" mapName="Južná Amerika"/>
+		<map label="Severná Amerika" mapName="Severná Amerika"/>
+		<map label="Svet" mapName="svet"/>
+	</newFileMapList>
+	
+	<!-- TEST MAP LIST ********************************************************** -->
+	<testMapList>
+		<map label="Slovensko" mapName="Slovensko">
+			<visibleNode label="hranica SR"/>
+			<test label="skúšať všetko">
+				<group label="vodné nádrže" question="vodnú nádrž">
+					<visibleNode label="rieky"/>
+				</group>
+				<group label="CHKO" question="chránenú oblasť"/>
+				<group label="rieky" question="rieku"/>
+				<group label="VÚC" question="vyšší územný celok"/>
+				<group label="chránené územie"/>
+				<group label="hranice celkov" question="geomorfologický celok"/>
+				<group label="hranice oblastí" question="geomorfologickú oblasť"/>
+				<group label="mestá" question="mesto">
+					<visibleNode label="rieky"/>
+					<visibleNode label="VÚC"/>
+				</group>
+			</test>
+			<test label="vodné nádrže">
+				<visibleNode label="rieky"/>
+				<group label="vodné nádrže" question="vodnú nádrž"/>
+			</test>
+			<test label="rieky">
+				<group label="rieky" question="rieku"/>
+			</test>
+			<test label="vyšie územné celky">
+				<group label="VÚC" question="vyšší územný celok"/>
+			</test>
+			<test label="chránené územia">
+				<group label="chránené územie"/>
+			</test>
+			<test label="chránené krajinné oblasti">
+				<level label="stredná" maxLevel="2" numTargets="5"/>
+	 			<level label="ťažká" maxLevel="3" numTargets="7"/>
+				<group label="CHKO" question="chránenú oblasť"/>
+			</test>
+			<test label="geomorfologické celky">
+				<group label="hranice celkov" question="geomorfologický celok"/>
+			</test>
+			<test label="mestá">
+				<visibleNode label="rieky"/>
+				<visibleNode label="VÚC"/>
+				<group label="mestá" question="mesto"/>
+			</test>
+		</map>
+		
+		<map label="Afrika" mapName="Afrika">
+			<visibleNode label="pobrežie"/>
+			<visibleNode label="rieky"/>
+			<test label="skúšať všetko">
+				<group label="štáty" question="štát"/>
+				<group label="mestá" question="mesto"/>
+				<group label="jazerá" question=""/>
+				<group label="rieky" question="rieku"/>
+				<group label="povrchové celky" question="povrchový celok"/>
+				<group label="moria a oceány" question=""/>
+			</test>
+			<test label="štáty">
+				<group label="štáty" question="štát"/>
+			</test>
+			<test label="hlavné mestá">
+				<visibleNode label="štáty"/>
+				<group label="hlavné mestá" question="hlavné mesto"/>
+			</test>
+			<test label="všetky mestá">
+				<visibleNode label="štáty"/>
+				<group label="mestá" question="mesto"/>
+			</test>
+			<test label="jazerá">
+				<group label="jazerá" question=""/>
+			</test>
+			<test label="rieky">
+				<group label="rieky" question="rieku"/>
+			</test>
+			<test label="povrchové celky">
+				<group label="povrchové celky" question="povrchový celok"/>
+			</test>
+			<test label="moria a oceány">
+				<group label="moria a oceány" question=""/>
+			</test>
+		</map>
+		
+		<map label="Austrália" mapName="Austrália">
+			<visibleNode label="pobrežie"/>
+			<visibleNode label="rieky"/>
+			<test label="skúšať všetko">
+				<group label="štáty" question="štát"/>
+				<group label="mestá" question="mesto"/>
+				<group label="rieky" question="rieku"/>
+				<group label="povrchové celky" question="povrchový celok"/>
+				<group label="moria a oceány" question=""/>
+			</test>
+			<test label="štáty">
+				<group label="štáty" question="štát"/>
+			</test>
+			<test label="hlavné mestá">
+				<visibleNode label="štáty"/>
+				<group label="hlavné mestá" question="hlavné mesto"/>
+			</test>
+			<test label="všetky mestá">
+				<visibleNode label="štáty"/>
+				<group label="mestá" question="mesto"/>
+			</test>
+			<test label="rieky">
+				<group label="rieky" question="rieku"/>
+			</test>
+			<test label="povrchové celky">
+				<group label="povrchové celky" question="povrchový celok"/>
+			</test>
+			<test label="moria a oceány">
+				<group label="moria a oceány" question=""/>
+			</test>
+		</map>
+		
+		<map label="Ázia" mapName="Ázia">
+			<visibleNode label="pobrežie"/>
+			<visibleNode label="rieky"/>
+			<test label="skúšať všetko">
+				<group label="štáty" question="štát"/>
+				<group label="mestá" question="mesto"/>
+				<group label="jazerá" question=""/>
+				<group label="rieky" question="rieku"/>
+				<group label="povrchové celky" question="povrchový celok"/>
+				<group label="moria a oceány" question=""/>
+			</test>
+			<test label="štáty">
+				<group label="štáty" question="štát"/>
+			</test>
+			<test label="hlavné mestá">
+				<visibleNode label="štáty"/>
+				<group label="hlavné mestá" question="hlavné mesto"/>
+			</test>
+			<test label="všetky mestá">
+				<visibleNode label="štáty"/>
+				<group label="mestá" question="mesto"/>
+			</test>
+			<test label="jazerá">
+				<group label="jazerá" question=""/>
+			</test>
+			<test label="rieky">
+				<group label="rieky" question="rieku"/>
+			</test>
+			<test label="povrchové celky">
+				<group label="povrchové celky" question="povrchový celok"/>
+			</test>
+			<test label="moria a oceány">
+				<group label="moria a oceány" question=""/>
+			</test>
+		</map>
+		
+		<map label="Európa" mapName="Európa">
+			<visibleNode label="pobrežie"/>
+			<visibleNode label="rieky"/>
+			<test label="skúšať všetko">
+				<group label="štáty" question="štát"/>
+				<group label="mestá" question="mesto"/>
+				<group label="rieky" question="rieku"/>
+				<group label="povrchové celky" question="povrchový celok"/>
+				<group label="moria a oceány" question=""/>
+			</test>
+			<test label="štáty">
+				<group label="štáty" question="štát"/>
+			</test>
+			<test label="hlavné mestá">
+				<visibleNode label="štáty"/>
+				<group label="hlavné mestá" question="hlavné mesto"/>
+			</test>
+			<test label="všetky mestá">
+				<visibleNode label="štáty"/>
+				<group label="mestá" question="mesto"/>
+			</test>
+			<test label="rieky">
+				<group label="rieky" question="rieku"/>
+			</test>
+			<test label="povrchové celky">
+				<group label="povrchové celky" question="povrchový celok"/>
+			</test>
+			<test label="moria a oceány">
+				<group label="moria a oceány" question=""/>
+			</test>
+		</map>
+		
+		<map label="Južná Amerika" mapName="Južná Amerika">
+			<visibleNode label="pobrežie"/>
+			<visibleNode label="rieky"/>
+			<test label="skúšať všetko">
+				<group label="štáty" question="štát"/>
+				<group label="mestá" question="mesto"/>
+				<group label="rieky" question="rieku"/>
+				<group label="povrchové celky" question="povrchový celok"/>
+				<group label="moria a oceány" question=""/>
+			</test>
+			<test label="štáty">
+				<group label="štáty" question="štát"/>
+			</test>
+			<test label="hlavné mestá">
+				<visibleNode label="štáty"/>
+				<group label="hlavné mestá" question="hlavné mesto"/>
+			</test>
+			<test label="všetky mestá">
+				<visibleNode label="štáty"/>
+				<group label="mestá" question="mesto"/>
+			</test>
+			<test label="rieky">
+				<group label="rieky" question="rieku"/>
+			</test>
+			<test label="povrchové celky">
+				<visibleNode label="rieky"/>
+				<group label="povrchové celky" question="povrchový celok"/>
+			</test>
+			<test label="moria a oceány">
+				<group label="moria a oceány" question=""/>
+			</test>
+		</map>
+		
+		<map label="Severná Amerika" mapName="Severná Amerika">
+			<visibleNode label="pobrežie"/>
+			<visibleNode label="rieky"/>
+			<test label="skúšať všetko">
+				<group label="štáty" question="štát"/>
+				<group label="mestá" question="mesto"/>
+				<group label="jazerá" question=""/>
+				<group label="rieky" question="rieku"/>
+				<group label="povrchové celky" question="povrchový celok"/>
+				<group label="moria a oceány" question=""/>
+			</test>
+			<test label="štáty">
+				<group label="štáty" question="štát"/>
+			</test>
+			<test label="hlavné mestá">
+				<visibleNode label="štáty"/>
+				<group label="hlavné mestá" question="hlavné mesto"/>
+			</test>
+			<test label="všetky mestá">
+				<visibleNode label="štáty"/>
+				<group label="mestá" question="mesto"/>
+			</test>
+			<test label="jazerá">
+				<visibleNode label="rieky"/>
+				<group label="jazerá" question=""/>
+			</test>
+			<test label="rieky">
+				<group label="rieky" question="rieku"/>
+			</test>
+			<test label="povrchové celky">
+				<group label="povrchové celky" question="povrchový celok"/>
+			</test>
+			<test label="moria a oceány">
+				<group label="moria a oceány" question=""/>
+			</test>
+		</map>
+		
+		<map label="Svet" mapName="svet">
+			<visibleNode label="kontinenty, svetadiely"/>
+			<visibleNode label="rieky"/>
+			<test label="skúšať všetko">
+				<group label="štáty" question="štát"/>
+				<group label="mestá" question="mesto"/>
+				<group label="jazerá" question=""/>
+				<group label="rieky" question="rieku"/>
+				<group label="povrchové celky" question="povrchový celok"/>
+				<group label="moria a oceány" question=""/>
+			</test>
+			<test label="štáty">
+				<group label="štáty" question="štát"/>
+			</test>
+			<test label="hlavné mestá">
+				<visibleNode label="štáty"/>
+				<group label="hlavné mestá" question="hlavné mesto"/>
+			</test>
+			<test label="všetky mestá">
+				<visibleNode label="štáty"/>
+				<group label="mestá" question="mesto"/>
+			</test>
+			<test label="jazerá">
+				<group label="jazerá" question=""/>
+			</test>
+			<test label="rieky">
+				<group label="rieky" question="rieku"/>
+			</test>
+			<test label="povrchové celky">
+				<group label="povrchové celky" question="povrchový celok"/>
+			</test>
+			<test label="moria a oceány">
+				<group label="moria a oceány" question=""/>
+			</test>
+		</map>
+	</testMapList>
+	
+	<!-- DISTANCE MAP LIST ********************************************************** -->
+	<distanceMapList>
+		<map label="Slovensko" mapName="Slovensko">
+			<visibleNode label="hranica SR"/>
+			<visibleNode label="rieky"/>
+			<test label="mestá" question="mesto">
+				<group label="mestá"/>
+			</test>
+			<test label="mestá (s hranicami VÚC)" question="mesto">
+				<visibleNode label="VÚC"/>
+				<group label="mestá"/>
+			</test>
+		</map>
+		
+		<map label="Svet" mapName="svet">
+			<visibleNode label="kontinenty, svetadiely"/>
+			<visibleNode label="moria a oceány"/>
+			<test label="hlavné mestá" question="hlavné mesto">
+				<group label="hlavné mestá"/>
+			</test>
+			<test label="hlavné mestá (s hranicami štátov)" question="hlavné mesto">
+				<visibleNode label="štáty"/>
+				<group label="hlavné mestá"/>
+			</test>
+			<test label="všetky mestá" question="mesto">
+				<group label="mestá"/>
+			</test>
+			<test label="všetky mestá (s hranicami štátov)" question="mesto">
+				<visibleNode label="štáty"/>
+				<group label="mestá"/>
+			</test>
+		</map>
+		
+		<map label="Afrika" mapName="Afrika">
+			<visibleNode label="pobrežie"/>
+			<visibleNode label="moria a oceány"/>
+			<test label="hlavné mestá" question="hlavné mesto">
+				<group label="hlavné mestá"/>
+			</test>
+			<test label="hlavné mestá (s hranicami štátov)" question="hlavné mesto">
+				<visibleNode label="štáty"/>
+				<group label="hlavné mestá"/>
+			</test>
+			<test label="všetky mestá" question="mesto">
+				<group label="mestá"/>
+			</test>
+			<test label="všetky mestá (s hranicami štátov)" question="mesto">
+				<visibleNode label="štáty"/>
+				<group label="mestá"/>
+			</test>
+		</map>
+		
+		<map label="Ázia" mapName="Ázia">
+			<visibleNode label="pobrežie"/>
+			<visibleNode label="moria a oceány"/>
+			<visibleNode label="hranica svetadiela"/>
+			<test label="hlavné mestá" question="hlavné mesto">
+				<group label="hlavné mestá"/>
+				<group label="ostatné hlavné mestá"/>
+			</test>
+			<test label="hlavné mestá (s hranicami štátov)" question="hlavné mesto">
+				<visibleNode label="štáty"/>
+				<group label="hlavné mestá"/>
+				<group label="ostatné hlavné mestá"/>
+			</test>
+			<test label="všetky mestá" question="mesto">
+				<group label="mestá"/>
+			</test>
+			<test label="všetky mestá (s hranicami štátov)" question="mesto">
+				<visibleNode label="štáty"/>
+				<group label="mestá"/>
+			</test>
+		</map>
+		
+		<map label="Európa" mapName="Európa">
+			<visibleNode label="pobrežie"/>
+			<visibleNode label="moria a oceány"/>
+			<visibleNode label="hranica svetadiela"/>
+			<test label="hlavné mestá" question="hlavné mesto">
+				<group label="hlavné mestá"/>
+			</test>
+			<test label="hlavné mestá (s hranicami štátov)" question="hlavné mesto">
+				<visibleNode label="štáty"/>
+				<group label="hlavné mestá"/>
+			</test>
+			<test label="všetky mestá" question="mesto">
+				<group label="mestá"/>
+			</test>
+			<test label="všetky mestá (s hranicami štátov)" question="mesto">
+				<visibleNode label="štáty"/>
+				<group label="mestá"/>
+			</test>
+		</map>
+		
+		<map label="Južná Amerika" mapName="Južná Amerika">
+			<visibleNode label="pobrežie"/>
+			<visibleNode label="moria a oceány"/>
+			<test label="hlavné mestá" question="hlavné mesto">
+				<group label="hlavné mestá"/>
+				<group label="ostatné hlavné mestá"/>
+			</test>
+			<test label="hlavné mestá (s hranicami štátov)" question="hlavné mesto">
+				<visibleNode label="štáty"/>
+				<group label="hlavné mestá"/>
+				<group label="ostatné hlavné mestá"/>
+			</test>
+			<test label="všetky mestá" question="mesto">
+				<group label="mestá"/>
+			</test>
+			<test label="všetky mestá (s hranicami štátov)" question="mesto">
+				<visibleNode label="štáty"/>
+				<group label="mestá"/>
+			</test>
+		</map>
+		
+		<map label="Severná Amerika" mapName="Severná Amerika">
+			<visibleNode label="pobrežie"/>
+			<visibleNode label="moria a oceány"/>
+			<test label="hlavné mestá" question="hlavné mesto">
+				<group label="hlavné mestá"/>
+			</test>
+			<test label="hlavné mestá (s hranicami štátov)" question="hlavné mesto">
+				<visibleNode label="štáty"/>
+				<group label="hlavné mestá"/>
+			</test>
+			<test label="všetky mestá" question="mesto">
+				<group label="mestá"/>
+			</test>
+			<test label="všetky mestá (s hranicami štátov)" question="mesto">
+				<visibleNode label="štáty"/>
+				<group label="mestá"/>
+			</test>
+		</map>
+	</distanceMapList>
+
+	<!-- DISTANCE MAP LIST ********************************************************** -->
+	<puzzleMapList>
+		<map label="svet" mapName="svet">
+			<visibleNode label="kontinenty, svetadiely"/>
+			<visibleNode label="moria a oceány"/>
+			<visibleNode label="rieky"/>
+			<visibleNode label="jazerá"/>
+			<test label="štáty" question="štát" answer="štátov">
+				<group label="štáty"/>
+			</test>
+		</map>
+		<map label="Afrika" mapName="Afrika">
+			<visibleNode label="pobrežie"/>
+			<visibleNode label="moria a oceány"/>
+			<visibleNode label="rieky"/>
+			<test label="štáty" question="štát" answer="štátov">
+				<group label="štáty"/>
+			</test>
+		</map>
+		<map label="Austrália" mapName="Austrália">
+			<visibleNode label="pobrežie"/>
+			<visibleNode label="moria a oceány"/>
+			<visibleNode label="rieky"/>
+			<visibleNode label="jazerá"/>
+			<test label="štáty" question="štát" answer="štátov">
+				<group label="štáty"/>
+			</test>
+		</map>
+		<map label="Ázia" mapName="Ázia">
+			<visibleNode label="pobrežie"/>
+			<visibleNode label="moria a oceány"/>
+			<visibleNode label="rieky"/>
+			<visibleNode label="jazerá"/>
+			<test label="štáty" question="štát" answer="štátov">
+				<group label="štáty"/>
+			</test>
+		</map>
+		<map label="Európa" mapName="Európa">
+			<visibleNode label="pobrežie"/>
+			<visibleNode label="moria a oceány"/>
+			<visibleNode label="rieky"/>
+			<visibleNode label="jazerá"/>
+			<test label="štáty" question="štát" answer="štátov">
+				<group label="štáty"/>
+			</test>
+		</map>
+		<map label="Južná Amerika" mapName="Južná Amerika">
+			<visibleNode label="pobrežie"/>
+			<visibleNode label="moria a oceány"/>
+			<visibleNode label="rieky"/>
+			<visibleNode label="jazerá"/>
+			<test label="štáty" question="štát" answer="štátov">
+				<group label="štáty"/>
+			</test>
+		</map>
+		<map label="Severná Amerika" mapName="Severná Amerika">
+			<visibleNode label="pobrežie"/>
+			<visibleNode label="moria a oceány"/>
+			<visibleNode label="rieky"/>
+			<visibleNode label="jazerá"/>
+			<test label="štáty" question="štát" answer="štátov">
+				<group label="štáty"/>
+			</test>
+		</map>
+	</puzzleMapList>
+</config>

@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Ovládanie objektov mapy</title>
+<link href="styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+<div class="topmenu"> <a href="index.html">Úvod</a> | <a href="mainwindow.html">Hlavné okno</a> | <a href="mapwindow.html">Okno mapy</a> | <a href="treewindow.html">Ovládanie objektov mapy</a> | <a href="drawing.html">Kreslenie</a> | <a href="export.html">Výstupy</a></div>
+<div class="scrshot"> <img src="img/treewindow.png" width="233" height="280" alt="okno Objekty" />
+  <p>plávajúce okno Ovládanie objektov mapy</p>
+</div>
+<h1>Ovládanie objektov mapy</h1>
+<p>Na ovládanie viditeľnosti a farebnosti objektov a viditeľnosti značiek v mape slúži samostatné plávajúce okno. Otvára sa automaticky pri načítaní mapy a počas práce s mapu je možné ho ľubovoľne otvoriť a zatvoriť tlačidlom <span class="buttonref">Objekty</span> v lište <a href="mapwindow.html">mapového okna</a>. Veľkosť okna je možné si prispôsobiť podľa potreby. Položky v okne je možné posúvať pomocou vertikálneho scrollbaru alebo kolieskom myši.</p>
+<p>Všetky objekty v mape sú zoradené do hierarchického stromu objektov, pričom objekty rovnakého typu sú logicky združené do skupín. Každej skupine alebo objektu zodpovedá jeden riadok v strome s  ikonami zobrazujúcimi aktuálny stav a názvom položky.</p>
+<p>V strome objektov sú tri druhy položiek:</p>
+<div class="scrshot"><img src="img/tree_branchnode.png" width="200" height="21" alt="skupina v strome" />
+  <p>položka stromu Skupina objektov</p>
+</div>
+<h3> Skupina objektov</h3>
+<p>Môže obsahovať iné skupiny alebo samostatné objekty. Obsahuje tieto ikony a prvky:</p>
+<ul>
+  <li><span class="buttonref">skupina otvorená</span> <img src="img/folder_open.png" width="16" height="16" alt="otvorená skupina" /> alebo <span class="buttonref">skupina zatvorená</span> <img src="img/folder_closed.png" width="16" height="16" alt="zatvorená skupina" /> - kliknutím otvára/zatvára túto skupinu.</li>
+  <li><span class="buttonref">objekty viditeľné</span> <img src="img/node_visible.png" width="16" height="16" alt="viditeľný objekt" /> alebo <span class="buttonref">objekty skryté</span> <img src="img/node_hidden.png" width="16" height="16" alt="skrytý objekt" /> - všetky objekty v celom podstrome sú viditeľné resp. skryté. Kliknutím sa zmení naraz viditeľnosť všetkých objektov v podstrome. Pokiaľ sú niektoré objekty v podstrome viditeľné a niektoré skryté, zobrazí sa ikona <span class="buttonref">niektoré objekty viditeľné</span> <img src="img/node_any.png" width="16" height="16" alt="niektoré objekty viditeľné" />. V takom prípade po kliknutí na ikonu sa všetky objekty v podstrome zobrazia.</li>
+  <li><span class="buttonref">značky viditeľné</span> <img src="img/mark_visible.png" width="16" height="16" alt="viditeľná značka" /> alebo <span class="buttonref">značky skryté</span> <img src="img/mark_hidden.png" width="16" height="16" alt="skrytá značka" /> - všetky značky v celom podstrome sú viditeľné resp. skryté. Kliknutím sa zmení naraz viditeľnosť všetkých značiek v podstrome. Pokiaľ sú niektoré značky v podstrome viditeľné a niektoré skryté, zobrazí sa ikona <span class="buttonref">niektoré značky viditeľné</span> <img src="img/mark_any.png" width="16" height="16" alt="niektoré značky viditeľné" />. V takom prípade po kliknutí na ikonu sa všetky značky v podstrome zobrazia.</li>
+  <li><span class="buttonref">farba objektu</span> <img src="img/picker_color.png" width="16" height="16" alt="farba objektu" /> - slúži na výber farby objektov v celom podstrome. U niektorých typov plošných objektov (napr. štátov) je možné zvoliť si <span class="buttonref">bez výplne</span> <img src="img/picker_none.png" width="16" height="16" alt="be výplne" />. V takom prípade je objekt zobrazený len ako obrys, ktorého farbu nie je možné meniť. Pokiaľ majú objekty v podstrome rôzne farby alebo sú bez výplne len niektoré, zobrazí sa ikona <span class="buttonref">rôzne farby</span> <img src="img/picker_any.png" width="16" height="16" alt="rôzne farby" />.</li>
+  <li><span class="buttonref">pridať značku</span> <img src="img/user_add.png" width="16" height="16" alt="pridať značku" /> - ako poslednú položku v tejto skupine pridá <a href="#usermark">užívateľskú značku</a>. Značka sa objaví v ľavom hornom rohu mapy, odkiaľ môže byť presunutá a upravená.</li>
+  <li><span class="buttonref">názov skupiny</span></li>
+</ul>
+<div class="scrshot"> <img src="img/tree_leafnode.png" width="200" height="21" alt="objekt v strome" />
+  <p>položka stromu Objekt</p>
+</div>
+<h3>Objekt</h3>
+<p>Predstavuje ovládanie konkrétneho objektu v mape. Obsahuje tieto ikony a prvky:</p>
+<ul>
+  <li><span class="buttonref">symbol objektu</span> <img src="img/mapmark0001.png" width="12" height="12" alt="symbol objektu" /> - zobrazuje typ objektu. Je rovnaký ako <a href="mapwindow.html#marks">symbol značky</a> v mape a nie je možné ho meniť.</li>
+  <li><span class="buttonref">objekt viditeľný</span> <img src="img/node_visible.png" width="16" height="16" alt="viditeľný objekt" /> alebo <span class="buttonref">objekt skrytý</span> <img src="img/node_hidden.png" width="16" height="16" alt="skrytý objekt" /> - kliknutím sa zmení viditeľnosť objektu. Zároveň sa príslušne upraví ikona všetkých nadradených skupín.</li>
+  <li><span class="buttonref">značka viditeľná</span> <img src="img/mark_visible.png" width="16" height="16" alt="viditeľná značka" /> alebo <span class="buttonref">značka skrytá</span> <img src="img/mark_hidden.png" width="16" height="16" alt="skrytá značka" /> - kliknutím sa zmení viditeľnosť značky objektu. Zároveň sa príslušne upraví ikona všetkých nadradených skupín</li>
+  <li><span class="buttonref">farba objektu</span> <img src="img/picker_color.png" width="16" height="16" alt="farba objektu" /> - slúži na výber farby objektu. U niektorých typov plošných objektov (napr. štátov) je možné zvoliť si <span class="buttonref">bez výplne</span> <img src="img/picker_none.png" width="16" height="16" alt="be výplne" />. V takom prípade je objekt zobrazený len ako obrys, ktorého farbu nie je možné meniť.</li>
+  <li><span class="buttonref">názov objektu</span> - preddefinovaný názov objektu, ktorý nie je možné meniť. V novej mape je rovnaký ako popiska značky v mape, ktorú je ale možné zmeniť.</li>
+</ul>
+<div class="scrshot"> <img src="img/tree_usernode.png" width="200" height="21" alt="značka v strome" />
+  <p>položka stromu Užívateľská značka</p>
+</div>
+<h3><a name="usermark" id="usermark"></a>Užívateľská značka </h3>
+<p>Po pridaní vlastnej značky do skupiny objektov sa zobrazí táto položka ako posledná vo zvolenej skupine. Užívateľská značka nepatrí k žiadnemu objektu. Značka sa objaví v ľavom hornom rohu mapy, odkiaľ môže byť presunutá a upravená. Obsahuje tieto ikony a prvky:</p>
+<ul>
+  <li><span class="buttonref">symbol značky</span> <img src="img/mapmark0001.png" width="12" height="12" alt="symbol objektu" /> - zobrazuje typ značky a zvolí sa automaticky podľa zložky, do ktorej bola užívateľská značka pridaná. Je rovnaký ako symbol značky v mape a nie je možné ho meniť.</li>
+  <li><span class="buttonref">zmazanie značky</span> <img src="img/user_delete.png" width="16" height="16" alt="zmazanie značky" /> - vymaže túto značku z mapy aj zo stromu objektov</li>
+  <li><span class="buttonref">značka viditeľná</span> <img src="img/mark_visible.png" width="16" height="16" alt="viditeľná značka" /> alebo <span class="buttonref">značka skrytá</span> <img src="img/mark_hidden.png" width="16" height="16" alt="skrytá značka" /> - kliknutím sa zmení viditeľnosť značky objektu. Zároveň sa príslušne upraví ikona všetkých nadradených skupín</li>
+  <li><span class="buttonref">názov značky</span> - preddefinovaný názov &quot;vlastná popiska&quot;, ktorý nie je možné meniť. Je rovnaký ako popiska objektu v mape, ktorú je ale možné zmeniť.</li>
+</ul>
+<h1>&nbsp;</h1>
+</body>
+</html>

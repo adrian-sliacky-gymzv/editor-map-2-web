@@ -1,0 +1,113 @@
+<mapdata mapName="Južná Amerika">
+  <signature>
+    <id>mxm.blindmaps</id>
+    <name>Editor máp 2</name>
+    <version>2.0</version>
+    <copyright>STUDIO MAX MEDIA SK, s.r.o.</copyright>
+    <url>http://www.oslovensku.sk/editor/</url>
+    <saved>Fri Apr 9 2010 04:27:15 PM</saved>
+  </signature>
+  <nodelist markSymbol="legend" label="Južná Amerika" nodeColor="any" nodeVisible="any" markVisible="hidden">
+    <node markSymbol="region" nodeColor="0x010101" label="štáty" nodeVisible="visible" markVisible="hidden" fillColor="0xFFFFFF" transparent="true" sort="true">
+      <node markLabel="Argentína" nodeColor="0x010101" markY="447.8" markX="300.95" label="Argentína" entity="staty_Argentína" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="region" fillColor="0xFFFFFF"/>
+      <node markLabel="Bolívia" nodeColor="0x010101" markY="285.6" markX="297.8" label="Bolívia" entity="staty_Bolívia" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="region" fillColor="0xFFFFFF"/>
+      <node markLabel="Brazília" nodeColor="0x010101" markY="205.45" markX="400.8" label="Brazília" entity="staty_Brazília" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="region" fillColor="0xFFFFFF"/>
+      <node markLabel="Čile" nodeColor="0x010101" markY="352.65" markX="260.25" label="Čile" entity="staty_Čile" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="region" fillColor="0xFFFFFF"/>
+      <node markLabel="Ekvádor" nodeColor="0x010101" markY="144.55" markX="166.75" label="Ekvádor" entity="staty_Ekvádor" nodeVisible="visible" markVisible="hidden" testLevel="2" markSymbol="region" fillColor="0xFFFFFF"/>
+      <node markLabel="Falklandy" nodeColor="0x010101" markY="611.65" markX="358.35" label="Falklandy / Spojené kráľovstvo" entity="staty_Falklandy" nodeVisible="visible" markVisible="hidden" testLevel="3" markSymbol="region" fillColor="0xFFFFFF"/>
+      <node markLabel="Francúzska Guyana" nodeColor="0x010101" markY="97" markX="408.1" label="Francúzska Guyana" entity="staty_Francúzska_Guyana" nodeVisible="visible" markVisible="hidden" testLevel="2" markSymbol="region" fillColor="0xFFFFFF"/>
+      <node markLabel="Guyana" nodeColor="0x010101" markY="76.8" markX="351.05" label="Guyana" entity="staty_Guyana" nodeVisible="visible" markVisible="hidden" testLevel="2" markSymbol="region" fillColor="0xFFFFFF"/>
+      <node markLabel="Kolumbia" nodeColor="0x010101" markY="102.4" markX="212.3" label="Kolumbia" entity="staty_Kolumbia" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="region" fillColor="0xFFFFFF"/>
+      <node markLabel="Paraguaj" nodeColor="0x010101" markY="341.55" markX="352.35" label="Paraguaj" entity="staty_Paraguaj" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="region" fillColor="0xFFFFFF"/>
+      <node markLabel="Peru" nodeColor="0x010101" markY="223.8" markX="194.4" label="Peru" entity="staty_Peru" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="region" fillColor="0xFFFFFF"/>
+      <node markLabel="Surinam" nodeColor="0x010101" markY="89.2" markX="381.9" label="Surinam" entity="staty_Surinam" nodeVisible="visible" markVisible="hidden" testLevel="2" markSymbol="region" fillColor="0xFFFFFF"/>
+      <node markLabel="Uruguaj" nodeColor="0x010101" markY="433" markX="377.85" label="Uruguaj" entity="staty_Uruguaj" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="region" fillColor="0xFFFFFF"/>
+      <node markLabel="Venezuela" nodeColor="0x010101" markY="46.3" markX="255.55" label="Venezuela" entity="staty_Venezuela" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="region" fillColor="0xFFFFFF"/>
+    </node>
+    <node markSymbol="town" nodeColor="any" label="mestá" nodeVisible="visible" markVisible="hidden">
+      <node markSymbol="town" nodeColor="0xffff00" label="hlavné mestá" nodeVisible="visible" markVisible="hidden" fillColor="0xFFF202" sort="true">
+        <node markLabel="Bogota" nodeColor="0xffff00" markY="87.35" markX="211.75" label="Bogota" entity="hlavne_mesta_povinne_Bogota" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="town" fillColor="0xFFF202" nopuzzle="true"/>
+        <node markLabel="Buenos Aires" nodeColor="0xffff00" markY="452.3" markX="358.05" label="Buenos Aires" entity="hlavne_mesta_povinne_Buenos_Aires" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="town" fillColor="0xFFF202" nopuzzle="true"/>
+        <node markLabel="Caracas" nodeColor="0xffff00" markY="36.9" markX="277.95" label="Caracas" entity="hlavne_mesta_povinne_Caracas" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="town" fillColor="0xFFF202" nopuzzle="true"/>
+        <node markLabel="Montevideo" nodeColor="0xffff00" markY="453.15" markX="378.6" label="Montevideo" entity="hlavne_mesta_povinne_Montevideo" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="town" fillColor="0xFFF202" nopuzzle="true"/>
+        <node markLabel="Santiago" nodeColor="0xffff00" markY="467.1" markX="258.2" label="Santiago" entity="hlavne_mesta_povinne_Santiago" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="town" fillColor="0xFFF202" nopuzzle="true"/>
+      </node>
+      <node markSymbol="town" nodeColor="0xffff00" label="ostatné hlavné mestá" nodeVisible="visible" markVisible="hidden" fillColor="0xFFF202" sort="true">
+        <node markLabel="Asunción" nodeColor="0xffff00" markY="365.75" markX="368.75" label="Asunción" entity="ostatne_hlavne_mesta_Asunción" nodeVisible="visible" markVisible="hidden" testLevel="2" markSymbol="town" fillColor="0xFFF202" nopuzzle="true"/>
+        <node markLabel="Brazília" nodeColor="0xffff00" markY="282.7" markX="448.75" label="Brazília" entity="ostatne_hlavne_mesta_Brazília" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="town" fillColor="0xFFF202" nopuzzle="true"/>
+        <node markLabel="Georgetown" nodeColor="0xffff00" markY="69.65" markX="360.7" label="Georgetown" entity="ostatne_hlavne_mesta_Georgetown" nodeVisible="visible" markVisible="hidden" testLevel="3" markSymbol="town" fillColor="0xFFF202" nopuzzle="true"/>
+        <node markLabel="La Paz" nodeColor="0xffff00" markY="287.9" markX="267.55" label="La Paz" entity="ostatne_hlavne_mesta_La_Paz" nodeVisible="visible" markVisible="hidden" testLevel="2" markSymbol="town" fillColor="0xFFF202" nopuzzle="true"/>
+        <node markLabel="Lima" nodeColor="0xffff00" markY="251.45" markX="185.95" label="Lima" entity="ostatne_hlavne_mesta_Lima" nodeVisible="visible" markVisible="hidden" testLevel="2" markSymbol="town" fillColor="0xFFF202" nopuzzle="true"/>
+        <node markLabel="Paramaribo" nodeColor="0xffff00" markY="77.7" markX="388.6" label="Paramaribo" entity="ostatne_hlavne_mesta_Paramaribo" nodeVisible="visible" markVisible="hidden" testLevel="3" markSymbol="town" fillColor="0xFFF202" nopuzzle="true"/>
+        <node markLabel="Quito" nodeColor="0xffff00" markY="136.15" markX="163" label="Quito" entity="ostatne_hlavne_mesta_Quito" nodeVisible="visible" markVisible="hidden" testLevel="2" markSymbol="town" fillColor="0xFFF202" nopuzzle="true"/>
+      </node>
+      <node markSymbol="town" nodeColor="0x888888" label="ostatné mesté" nodeVisible="visible" markVisible="hidden" fillColor="0xFFF202" sort="true">
+        <node markLabel="Belo Horizonte" nodeColor="0x888888" markY="323.35" markX="494.05" label="Belo Horizonte" entity="ostatne_mesta_povinne_Belo_Horizonte" nodeVisible="visible" markVisible="hidden" testLevel="3" markSymbol="town" fillColor="0xFFF202" nopuzzle="true"/>
+        <node markLabel="Rio de Janeiro" nodeColor="0x888888" markY="348.75" markX="491.2" label="Rio de Janeiro" entity="ostatne_mesta_povinne_Rio_de_Janeiro" nodeVisible="visible" markVisible="hidden" testLevel="2" markSymbol="town" fillColor="0xFFF202" nopuzzle="true"/>
+        <node markLabel="Sãao Paulo" nodeColor="0x888888" markY="352.9" markX="469.15" label="Sãao Paulo" entity="ostatne_mesta_povinne_São_Paulo" nodeVisible="visible" markVisible="hidden" testLevel="2" markSymbol="town" fillColor="0xFFF202" nopuzzle="true"/>
+      </node>
+    </node>
+    <node markSymbol="river" nodeColor="0x2222ff" label="vodopády" nodeVisible="visible" markVisible="hidden" sort="true">
+      <node markLabel="Angelov vodopád" nodeColor="0x2222ff" markY="63.1" markX="316.95" label="Angelov vodopád" entity="vodopady_Angelov_vodopád" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="river" nopuzzle="true"/>
+      <node markLabel="vodopády Iguaçu" nodeColor="0x2222ff" markY="369.4" markX="396.9" label="vodopády Iguaçu" entity="vodopady_vodopády_Iguaçu" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="river" nopuzzle="true"/>
+    </node>
+    <node markSymbol="lake" nodeColor="0x2222ff" label="jazerá" nodeVisible="visible" markVisible="hidden" fillColor="0x02AEEF" sort="true">
+      <node markLabel="jazero Titicaca" nodeColor="0x2222ff" markY="279.65" markX="255.85" label="jazero Titicaca" entity="jazera_j_Titicaca" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="lake" fillColor="0x02AEEF" nopuzzle="true"/>
+    </node>
+    <node markSymbol="river" nodeColor="0x2222ff" label="rieky" nodeVisible="visible" markVisible="hidden" sort="true">
+      <node markLabel="Amazonka" nodeColor="0x2222ff" markY="165.9" markX="262.7" label="Amazonka" entity="rieky_Amazonka" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="river"/>
+      <node markLabel="Madeira" nodeColor="0x2222ff" markY="185.95" markX="320.5" label="Madeira" entity="rieky_Madeira" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="river"/>
+      <node markLabel="Orinoco" nodeColor="0x2222ff" markY="60.95" markX="281.15" label="Orinoco" entity="rieky_Orinoco" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="river"/>
+      <node markLabel="Panamský prieplav" nodeColor="0x2222ff" markY="44.55" markX="156.75" label="Panamský prieplav" entity="rieky_Panamský_prieplav" nodeVisible="visible" markVisible="hidden" testLevel="2" markSymbol="river" nopuzzle="true"/>
+      <node markLabel="Paraguaj" nodeColor="0x2222ff" markY="299.9" markX="371.95" label="Paraguaj" entity="rieky_Paraguaj" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="river"/>
+      <node markLabel="Paraná" nodeColor="0x2222ff" markY="396.45" markX="352.3" label="Paraná" entity="rieky_Paraná" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="river"/>
+      <node markLabel="Rio Branco" nodeColor="0x2222ff" markY="103.15" markX="330.55" label="Rio Branco" entity="rieky_Rio_Branco" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="river"/>
+      <node markLabel="Rio Negro" nodeColor="0x2222ff" markY="115.35" markX="275" label="Rio Negro" entity="rieky_Rio_Negro" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="river"/>
+      <node markLabel="Tapajos" nodeColor="0x2222ff" markY="181.75" markX="372.5" label="Tapajos" entity="rieky_Tapajos" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="river"/>
+      <node markLabel="Tocantins" nodeColor="0x2222ff" markY="188.5" markX="461.7" label="Tocantins" entity="rieky_Tocantins" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="river"/>
+    </node>
+    <node markSymbol="geo" nodeColor="any" label="povrchové celky" nodeVisible="visible" markVisible="hidden" fillColor="0xD2AB67" transparent="true" sort="true">
+      <node markLabel="Amazonská nížina" nodeColor="0x7fdf7f" markY="158.05" markX="308.65" label="Amazonská nížina" entity="pohoria_Amazonská_nížina" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="geo" fillColor="0xD2AB67"/>
+      <node markLabel="Andy" nodeColor="0xdfbf8f" markY="253.45" markX="211.25" label="Andy" entity="pohoria_Andy" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="geo" fillColor="0xD2AB67"/>
+      <node markLabel="Brazílska vysočina" nodeColor="0xdfbf8f" markY="273.7" markX="480.9" label="Brazílska vysočina" entity="pohoria_Brazílska_vysočina" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="geo" fillColor="0xD2AB67"/>
+      <node markLabel="Guayanská vysočina" nodeColor="0xdfbf8f" markY="77.8" markX="311.6" label="Guayanská vysočina" entity="pohoria_Guayanská_vysočina" nodeVisible="visible" markVisible="hidden" testLevel="2" markSymbol="geo" fillColor="0xD2AB67"/>
+      <node markLabel="Laplatská nížina" nodeColor="0x7fdf7f" markY="437.3" markX="339.1" label="Laplatská nížina" entity="pohoria_Laplatská_nížina" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="geo" fillColor="0xD2AB67"/>
+      <node markLabel="púšť Atacama" nodeColor="0xafaf00" markY="355.45" markX="257.15" label="púšť Atacama" entity="pohoria_púšť_Atacama" nodeVisible="visible" markVisible="hidden" testLevel="2" markSymbol="geo" fillColor="0xD2AB67"/>
+    </node>
+    <node markSymbol="island" nodeColor="0xbbbbbb" label="ostrovy, polostrovy" nodeVisible="hidden" markVisible="hidden" fillColor="0xBBBBBB" transparent="true" sort="true">
+      <node markLabel="Falklandy" nodeColor="0xbbbbbb" markY="612.25" markX="357.9" label="Falklandy" entity="ostrovy__polostrovy_Falklandy" nodeVisible="hidden" markVisible="hidden" testLevel="2" markSymbol="island" fillColor="0xBBBBBB"/>
+      <node markLabel="Galapágy" nodeColor="0xbbbbbb" markY="137.65" markX="30.1" label="Galapágy" entity="ostrovy__polostrovy_Galapágy" nodeVisible="hidden" markVisible="hidden" testLevel="2" markSymbol="island" fillColor="0xBBBBBB"/>
+      <node markLabel="Ohňová zem" nodeColor="0xbbbbbb" markY="640.5" markX="310.1" label="Ohňová zem" entity="ostrovy__polostrovy_Ohňová_zem" nodeVisible="hidden" markVisible="hidden" testLevel="2" markSymbol="island" fillColor="0xBBBBBB"/>
+    </node>
+    <node markSymbol="sea" nodeColor="any" label="moria a oceány" nodeVisible="visible" markVisible="hidden">
+      <node markSymbol="sea" nodeColor="0x0099ff" label="moria" nodeVisible="visible" markVisible="hidden" fillColor="0x8ED8F8" sort="true">
+        <node markLabel="Drakov prieliv" nodeColor="0x0099ff" markY="652.9" markX="314.15" label="Drakov prieliv" entity="moria_Drakov_prieliv" nodeVisible="visible" markVisible="hidden" testLevel="2" markSymbol="sea" fillColor="0x8ED8F8"/>
+        <node markLabel="Karibské more" nodeColor="0x0099ff" markY="9.3" markX="220.35" label="Karibské more" entity="moria_Karibské_more" nodeVisible="visible" markVisible="hidden" testLevel="2" markSymbol="sea" fillColor="0x8ED8F8"/>
+        <node markLabel="Magalhăesov prieliv" nodeColor="0x0099ff" markY="633.2" markX="296.4" label="Magalhăesov prieliv" entity="moria_Magalhăesov_prieliv" nodeVisible="visible" markVisible="hidden" testLevel="2" markSymbol="sea" fillColor="0x8ED8F8"/>
+      </node>
+      <node markSymbol="sea" nodeColor="0x7fccff" label="oceány" nodeVisible="visible" markVisible="hidden" fillColor="0xC7EAFB" sort="true">
+        <node markLabel="Atlantický oceán" nodeColor="0x7fccff" markY="465.4" markX="466.75" label="Atlantický oceán" entity="oceany_Atlantický_oceán" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="sea" fillColor="0xC7EAFB"/>
+        <node markLabel="Tichý oceán" nodeColor="0x7fccff" markY="296.05" markX="111.7" label="Tichý oceán" entity="oceany_Tichý_oceán" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="sea" fillColor="0xC7EAFB"/>
+      </node>
+    </node>
+    <node markLabel="pobrežie" nodeColor="0x000000" markY="286.25" markX="546.6" label="pobrežie" entity="pobrezie_pobrežie" nodeVisible="visible" markVisible="hidden" testLevel="0" markSymbol="legend"/>
+    <node markSymbol="legend" nodeColor="0x0066bf" label="zemepisná sieť" nodeVisible="visible" markVisible="hidden">
+      <node markLabel="0°" nodeColor="0x0066bf" markY="132.95" markX="608.55" label="0°" entity="zemepisna_siet_0" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="legend" nopuzzle="true"/>
+      <node markLabel="30°  j. z.š." nodeColor="0x0066bf" markY="428.2" markX="576.2" label="30°  j. z.š." entity="zemepisna_siet_30__j_zš" nodeVisible="visible" markVisible="hidden" testLevel="2" markSymbol="legend"/>
+      <node markLabel="40°  j. z.š." nodeColor="0x0066bf" markY="521.8" markX="534.7" label="40°  j. z.š." entity="zemepisna_siet_40__j_zš" nodeVisible="visible" markVisible="hidden" testLevel="2" markSymbol="legend"/>
+      <node markLabel="50° j. z.š." nodeColor="0x0066bf" markY="605.8" markX="470.65" label="50° j. z.š." entity="zemepisna_siet_50_j_zš" nodeVisible="visible" markVisible="hidden" testLevel="2" markSymbol="legend"/>
+      <node markLabel="40° z. z. d." nodeColor="0x0066bf" markY="71.2" markX="535.2" label="40° z. z. d." entity="zemepisna_siet_40_z_z_d" nodeVisible="visible" markVisible="hidden" testLevel="2" markSymbol="legend"/>
+      <node markLabel="50°  z. z. d." nodeColor="0x0066bf" markY="17.5" markX="439.8" label="50°  z. z. d." entity="zemepisna_siet_50__z_z_d" nodeVisible="visible" markVisible="hidden" testLevel="2" markSymbol="legend"/>
+      <node markLabel="60°  z. z. d." nodeColor="0x0066bf" markY="-4" markX="346.1" label="60°  z. z. d." entity="zemepisna_siet_60__z_z_d" nodeVisible="visible" markVisible="hidden" testLevel="2" markSymbol="legend"/>
+      <node markLabel="80°  z. z. d." nodeColor="0x0066bf" markY="17.15" markX="153.2" label="80°  z. z. d." entity="zemepisna_siet_80__z_z_d" nodeVisible="visible" markVisible="hidden" testLevel="3" markSymbol="legend"/>
+      <node markLabel="90°  z. z. d." nodeColor="0x0066bf" markY="80.75" markX="57.85" label="90°  z. z. d." entity="zemepisna_siet_90__z_z_d" nodeVisible="visible" markVisible="hidden" testLevel="3" markSymbol="legend"/>
+      <node markLabel="70°  z. z. d." nodeColor="0x0066bf" markY="-7.25" markX="248.15" label="70°  z. z. d." entity="zemepisna_siet_70__z_z_d" nodeVisible="visible" markVisible="hidden" testLevel="2" markSymbol="legend"/>
+      <node markLabel="10° s. z. š." nodeColor="0x0066bf" markY="34.2" markX="474.2" label="10° s. z. š." entity="zemepisna_siet_10_s_z_š" nodeVisible="visible" markVisible="hidden" testLevel="3" markSymbol="legend" nopuzzle="true"/>
+      <node markLabel="10°  j. z.š." nodeColor="0x0066bf" markY="233.2" markX="618.05" label="10°  j. z.š." entity="zemepisna_siet_10__j_zš" nodeVisible="visible" markVisible="hidden" testLevel="2" markSymbol="legend"/>
+      <node markLabel="20° j. z.š." nodeColor="0x0066bf" markY="331.85" markX="600.45" label="20° j. z.š." entity="zemepisna_siet_20_j_zš" nodeVisible="visible" markVisible="hidden" testLevel="2" markSymbol="legend"/>
+      <node markLabel="obratník Kozorožca" nodeColor="0x0066bf" markY="365" markX="591.45" label="obratník Kozorožca" entity="zemepisna_siet_obratník_Kozorožca" nodeVisible="visible" markVisible="hidden" testLevel="1" markSymbol="legend"/>
+    </node>
+    <node markLabel="mierka mapy" nodeColor="0x000000" markY="647.1" markX="44" label="mierka mapy" entity="mierka_mapy_mierka_mapy" nodeVisible="visible" markVisible="hidden" testLevel="0" colorAdd="true" markSymbol="legend"/>
+  </nodelist>
+  <drawinglist/>
+</mapdata>

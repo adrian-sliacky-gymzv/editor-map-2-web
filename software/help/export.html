@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Výstupy</title>
+<link href="styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+<div class="topmenu"> <a href="index.html">Úvod</a> | <a href="mainwindow.html">Hlavné okno</a> | <a href="mapwindow.html">Okno mapy</a> | <a href="treewindow.html">Ovládanie objektov mapy</a> | <a href="drawing.html">Kreslenie</a> | <a href="export.html">Výstupy</a></div>
+<h1>Výstupy</h1>
+<p>Každú mapu je možné exportovať ako obrázok JPEG alebo PNG, prípadne vytlačiť. Slúžia na to tlačidlá <span class="buttonref">Export</span> a <span class="buttonref">Tlač</span> v lište <a href="mapwindow.html">mapového okna</a>. Po kliknutí na niektoré z nich sa zobrazí okno v ktorom je možné spresniť požiadavku na výstup.</p>
+<h3>Výrez </h3>
+<p>V okne Výrez je zobrazená zmenšená aktuálna mapa. Ťahaním štyroch červených čiar je možné zvoliť si požadovaný výrez z mapy, ktorý sa vyexportuje, prípadne vytlačí. Na začiatku je výrez nastavený na celú mapu.</p>
+<h2>Možnosti exportu</h2>
+<p>Pokiaľ bol zvolený <span class="buttonref">Export</span>, pod oknom výrezu sú tieto možnosti:</p>
+<ul>
+  <li><span class="buttonref">Rozlíšenie: Nízke, Stredné, Vysoké</span> - určuje výsledné rozlíšenie obrázku ako 0.5, 1, resp. 2 násobok  veľkosti mapy pri 100% zväčšení. Momentálne zväčšenie mapy nemá na výsledné rozlíšenie vplyv.</li>
+  <li><span class="buttonref">Formát: JPEG, PNG</span> - určuje formát a kompresiu výsledného obrázku. JPEG používa stratovú kompresiu, PNG bezstratovú kompresiu. Program generuje PNG obrázky s farebnou hĺbkou 24bit (RGB).</li>
+</ul>
+<p>Po kliknutí tlačidla <span class="buttonref">OK</span> je možné vybrať si cieľový adresár a názov súboru, do ktorého bude obrázok uložený.</p>
+<h2>Možnosti tlače</h2>
+<p>Pokiaľ bola zvolená <span class="buttonref">Tlač</span>, pod oknom výrezu je možnosť výberu dvoch spôsobov tlače:</p>
+<ul>
+  <li><span class="buttonref">vektor</span> - na tlač sa použije vektorový spôsob tlače, ktorý presne uchová geometriu objektov a textov a umožňuje ľubovoľné zväčšenie. Tento spôsob je vhodný napríklad pre tlač do PDF súboru. Nevýhodou je, že tento spôsob  nepoužíva priesvitnosť objektov. Výsledkom je, že plošné entity, ktorých farba je <span class="buttonref">bez výplne</span> <img src="img/picker_none.png" width="16" height="16" alt="be výplne" />, budú mať výplň určenú programom.</li>
+  <li><span class="buttonref">bitmapa</span> - na tlač sa použije rastrový spôsob tlače. Výhodou je presná farebnosť tak, ako si ju užívateľ zvolil. Nevýhodou je, že neumožňuje následné zväčšenie bez straty kvality. Tento spôsob je vhodný pre bežnú tlač na tlačiareň.</li>
+</ul>
+<p>Po kliknutí tlačidla <span class="buttonref">OK</span> sa zobrazí systémové okno na výber tlačiarne, nastavenie papiera, počet kópií atd. Editor následne zvolený výsek mapy prispôsobí  formátu papiera a vytlačí. Preto je vhodné zvoliť si takú orientáciu papiera, ktorá najlepšie zodpovedá zvolenému výseku mapy.</p>
+<p>&nbsp;</p>
+</body>
+</html>

@@ -1,0 +1,110 @@
+@charset "utf-8";
+/* CSS Document */
+
+html, body, table, td, th, h1, h2, h3, p , ul, li, img{
+	margin:0px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: normal;
+	text-align: left;
+	clear: left;
+	padding: 0px;
+}
+body {
+	margin: 12px;
+	max-width: 960px;
+}
+p , ul, h3{
+	margin-bottom: 8px;
+	margin-left: 12px;
+}
+
+h3 {
+	font-weight: bold;
+	color: #004C7F;
+	margin-top: 12px;
+}
+h2 {
+	font-weight: bold;
+	color: #004C7F;
+	margin-top: 12px;
+	margin-bottom: 6px;
+	font-size: 14px;
+}
+
+
+h1 {
+	font-size: 16px;
+	font-weight: bold;
+	color: #990000;
+	margin-top: 20px;
+	margin-bottom: 12px;
+}
+li  {
+	margin-left: 32px;
+}
+a {
+	color: #004C7F;
+	text-decoration: underline;
+}
+a:hover {
+	color: #004C7F;
+	text-decoration: none;
+}
+
+.scrshot {
+	float: right;
+	clear: right;
+	border: 1px;
+	border-style: solid;
+	margin: 8px;
+	padding: 8px;
+	border-color: #999;
+}
+
+.scrshot p {
+	text-align: center;
+	font-size: 9px;
+	font-style: italic;
+	margin-bottom: 0px;
+	margin-left: 0px;
+	margin-top: 6px;
+}
+
+.toplogo {
+	float: right;
+	clear: right;
+	padding: 0px;
+	margin-left: 25px;
+	margin-bottom: 25px;
+	margin-right: 0px;
+	margin-top: 25px;
+}
+.toplogo p {
+	text-align: right;
+	color: #004C7F;
+	font-weight: bold;
+}
+.unbuletted {
+	list-style-type: none;
+}
+.topmenu {
+	border: 1px solid #004C7F;
+	text-align: center;
+	padding: 6px;
+}
+.topmenu a {
+	color: #900;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+.topmenu a:hover {
+	color: #900;
+	text-decoration: underline;
+}
+.buttonref {
+	font-weight: bold;
+	color: #004C7F;
+	font-style: italic;
+}

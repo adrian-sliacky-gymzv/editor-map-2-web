@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Hlavné okno programu</title>
+<link href="styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+<div class="topmenu"> <a href="index.html">Úvod</a> | <a href="mainwindow.html">Hlavné okno</a> | <a href="mapwindow.html">Okno mapy</a> | <a href="treewindow.html">Ovládanie objektov mapy</a> | <a href="drawing.html">Kreslenie</a> | <a href="export.html">Výstupy</a></div>
+<h1>Hlavné okno programu</h1>
+<p>Po otvorení Editora máp je hore zobrazená hlavná lišta programu, pomocou ktorej je možné vytvoriť/otvoriť/uložiť mapu, prípadne vybrať si niektorú z aktivít. Hlavné okno programu je možné rozmerovo prispôsobiť pracovnej ploche.</p>
+<div class="scrshot"> <img src="img/main_map.png" width="370" height="31" alt="tlačítka Mapa na hlavnej lište" />
+  <p>tlačidlá na prácu so súborom</p>
+</div>
+<h2>Práca so súborom</h2>
+<p>Mapy sa na disk ukladajú v súboroch s koncovkou <strong>.MEF</strong>. Po inštalácii Editora máp sa súbory s touto koncovkou zobrazujú s ikonou editora <img src="img/editormap16.png" width="16" height="16" alt="ikona editora" />. Pri pokuse o otvorenie .MEF súboru v operačnom systéme sa automaticky otvorí editor máp a mapa sa načíta. V editore môže byť otvorená len jedna mapa, preto pokiaľ už je nejaká mapa otvorená, jej obsah sa stratí a načíta sa len nová mapa. V názve okna editora sa zobrazuje práve otvorený súbor a názov mapy.</p>
+<div class="scrshot"> <img src="img/newmap.png" width="250" height="100" alt="výber novej mapy" />
+  <p>výberové okno novej mapy</p>
+</div>
+<p>Na prácu so súborom slúžia tlačidlá <strong>Mapa</strong> na hlavnej lište:</p>
+<ul>
+  <li><span class="buttonref">Nová</span> - po kliknutí sa otvorí okno s výberom mapy, s ktorou chcete ďalej pracovať. Nová mapa má preddefinovanú viditeľnosť a farby objektov, viditeľnosť a texty značiek. Tieto vlastnosti mapy môžete meniť a zmeny si uložiť do súboru.</li>
+  <li><span class="buttonref">Otvor</span> - otvorí sa systémové okno na výber mapového .MEF súboru z disku počítača. Mapu je možné v editore otvoriť aj priamym otvorením .MEF súboru v operačnom systéme.</li>
+  <li><span class="buttonref">Ulož</span> - kliknutím uložíte do súboru momentálny stav mapy. Pokiaľ mapa ešte nebola uložená (bola vytvorená ako <span class="buttonref">Nová</span>), automaticky sa ponúkne možnosť <span class="buttonref">Ulož ako</span>.</li>
+  <li><span class="buttonref">Ulož ako</span> - otvorí sa systémové okno na výber zložky a názvu súboru, do ktorého sa má uložiť momentálny stav mapy. Pokiaľ mapa ešte nebola uložená (je vytvorená ako <span class="buttonref">Nová</span>), automaticky sa ponúkne zložka Moje dokumenty a názov súboru zodpovedajúci mape.</li>
+</ul>
+<p>Pokiaľ je v editore otvorená mapa, na ktorej boli vykonané zmeny a tieto neboli uložené do súboru, pri pokuse o vytvorenie novej mapy, alebo načítanie mapy zo súboru sa objaví varovné okno.</p>
+<p>Po vytvorení novej alebo otvorení mapy sa v editore zobrazí <span class="buttonref"><a href="mapwindow.html">Okno mapy</a></span> s vlastnou lištou nástrojov.</p>
+<div class="scrshot"> <img src="img/main_activities.png" width="348" height="31" alt="tlačítka Aktivity na hlavnej lište" />
+  <p>tlačidlá na spustenie aktivít</p>
+</div>
+<h2><a name="aktivity" id="aktivity"></a>Aktivity</h2>
+<p>Editor máp vo verzii 2.0 obsahuje tri aktivity na precvičenie si zemepisných vedomostí. Aktivity je možné spúšťať bez ohľadu ma práve editovanú mapu. Počas aktivity je editovaná mapa skrytá, po ukončení aktivity je možné pokračovať v jej editovaní. Aktivity sa spúšťajú tlačidlami <strong>Aktivity</strong> na hlavnej lište:</p>
+<ul>
+  <li><span class="buttonref">Vyskúšaj sa!</span> - táto aktivita testuje rozoznávanie rôznych typov objektov na pozadí slepej mapy. Program v každej otázke vykreslí niekoľko objektov (napr. 5 rôznych riek) so značkami bez popisiek. Úlohou je kliknúť na značku správneho objektu. Po kliknutí sa ku zvolenej značke zobrazí popiska (názov objektu). Ak bola odpoveď nesprávna, zároveň sa doplní popiska ku značke správnej odpovede. Správna a nesprávna odpoveď sú navzájom farebne odlíšené.</li>
+  <li><span class="buttonref">Traf sa!</span> - táto aktivita je zameraná na správny odhad polohy bodových objektov (napr. miest) na pozadí slepej mapy. Úlohou je kliknúť čo najpresnejšie do mapy na miesto, kde sa má daný objekt nachádzať. Po kliknutí program zabodne červenú vlajočku na označené miesto a zelenú vlajočku na správne miesto. Zároveň oboduje presnosť zásahu v rozmedzí 0-100 bodov.</li>
+  <li><span class="buttonref">Poskladaj!</span> - táto aktivita je zameraná na správne určenie polohy plošných objektov (napr. štátov). Keďže predchádzajúce objekty z mapy nemiznú, pri dostatočnom počte otázok sa postupne vyskladá celá mapa. Do testu nie sú zahrnuté plošne veľmi malé objekty. V každej otázke sa uprostred slepej mapy zobrazí nový objekt vykreslený žltou farbou. Objekt je potrebné myšou potiahnuť čo najpresnejšie na jeho správne miesto. Po uvoľnení tlačidlá myši sa objekt uloží na svoje správne miesto. Pokiaľ bola poloha určená dostatočne presne, objekt sa vykreslí zelenou, pokiaľ nie, červenou farbou. Ostatne uložený objekt je vždy vykreslený výraznejšou farbou, aby si bolo možné skontrolovať svoju odpoveď.</li>
+</ul>
+<div class="scrshot"> <img src="img/exam_selection.png" width="260" height="260" alt="výber parametrov aktivity" />
+  <p>okno výberu parametrov aktivity</p>
+</div>
+<p>Po kliknutí na tlačidlo niektorej aktivity sa zobrazí okno s výberom parametrov.</p>
+<p>Každá z aktivít má v programe zadefinovaných niekoľko druhov testov pre niektoré alebo všetky mapy. Pre každý test je špecifický typ objektov, obsah podkladovej slepej mapy, obtiažnosť a počet otázok.</p>
+<ul>
+  <li><span class="buttonref">Vyber si mapu</span> - ponúkne zoznam máp, ktoré je možné v danej aktivite použiť. Po zmene mapy sa upravia možnosti výberu v ďalších parametroch.</li>
+  <li><span class="buttonref">Vyber si test</span> - pre danú aktivitu a daný štát môže existovať viac typov testov, ktoré sa líšia typom objektov alebo podkladovou mapou. Po zmene sa upravia možnosti výberu v ďalších parametroch.</li>
+  <li><span class="buttonref">Vyber si obtiažnosť</span> - všetky objekty v editore majú preddefinovanú svoju obtiažnosť. Do testu budú zahrnuté len objekty s vybranou alebo nižšou obtiažnosťou. Po zmene obtiažnosti sa upraví maximálna možná hodnota počtu otázok.</li>
+  <li><span class="buttonref">Počet otázok</span> - je možné si zvoliť počet otázok v danej aktivite od 1 až po maximálny počet objektov, ktoré zodpovedajú zvolenej mape, testu a obtiažnosti.</li>
+</ul>
+<p>Po kliknutí na <span class="buttonref">Začni</span> sa spustí aktivita. Otázky sa striedajú náhodne a v jednom teste sa nikdy neopakujú.</p>
+<p>V ľavom hornom rohu je zobrazená tabuľka s aktuálnym skóre (počet správnych/presných odpovedí, počet nesprávnych/nepresných odpovedí, alebo celkový počet bodov) a uplynutým časom. Po skončení testu sa test vyhodnotí celkovým časom a percentuálnou úspešnosťou.</p>
+</body>
+</html>
