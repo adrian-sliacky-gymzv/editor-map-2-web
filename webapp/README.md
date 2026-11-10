@@ -1,6 +1,6 @@
 # Editor máp 2 — Technical Documentation
 
-Live application: **https://adrian-sliacky-gymzv.github.io/editor-map-2-web/**
+Live application: **https://em.adriansliacky.sk/**
 
 A non-commercial, static web reimplementation of the original Slovak game
 **Editor máp 2** (2010). It preserves the original eight maps, 1,982 geographic
@@ -267,6 +267,7 @@ Current status: **69 tests, 69 passing**. Coverage includes:
 - recenter controls;
 - statistics and city training;
 - relative paths, manifest, help pages and GitHub Pages workflow;
+- the `em.adriansliacky.sk` CNAME and custom-domain deployment;
 - responsive and dark-theme source guards.
 
 The complete activity matrix was exercised across **94 combinations**

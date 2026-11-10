@@ -5,14 +5,17 @@
 | | |
 | --- | --- |
 | Repository | <https://github.com/adrian-sliacky-gymzv/editor-map-2-web> |
-| Live site | <https://adrian-sliacky-gymzv.github.io/editor-map-2-web/> |
+| **Live site** | **<https://em.adriansliacky.sk/>** |
+| Default Pages URL | <https://adrian-sliacky-gymzv.github.io/editor-map-2-web/> (redirects to the live site) |
+| Custom domain | `em.adriansliacky.sk` (HTTPS enforced) |
 | Pages source | **GitHub Actions** |
 | Workflow | `.github/workflows/pages.yml` |
 | Published folder | `webapp/` |
 | Default branch | `master` |
 
-The site is live. The workflow is enabled to create the Pages site
-automatically when needed.
+The site is live on the custom domain. The workflow is enabled to create the
+Pages site automatically when needed. `webapp/CNAME` keeps the domain attached
+across deployments.
 
 ## Updating the live site
 
@@ -100,8 +103,9 @@ https://<user>.github.io/<repo>/
 
 ### 5. Custom domain
 
-See [`CUSTOM_DOMAIN.md`](CUSTOM_DOMAIN.md) for the exact Cloudflare records and
-GitHub settings for `adriansliacky.sk` or `mapy.adriansliacky.sk`.
+The production domain is **`em.adriansliacky.sk`**, configured with a Cloudflare
+CNAME and HTTPS enforced. See [`CUSTOM_DOMAIN.md`](CUSTOM_DOMAIN.md) for the
+existing setup and the bare-domain alternative.
 
 ## Deployment checklist
 
@@ -113,7 +117,8 @@ GitHub settings for `adriansliacky.sk` or `mapy.adriansliacky.sk`.
 - [x] Homepage, CSS, JS, map data and thumbnails load.
 - [x] A game starts from the live site without console errors.
 - [x] Custom `404.html` is served.
-- [ ] Optional custom domain configured (see `CUSTOM_DOMAIN.md`).
+- [x] Custom domain `em.adriansliacky.sk` configured.
+- [x] HTTPS certificate approved and HTTPS enforced.
 
 ## Troubleshooting
 

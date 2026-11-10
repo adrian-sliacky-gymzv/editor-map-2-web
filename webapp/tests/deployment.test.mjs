@@ -83,6 +83,7 @@ test('help pages are mobile-ready and deployment-safe', () => {
 
 test('GitHub Pages deployment files are present', () => {
   assert.ok(fs.existsSync(path.join(ROOT, '.nojekyll')));
+  assert.equal(read('CNAME').trim(), 'em.adriansliacky.sk');
   const fallback = read('404.html');
   assert.match(fallback, /href="\.\/"/);
   assert.match(fallback, /Táto adresa na mape nie je/);

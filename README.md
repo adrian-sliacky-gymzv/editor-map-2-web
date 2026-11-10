@@ -1,6 +1,6 @@
 # Editor máp 2 — web version
 
-### ▶ Play it now: **https://adrian-sliacky-gymzv.github.io/editor-map-2-web/**
+### ▶ Play it now: **https://em.adriansliacky.sk/**
 
 A free browser game for learning the map of Slovakia and the world, built around the original Slovak school game **Editor máp 2** (2010). It works on a phone, tablet or computer. There is nothing to install and no account to create.
 
@@ -16,7 +16,7 @@ The project recreates the original game’s eight maps and 1,982 objects: Slovak
 
 ### How to play
 
-1. Open **https://adrian-sliacky-gymzv.github.io/editor-map-2-web/**.
+1. Open **https://em.adriansliacky.sk/**.
 2. Choose an activity:
    - **Vyskúšaj sa!** — a place name is shown and several pins appear. Pick the correct pin.
    - **Traf sa!** — click where you think the place is. The closer you are, the more points you get.
@@ -72,7 +72,7 @@ Original game: **RNDr. Štefan Karolčík, PhD** (author), **Ing. Juraj Hrabovec
 
 # Slovenčina
 
-### ▶ Zahraj si teraz: **https://adrian-sliacky-gymzv.github.io/editor-map-2-web/**
+### ▶ Zahraj si teraz: **https://em.adriansliacky.sk/**
 
 Bezplatná webová hra na učenie sa mapy Slovenska a sveta, postavená na pôvodnej slovenskej školskej hre **Editor máp 2** (2010). Funguje na telefóne, tablete aj počítači. Netreba nič inštalovať ani si vytvárať účet.
 
@@ -84,7 +84,7 @@ Projekt obsahuje všetkých osem pôvodných máp a 1 982 objektov: Slovensko, E
 
 ### Ako hrať
 
-1. Otvor **https://adrian-sliacky-gymzv.github.io/editor-map-2-web/**.
+1. Otvor **https://em.adriansliacky.sk/**.
 2. Vyber aktivitu:
    - **Vyskúšaj sa!** — zobrazí sa názov miesta a niekoľko značiek. Vyber tú správnu.
    - **Traf sa!** — klikni tam, kde si myslíš, že miesto leží. Čím bližšie, tým viac bodov.

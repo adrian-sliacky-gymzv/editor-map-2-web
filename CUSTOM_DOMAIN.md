@@ -1,81 +1,79 @@
-# Using adriansliacky.sk with GitHub Pages
+# Custom domain: em.adriansliacky.sk
 
-Yes. GitHub Pages supports custom domains, including a custom domain on a
-project site such as this one. The current GitHub Pages URL will continue to
-work while DNS is being prepared; only switch the GitHub Pages custom-domain
-setting after the DNS records below are in place.
+The application is live on a custom domain while remaining hosted on GitHub
+Pages.
 
-The domain `adriansliacky.sk` currently uses Cloudflare nameservers
-(`laila.ns.cloudflare.com` and `michael.ns.cloudflare.com`). No public A, CNAME,
-MX or TXT records were found for the apex or `www` at the time of writing, so
-there is no existing site to preserve. **Do not add these records if that
-changes or if the domain is used for email elsewhere.**
+| | |
+| --- | --- |
+| **Live URL** | **<https://em.adriansliacky.sk/>** |
+| DNS record | `CNAME em → adrian-sliacky-gymzv.github.io` |
+| DNS provider | Cloudflare |
+| Proxy status | **DNS only** (grey cloud) |
+| GitHub Pages custom domain | `em.adriansliacky.sk` |
+| HTTPS | Certificate approved; **Enforce HTTPS** enabled |
+| CNAME file | `webapp/CNAME` |
 
-Two sensible options:
+## How it works
 
-- **Recommended: `mapy.adriansliacky.sk`** — one DNS record, no effect on the
-  apex domain or email.
-- **Root domain: `adriansliacky.sk`** — the site opens at the bare domain and
-  GitHub redirects `www.adriansliacky.sk` to it. More DNS records.
+A custom domain is a DNS mapping, not a browser redirect.
 
----
+1. A visitor opens `https://em.adriansliacky.sk/`.
+2. Cloudflare resolves the CNAME to `adrian-sliacky-gymzv.github.io`.
+3. The browser connects to GitHub Pages using the custom hostname.
+4. GitHub Pages serves this repository and presents a TLS certificate for
+   `em.adriansliacky.sk`.
+5. The address bar stays on **`em.adriansliacky.sk`**. Internal links use
+   relative paths, so navigation stays on the custom domain.
 
-## Option A — recommended subdomain `mapy.adriansliacky.sk`
+The default Pages URL
+`https://adrian-sliacky-gymzv.github.io/editor-map-2-web/` redirects to the
+custom domain. That is GitHub Pages behaviour, not DNS.
 
-### 1. Add one DNS record in Cloudflare
+## Current Cloudflare record
 
-In Cloudflare → **adriansliacky.sk → DNS → Records**, add:
+Cloudflare → `adriansliacky.sk` → **DNS → Records**:
 
 | Type | Name | Target | Proxy status | TTL |
 | --- | --- | --- | --- | --- |
-| CNAME | `mapy` | `adrian-sliacky-gymzv.github.io` | **DNS only** (grey cloud) | Auto |
+| CNAME | `em` | `adrian-sliacky-gymzv.github.io` | **DNS only** | Auto |
 
-Important: use **DNS only**, not the orange-cloud proxy, while GitHub verifies
-the domain and issues the HTTPS certificate.
+Keep it **DNS only**. If you later enable the orange-cloud proxy, use
+SSL/TLS mode **Full (strict)** and verify that GitHub’s certificate and
+redirects still work. DNS only is the simplest and most reliable setup.
 
-Verify from a terminal:
+## GitHub Pages settings
+
+Repository → **Settings → Pages**:
+
+- **Source:** GitHub Actions
+- **Custom domain:** `em.adriansliacky.sk`
+- **Enforce HTTPS:** enabled
+
+`webapp/CNAME` contains:
+
+```text
+em.adriansliacky.sk
+```
+
+The file is part of the deployed site and keeps the custom domain attached
+across future deployments.
+
+## Verification
 
 ```powershell
-Resolve-DnsName mapy.adriansliacky.sk -Type CNAME
+Resolve-DnsName em.adriansliacky.sk -Type CNAME
+Invoke-WebRequest -UseBasicParsing https://em.adriansliacky.sk/
 ```
 
-It should return `adrian-sliacky-gymzv.github.io`.
+Expected: the CNAME resolves to `adrian-sliacky-gymzv.github.io`, and HTTPS
+returns HTTP 200.
 
-### 2. Add the CNAME file to the site
+## Using the bare domain instead
 
-Create `webapp/CNAME` containing exactly:
+If you later want `https://adriansliacky.sk/` rather than the `em` subdomain:
 
-```text
-mapy.adriansliacky.sk
-```
-
-Commit and push. The file must be at the root of the published site.
-
-### 3. Set the custom domain in GitHub
-
-Repository → **Settings → Pages → Custom domain**:
-
-```text
-mapy.adriansliacky.sk
-```
-
-Click **Save**, wait for the DNS check to pass, then enable **Enforce HTTPS**.
-GitHub may take a few minutes and, rarely, up to 24 hours to issue the
-certificate.
-
-The final URL will be:
-
-```text
-https://mapy.adriansliacky.sk
-```
-
----
-
-## Option B — root domain `adriansliacky.sk`
-
-### 1. Add DNS records in Cloudflare
-
-For the apex (`@`), add four A records and four AAAA records:
+1. In Cloudflare, remove the `em` record if it is no longer needed.
+2. Add these apex records, all **DNS only**:
 
 | Type | Name | Value |
 | --- | --- | --- |
@@ -88,71 +86,21 @@ For the apex (`@`), add four A records and four AAAA records:
 | AAAA | `@` | `2606:50c0:8002::153` |
 | AAAA | `@` | `2606:50c0:8003::153` |
 
-Then add the `www` redirect target:
+3. Add `CNAME www → adrian-sliacky-gymzv.github.io` (DNS only). Remove
+   conflicting `@` or `www` records first.
+4. Change `webapp/CNAME` to `adriansliacky.sk`.
+5. Change the GitHub Pages custom domain to `adriansliacky.sk`.
+6. Wait for the certificate, then keep **Enforce HTTPS** enabled.
 
-| Type | Name | Target | Proxy status | TTL |
-| --- | --- | --- | --- | --- |
-| CNAME | `www` | `adrian-sliacky-gymzv.github.io` | **DNS only** | Auto |
+Cloudflare also supports a flattened CNAME at the apex, but the A/AAAA values
+above follow GitHub’s documented setup directly.
 
-Remove any conflicting A/AAAA/CNAME records for `@` or `www`. Do not use the
-orange-cloud proxy for these records while GitHub verifies the domain.
+## Notes
 
-Cloudflare also supports a flattened CNAME at `@`, but the A/AAAA records above
-match GitHub’s documented setup more directly.
-
-### 2. Add the CNAME file
-
-Create `webapp/CNAME` containing exactly:
-
-```text
-adriansliacky.sk
-```
-
-Commit and push.
-
-### 3. Set the custom domain in GitHub
-
-Repository → **Settings → Pages → Custom domain**:
-
-```text
-adriansliacky.sk
-```
-
-Save it, wait for the check, then enable **Enforce HTTPS**. GitHub will redirect
-`www.adriansliacky.sk` to the apex domain when both records are present.
-
----
-
-## What happens to the existing GitHub Pages URL?
-
-The default URL remains available during preparation:
-
-```text
-https://adrian-sliacky-gymzv.github.io/editor-map-2-web/
-```
-
-Once a custom domain is configured, GitHub Pages may redirect the default URL
-to the custom domain. That is expected.
-
-## Cloudflare notes
-
-- During setup, every GitHub Pages record must be **DNS only** (grey cloud).
-- After GitHub has issued the certificate and **Enforce HTTPS** is on, the
-  orange cloud can optionally be enabled with SSL/TLS mode **Full (strict)**.
-  If you see redirect loops, switch back to DNS only.
-- Do not add a Cloudflare “Always Use HTTPS” rule until the GitHub certificate
-  is active.
-- Keep any unrelated MX/TXT records for email; only replace conflicting records
-  for `@` or `www`.
-
-## If you want me to finish the GitHub side
-
-After the DNS record(s) are added, tell me and I can:
-
-1. create `webapp/CNAME`,
-2. set the custom domain through the GitHub API,
-3. wait for GitHub’s DNS/TLS check,
-4. verify `https://mapy.adriansliacky.sk` (or the apex) in a browser.
-
-I cannot add the DNS records because the Cloudflare account is not accessible
-from this machine.
+- DNS changes can take a few minutes to propagate.
+- GitHub usually issues the TLS certificate within minutes; the certificate
+  currently expires on **2027-02-08** and renews automatically.
+- Keep unrelated MX/TXT records for email; only replace records that conflict
+  with the website hostname.
+- Do not use Cloudflare’s “Always Use HTTPS” until GitHub has issued the
+  certificate.
