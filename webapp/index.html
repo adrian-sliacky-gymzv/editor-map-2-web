@@ -44,6 +44,13 @@
             <button type="button" class="home-header-play" data-classic-mode="distance" data-classic-preset="hero" aria-label="Hrať Traf sa! — ťažká, 10 otázok">
               Hrať <span aria-hidden="true">→</span>
             </button>
+            <button type="button" id="soundToggle" class="icon-btn home-sound" data-sound-toggle aria-pressed="true" aria-label="Zvuk zapnutý" title="Zvuk zapnutý" aria-keyshortcuts="M">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/>
+                <path class="sound-waves" d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12"/>
+                <path class="sound-slash" d="m4 4 16 16"/>
+              </svg>
+            </button>
             <button type="button" id="settingsBtn" class="icon-btn home-settings" aria-label="Nastavenia" title="Nastavenia" aria-keyshortcuts=",">⚙</button>
             <button type="button" id="homeHelpBtn" class="icon-btn home-help" aria-label="Ako hrať (?)" title="Ako hrať (?)" aria-keyshortcuts="Shift+/">?</button>
           </div>
@@ -864,6 +871,7 @@
           <div class="shortcut-row"><span class="shortcut-keys"><kbd>Enter</kbd><span>alebo</span><kbd>Space</kbd></span><span>Po odpovedi ďalšia otázka; v dialógoch potvrdenie.</span></div>
           <div class="shortcut-row"><span class="shortcut-keys"><kbd>Esc</kbd></span><span>Zavrieť dialóg alebo ukončiť rozohranú aktivitu.</span></div>
           <div class="shortcut-row"><span class="shortcut-keys"><kbd>?</kbd></span><span>Otvoriť alebo zavrieť túto nápovedu.</span></div>
+          <div class="shortcut-row"><span class="shortcut-keys"><kbd>M</kbd></span><span>Stlmiť zvuk.</span></div>
           <div class="shortcut-row"><span class="shortcut-keys"><kbd>+</kbd><kbd>−</kbd><kbd>0</kbd></span><span>Priblížiť, oddialiť a zobraziť celú mapu.</span></div>
           <div class="shortcut-row"><span class="shortcut-keys"><kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd></span><span data-i18n-html="helpShortcutPan">Posun mapy; so <kbd>Shift</kbd> rýchlejšie.</span></div>
           <div class="shortcut-row"><span class="shortcut-keys"><kbd>/</kbd></span><span data-i18n-html="helpShortcutAtlas">Atlas: skočiť do vyhľadávania. <kbd>Esc</kbd> ho vyčistí.</span></div>
@@ -1005,6 +1013,15 @@
             </button>
           </div>
           <p class="setup-field-hint">Automaticky podľa jazyka prehliadača.</p>
+        </div>
+        <div class="setup-field settings-sound-field">
+          <span class="setup-label">Zvuk</span>
+          <label class="switch settings-sound">
+            <input type="checkbox" data-sound-checkbox id="soundEnabled" checked>
+            <span class="switch-track" aria-hidden="true"></span>
+            <span class="switch-label" data-sound-state>Zapnutý</span>
+          </label>
+          <p class="setup-field-hint">Krátke zvuky pri odpovediach a výsledkoch.</p>
         </div>
       </div>
       <div class="dialog-actions">

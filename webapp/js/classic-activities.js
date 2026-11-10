@@ -31,6 +31,7 @@ import {
 } from './scoring.js';
 import { gameMessage, getLanguage, t } from './i18n.js';
 import { navigate } from './navigation.js';
+import { playCorrect, playResult, playScore, playWrong } from './sound.js';
 import {
   $,
   announce,
@@ -1286,9 +1287,11 @@ function answerTestQuestion(clickedNode) {
   }
   if (correct) {
     GAME.correct += 1;
+    playCorrect();
     setQuestionHtml(cfgText('correctTestAnswer'));
   } else {
     GAME.incorrect += 1;
+    playWrong();
     setQuestionHtml(cfgText('incorrectTestAnswer'));
   }
   setMissionFeedback(correct ? 'Správne! +1' : 'Nesprávne!', correct ? 'correct' : 'wrong');
@@ -1338,6 +1341,7 @@ function showTestFinal() {
   // The original leaves the last question's marks and shapes on screen.
   setQuestionNumber(0);
   const percent = Math.round((GAME.correct / GAME.numQ) * 100);
+  playResult(percent);
   let finalHtml = htmlFromConfig(cfgText('testFinalScore'), {
     CORRECTQ: spaced(GAME.correct),
     TOTALQ: spaced(GAME.numQ),
@@ -1423,6 +1427,7 @@ function onDistanceClick(point) {
   const dist = distanceBetween(point, { x: targetX, y: targetY });
   const maxDist = maxDistanceForMap(GAME.mapView.W, GAME.mapView.H);
   const score = scoreForDistance(dist, maxDist);
+  playScore(score);
   GAME.totalScore += score;
   const success = score >= 70;
   if (GAME.mode === 'practice') {
@@ -1523,6 +1528,7 @@ function showDistanceFinal() {
   // Keep the final guess and correct position visible for review.
   setQuestionNumber(0);
   const percent = Math.round(GAME.totalScore / GAME.numQ);
+  playResult(percent);
   let finalHtml = htmlFromConfig(cfgText('distanceFinalScore'), {
     TOTALSCORE: spaced(GAME.totalScore),
     TOTALTIME: spaced(timeText()),
@@ -1777,11 +1783,13 @@ function answerPuzzle(targetNode) {
 
   if (correct) {
     GAME.correct += 1;
+    playCorrect();
     GAME.mapView.setEntityColor(key, '#77ff77');
     setQuestionHtml(cfgText('correctPuzzleAnswer'));
     setMissionFeedback('Správne umiestnené! +1', 'correct');
   } else {
     GAME.incorrect += 1;
+    playWrong();
     GAME.mapView.setEntityColor(key, '#ff0000');
     setQuestionHtml(htmlFromConfig(cfgText('incorrectPuzzleAnswer'), {
       ENTITYNAME: escapeHtml(nodeLabel(targetNode)),
@@ -1837,6 +1845,7 @@ function showPuzzleFinal() {
   setQuestionNumber(0);
   const answered = GAME.correct + GAME.incorrect;
   const percent = answered ? Math.round((GAME.correct / answered) * 100) : 0;
+  playResult(percent);
   const type = GAME.testEl.getAttribute('answer') || GAME.testEl.getAttribute('question') || GAME.testEl.getAttribute('label') || '';
   const finalType = answered === 1 && type === 'štátov' ? 'štátu' : type;
   setQuestionHtml(htmlFromConfig(cfgText('puzzleFinalScore'), {

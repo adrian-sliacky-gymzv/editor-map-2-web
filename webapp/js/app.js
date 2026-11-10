@@ -23,6 +23,7 @@ import {
 import { tapSlop } from './map-gestures.js';
 import { initI18n, t } from './i18n.js';
 import { dismissTopOverlay, navigate, pushOverlay, registerRoute } from './navigation.js';
+import { initSound, playCorrect, playResult, playScore, playWrong, toggleMuted } from './sound.js';
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
@@ -903,6 +904,7 @@ function answerDistance(guess) {
 
   const distance = distanceBetween(guess, target);
   const score = scoreForDistance(distance);
+  playScore(score);
 
   state.answered = true;
   state.total += score;
@@ -943,6 +945,8 @@ function answerQuiz(clicked) {
   if (!target || !clicked) return;
 
   const correct = clicked.entity === target.entity;
+  if (correct) playCorrect();
+  else playWrong();
   state.answered = true;
   if (correct) state.correct += 1;
   else state.incorrect += 1;
@@ -982,6 +986,8 @@ function answerPuzzle(drop) {
   );
   const distance = distanceBetween(drop, target);
   const correct = isPuzzleCorrect(drop, target, tolerance);
+  if (correct) playCorrect();
+  else playWrong();
 
   state.answered = true;
   if (correct) state.correct += 1;
@@ -1023,6 +1029,7 @@ function showFinal() {
   const percent = state.mode === 'distance'
     ? finalPercent(state.total, state.gameNumQ)
     : percentOf(state.correct, state.gameNumQ);
+  playResult(percent);
 
   const result = buildFinalText(percent, timeText);
   const record = recordResult(state.mode, result.stats);
@@ -2593,6 +2600,13 @@ function bindGlobalEvents() {
       return;
     }
 
+    const muteKey = event.key.toLowerCase() === 'm';
+    if (muteKey && !event.repeat && !typing && !event.ctrlKey && !event.metaKey && !event.altKey) {
+      event.preventDefault();
+      toggleMuted();
+      return;
+    }
+
     if (typing || hasBlockingOverlay() || event.ctrlKey || event.metaKey || event.altKey) return;
 
     const homeVisible = isVisible('#homeScreen');
@@ -2659,6 +2673,7 @@ function bindGlobalEvents() {
 
 function init() {
   initI18n();
+  initSound();
   registerAppRoutes();
   const settings = loadSettings();
   state.level = settings.level;

@@ -625,6 +625,14 @@ export const EN = {
   'Slovenčina': 'Slovenčina',
   'English': 'English',
   'Automaticky podľa jazyka prehliadača.': 'Automatically follows your browser language.',
+  'Zvuk': 'Sound',
+  'Zvuk zapnutý': 'Sound on',
+  'Zvuk vypnutý': 'Sound off',
+  'Zapnutý': 'On',
+  'Vypnutý': 'Off',
+  'Stlmiť zvuk.': 'Mute sound.',
+  'Krátke zvuky pri odpovediach a výsledkoch.':
+    'Short sounds for answers and results.',
   'Hotovo': 'Done',
   'Nastavenia aplikácie': 'Application settings',
 };

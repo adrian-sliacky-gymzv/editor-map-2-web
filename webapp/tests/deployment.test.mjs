@@ -211,6 +211,22 @@ test('repository link and reimplementation credit are present', () => {
   assert.match(html, /<meta name="author" content="Adrian Sliacky">/);
 });
 
+test('sound controls are discoverable and persisted', () => {
+  const html = read('index.html');
+  const app = read('js/app.js');
+  const sound = read('js/sound.js');
+  assert.match(html, /id="soundToggle"/);
+  assert.match(html, /data-sound-toggle/);
+  assert.match(html, /data-sound-checkbox/);
+  assert.match(html, /data-sound-state/);
+  assert.match(html, /aria-keyshortcuts="M"/);
+  assert.match(html, /<kbd>M<\/kbd>/);
+  assert.match(app, /initSound\(\)/);
+  assert.match(app, /toggleMuted\(\)/);
+  assert.match(sound, /editorMap2\.sound\.v1/);
+  assert.match(sound, /AudioContext/);
+});
+
 test('motion is short, purposeful and reduced-motion aware', () => {
   const css = read('redesign.css');
   assert.match(css, /@keyframes dialog-in/);

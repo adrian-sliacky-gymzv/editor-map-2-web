@@ -43,6 +43,15 @@ messages. The result card can be closed and reopened without leaving the game.
   such as `jazero`, `púšť` or `vodná nádrž` are translated in English mode; the
   original map data is never modified.
 
+### Sound
+
+- Short, quiet Web Audio cues for correct/wrong answers, distance scores and
+  final results. There are no external audio files and no background music.
+- Sound starts only after a user gesture, so browsers never autoplay it.
+- Mute from the **speaker button** in the home header, the **Sound** switch in
+  Settings, or the `M` shortcut. The choice is stored in
+  `localStorage` under `editorMap2.sound.v1`.
+
 ### Map editor
 
 - New/Open/Save/Save As for the original `.mef` files. The editor uses the File
@@ -222,6 +231,7 @@ only after the user zooms in.
 | Arrow keys | Pan the map (hold `Shift` for a larger step) |
 | `/` | Atlas search |
 | `?` | Open/close help |
+| `M` | Mute/unmute sound |
 | `Ctrl+S` | Editor: save |
 | `Ctrl+Shift+S` | Editor: save as |
 | `Ctrl+O` | Editor: open |
@@ -307,6 +317,8 @@ Supported map keys: `slovensko`, `svet`, `europa`, `afrika`, `azia`,
   table with inverted map linework for contrast.
 - Fast 110–180 ms opacity/transform motion for screens, dialogs, toasts and
   button feedback; disabled by `prefers-reduced-motion: reduce`.
+- Subtle generated sound cues with a persistent mute control and no autoplay
+  before the first user interaction.
 - Responsive breakpoints tested at 320, 390, 568 (landscape), 768, 1024 and
   1280+ px.
 - `aria-keyshortcuts` on the main shortcuts; the help dialog is keyboard
@@ -324,7 +336,7 @@ Supported map keys: `slovensko`, `svet`, `europa`, `afrika`, `azia`,
 npm test
 ```
 
-Current status: **102 tests, 102 passing**. Coverage includes:
+Current status: **104 tests, 104 passing**. Coverage includes:
 
 - original scoring, per-map maximum distance and puzzle tolerance;
 - original quiz group cycling, unused targets and candidate sampling;
