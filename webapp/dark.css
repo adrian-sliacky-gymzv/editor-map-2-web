@@ -1,0 +1,1260 @@
+/* ============================================================
+   Editor máp 2 — automatic dark theme
+   Curated dark surfaces keep the original map paper readable while
+   the application chrome follows the system colour scheme.
+   ============================================================ */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --ink: #e8eefb;
+    --ink-2: #c6d2e6;
+    --muted: #97a6bf;
+    --line: #23314a;
+    --line-2: #334562;
+    --blue: #9ab7ff;
+    --blue-2: #79a2ff;
+    --blue-soft: #162447;
+    --blue-deep: #c4d6ff;
+    --green: #77d688;
+    --green-2: #54c66c;
+    --green-soft: #10291c;
+    --red: #ff8d8d;
+    --red-2: #ff7070;
+    --red-soft: #35171d;
+    --amber: #f7be65;
+    --amber-2: #f3ad4f;
+    --amber-soft: #332413;
+    --purple: #c7a6ff;
+    --purple-soft: #25183b;
+    --bg: #07101e;
+    --card: #0f192a;
+    --bar-1: #182740;
+    --bar-2: #111d31;
+    --bar-3: #0b1525;
+    --bar-border: #314563;
+    --panel-1: #25334a;
+    --panel-2: #152137;
+    --dialog: #111b2c;
+    --dialog-border: #334660;
+    --focus: #82a7ff;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.24);
+    --shadow: 0 18px 46px rgba(0, 0, 0, 0.42);
+  }
+
+  html,
+  body {
+    background: #07101d;
+    color: var(--ink);
+  }
+
+  /* ------------------------------------------------------------
+     HOME
+     ------------------------------------------------------------ */
+
+  .home-screen {
+    background:
+      radial-gradient(900px 520px at 8% -8%, rgba(53, 86, 150, 0.24) 0%, rgba(7, 16, 29, 0) 62%),
+      radial-gradient(900px 520px at 96% 2%, rgba(73, 69, 145, 0.22) 0%, rgba(7, 16, 29, 0) 58%),
+      linear-gradient(180deg, #0a1424 0%, #091321 52%, #07101d 100%);
+  }
+
+  .home-bg {
+    opacity: 0.055;
+    filter: invert(1) grayscale(1);
+  }
+
+  .brand-copy h1 {
+    color: #e3ebff;
+  }
+
+  .brand-kicker {
+    color: #8fa5c9;
+  }
+
+  .brand-logo {
+    box-shadow: 0 0 0 1px rgba(142, 170, 235, 0.22), 0 6px 14px rgba(0, 0, 0, 0.36);
+  }
+
+  .icon-btn {
+    background: linear-gradient(#1a2941, #121f34);
+    border-color: #3a4e6c;
+    color: #dfe9ff;
+  }
+
+  .icon-btn:hover {
+    background: linear-gradient(#223653, #182741);
+  }
+
+  .hero {
+    background:
+      radial-gradient(520px 300px at 100% 0%, rgba(88, 133, 255, 0.18) 0%, rgba(88, 133, 255, 0) 62%),
+      linear-gradient(135deg, #101d31 0%, #0c1728 55%, #091321 100%);
+    border-color: #263a57;
+    box-shadow: var(--shadow);
+  }
+
+  .hero::after {
+    background: radial-gradient(circle, rgba(86, 126, 231, 0.16), rgba(47, 111, 237, 0) 66%);
+  }
+
+  .eyebrow {
+    color: #9ab0d6;
+  }
+
+  .hero h2 {
+    color: #f2f6ff;
+  }
+
+  .hero-lead {
+    color: #b7c6dc;
+  }
+
+  .btn-primary {
+    background: linear-gradient(180deg, #3f7cf3 0%, #2858d8 100%);
+    border-color: #3768d2;
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(47, 111, 237, 0.25);
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(180deg, #548cf7 0%, #3165e3 100%);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    border-color: #3a4f6d;
+    color: #dbe7ff;
+  }
+
+  .btn-ghost:hover {
+    background: #15243b;
+    border-color: #5875a4;
+  }
+
+  .btn-ghost-quiet {
+    color: #a8bce0;
+    background: transparent;
+    border-color: transparent;
+  }
+
+  .btn-ghost-quiet:hover {
+    background: rgba(83, 111, 166, 0.16);
+    border-color: #344a68;
+  }
+
+  .hero-map img {
+    background: #eef1f6;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.46), 0 0 0 1px rgba(95, 125, 177, 0.4);
+  }
+
+  .hero-map-badge {
+    background: rgba(14, 25, 43, 0.92);
+    border-color: #344966;
+    color: #b7c9e8;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.32);
+  }
+
+  .hero-map-badge b {
+    color: #dbe7ff;
+  }
+
+  .mode-card {
+    border-color: #233550;
+    background: #0e1929;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .mode-card:hover {
+    border-color: color-mix(in srgb, var(--accent) 45%, #2b3c57);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.32);
+  }
+
+  .mode-card-distance {
+    background: linear-gradient(145deg, #0d1c1b 0%, #0b1724 100%);
+  }
+
+  .mode-card-quiz {
+    background: linear-gradient(145deg, #0d1729 0%, #0c1523 100%);
+  }
+
+  .mode-card-puzzle {
+    background: linear-gradient(145deg, #1d180d 0%, #12151d 100%);
+  }
+
+  .mode-card-editor {
+    background:
+      radial-gradient(420px 180px at 100% 0%, rgba(20, 184, 166, 0.16), transparent 70%),
+      linear-gradient(145deg, #0c1b1b 0%, #0b1721 100%);
+  }
+
+  .mode-card-atlas {
+    background: linear-gradient(145deg, #171329 0%, #101522 100%);
+  }
+
+  .mode-card-distance .mode-icon,
+  .mode-tag {
+    color: var(--accent-deep);
+  }
+
+  .mode-icon {
+    background: var(--accent-soft);
+  }
+
+  .mode-card-distance {
+    --accent-soft: #123024;
+    --accent-deep: #8fe09b;
+  }
+
+  .mode-card-quiz {
+    --accent-soft: #15264a;
+    --accent-deep: #a9c2ff;
+  }
+
+  .mode-card-puzzle {
+    --accent-soft: #332513;
+    --accent-deep: #f6c16d;
+  }
+
+  .mode-card-editor {
+    --accent-soft: #10302d;
+    --accent-deep: #83ead9;
+  }
+
+  .mode-card-atlas {
+    --accent-soft: #291d42;
+    --accent-deep: #cfb4ff;
+  }
+
+  .mode-tag {
+    color: var(--accent-deep);
+  }
+
+  .mode-body h3,
+  .panel-head h2,
+  .feature-list b {
+    color: #e8eefb;
+  }
+
+  .mode-body p,
+  .feature-list span span,
+  .progress-note,
+  .progress-meta,
+  .footer-brand p,
+  .footer-credits {
+    color: #a7b6ce;
+  }
+
+  .btn-mode {
+    background: #17263d;
+    border-color: #344a68;
+    color: #dfe9ff;
+  }
+
+  .btn-mode:hover {
+    background: #203451;
+  }
+
+  .btn-mode-editor {
+    background: linear-gradient(180deg, #18b7a4, #0f766e);
+    border-color: #0b5f58;
+    color: #fff;
+  }
+
+  .btn-mode-editor:hover {
+    background: linear-gradient(180deg, #2dd4bf, #0d9488);
+  }
+
+  .btn-mode-atlas {
+    background: #2a1c46;
+    border-color: #503878;
+    color: #d8c4ff;
+  }
+
+  .btn-mode-atlas:hover {
+    background: #38255b;
+  }
+
+  .mode-chiplist span {
+    background: rgba(20, 184, 166, 0.11);
+    border-color: rgba(94, 234, 212, 0.24);
+    color: #9df0e3;
+  }
+
+  .panel {
+    background: var(--card);
+    border-color: #243651;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .panel-hint,
+  .progress-note,
+  .progress-meta,
+  .atlas-legend,
+  .atlas-detail,
+  .atlas-distribution-labels,
+  .atlas-tip {
+    color: var(--muted);
+  }
+
+  .feature-dot {
+    box-shadow: 0 0 0 4px rgba(115, 160, 255, 0.14);
+  }
+
+  .progress-name,
+  .progress-value,
+  .atlas-detail-name,
+  .atlas-distribution-labels b {
+    color: #e4ecfb;
+  }
+
+  .progress-bar {
+    background: #22314a;
+  }
+
+  .progress-item[data-mode="distance"] {
+    --accent: #54c66c;
+  }
+
+  .progress-item[data-mode="quiz"] {
+    --accent: #79a2ff;
+  }
+
+  .progress-item[data-mode="puzzle"] {
+    --accent: #f3ad4f;
+  }
+
+  .home-footer {
+    border-color: #22314a;
+  }
+
+  .footer-brand p,
+  .footer-credits {
+    color: #8fa0ba;
+  }
+
+  .link-btn {
+    color: #9ab7ff;
+  }
+
+  /* ------------------------------------------------------------
+     SHARED FORMS, CHIPS, DIALOGS
+     ------------------------------------------------------------ */
+
+  .search-field input {
+    background: rgba(12, 23, 40, 0.92);
+    border-color: var(--line-2);
+    color: var(--ink);
+  }
+
+  .search-field input:focus {
+    background: #0d1a2d;
+    border-color: var(--blue-2);
+    box-shadow: 0 0 0 3px rgba(121, 162, 255, 0.16);
+  }
+
+  .search-icon,
+  .search-field input::placeholder {
+    color: #7286a3;
+  }
+
+  .chip {
+    background: #122137;
+    border-color: #2b3d59;
+    color: #bdccdf;
+  }
+
+  .chip:hover {
+    background: #182b45;
+  }
+
+  .chip.is-active {
+    background: #223a68;
+    border-color: #5477b7;
+    color: #e6efff;
+  }
+
+  .segmented {
+    background: #101c2e;
+    border-color: #2d405e;
+  }
+
+  .seg-btn {
+    color: #adbed6;
+  }
+
+  .seg-btn .seg-count {
+    color: #7f93b0;
+  }
+
+  .seg-btn.is-active {
+    background: #20365d;
+    color: #e8f0ff;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+
+  .seg-btn.is-active .seg-count {
+    color: #b7cbf0;
+  }
+
+  .step-btn {
+    border-color: #344863;
+    background: linear-gradient(#1b2b45, #121f33);
+    color: #e1eaff;
+  }
+
+  .step-btn:hover:not(:disabled) {
+    background: linear-gradient(#243a5a, #192a43);
+  }
+
+  .step-value {
+    background: #0d1a2b;
+    border-color: #344863;
+    color: #e8efff;
+  }
+
+  .overlay {
+    background: rgba(1, 5, 12, 0.7);
+  }
+
+  .dialog {
+    background: var(--dialog);
+    border-color: var(--dialog-border);
+    box-shadow: 0 26px 80px rgba(0, 0, 0, 0.58);
+  }
+
+  .dialog-head {
+    background: linear-gradient(180deg, #1a2a44 0%, #132139 58%, #0e192b 100%);
+    border-bottom-color: #344863;
+  }
+
+  .dialog-head h2 {
+    color: #dbe8ff;
+  }
+
+  .dialog-x {
+    background: linear-gradient(#1b2b45, #121f33);
+    border-color: #3b4f6d;
+    color: #dfeaff;
+  }
+
+  .dialog-body {
+    color: #c5d3e6;
+  }
+
+  .dialog-body p {
+    color: #b8c7dd;
+  }
+
+  .dialog-actions {
+    background: #0e1a2b;
+    border-top-color: #2a3c58;
+  }
+
+  .btn-soft {
+    background: #1a2940;
+    border-color: #354966;
+    color: #dce7fa;
+  }
+
+  .btn-soft:hover {
+    background: #223651;
+  }
+
+  .btn-danger {
+    background: linear-gradient(#d44a4a, #b32626);
+    border-color: #9d2020;
+    color: #fff;
+  }
+
+  .btn-start {
+    background: linear-gradient(#2d8f4a, #1e6a36);
+    border-color: #247342;
+    color: #fff;
+  }
+
+  .btn-start:hover {
+    background: linear-gradient(#37a658, #257d40);
+  }
+
+  .setup-dialog {
+    background: #0d1829;
+    border-color: #30445f;
+    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6);
+  }
+
+  .setup-head {
+    background:
+      radial-gradient(600px 180px at 100% 0%, rgba(85, 129, 231, 0.18), transparent 70%),
+      linear-gradient(180deg, #182943, #101d31);
+    border-bottom-color: #30445f;
+  }
+
+  .setup-head h2 {
+    color: #eef4ff;
+  }
+
+  .setup-subtitle,
+  .setup-field-hint,
+  .setup-summary-sub {
+    color: #9bacc5;
+  }
+
+  .setup-label {
+    color: #8ea4c2;
+  }
+
+  .setup-map-card {
+    background: #0f1c2f;
+    border-color: #2b3d58;
+    color: #e0eaff;
+  }
+
+  .setup-map-card:hover {
+    border-color: #5578ae;
+    background: #13233a;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+  }
+
+  .setup-map-card.is-selected {
+    border-color: #79a2ff;
+    background: #142747;
+    box-shadow: 0 0 0 2px rgba(121, 162, 255, 0.2);
+  }
+
+  .setup-map-thumb {
+    background: #e9e5da;
+  }
+
+  .setup-map-copy span {
+    color: #8399b8;
+  }
+
+  .setup-select {
+    background: #0c192a;
+    border-color: #334863;
+    color: #e5eeff;
+  }
+
+  .setup-select:focus {
+    border-color: #79a2ff;
+    outline-color: rgba(121, 162, 255, 0.25);
+  }
+
+  .setup-level {
+    background: #0f1c2f;
+    border-color: #2b3d58;
+    color: #d3dfef;
+  }
+
+  .setup-level .seg-count {
+    color: #8095b3;
+  }
+
+  .setup-level.is-active {
+    background: #142747;
+    border-color: #79a2ff;
+    box-shadow: 0 0 0 2px rgba(121, 162, 255, 0.16);
+  }
+
+  .setup-level.is-active .seg-count {
+    color: #a9c4ff;
+  }
+
+  .setup-summary {
+    background: linear-gradient(135deg, #10203a, #0d1a2d);
+    border-color: #2c4264;
+    color: #b9c9e0;
+  }
+
+  .setup-summary-main b {
+    color: #e2ebff;
+  }
+
+  .setup-actions {
+    background: #0c1727;
+    border-top-color: #2c3f5a;
+  }
+
+  .about-brand h3,
+  .about-list dt {
+    color: #dbe7ff;
+  }
+
+  .about-list dd,
+  .about-body p {
+    color: #b4c4dc;
+  }
+
+  .about-list div {
+    border-bottom-color: #263852;
+  }
+
+  .fine {
+    color: #93a4bf;
+    border-top-color: #2a3b55;
+  }
+
+  .help-dialog {
+    background: #0d1829;
+  }
+
+  .help-intro {
+    border-bottom-color: #2a3c57;
+    color: #aab9cf;
+  }
+
+  .help-heading {
+    color: #a9c2ff;
+  }
+
+  .record-badge {
+    background: #1d7a37;
+    color: #ecfff1;
+  }
+
+  .result-dialog {
+    background: #0e1929;
+  }
+
+  .result-stats .stat {
+    background: #101f34;
+    border-color: #2a3c58;
+  }
+
+  .stat-value {
+    color: #ff9a9a;
+  }
+
+  .stat-label {
+    color: #a2b3cb;
+  }
+
+  .result-text {
+    color: #c7d5e7;
+  }
+
+  .result-list-wrap {
+    background: #0b1727;
+    border-color: #2a3c58;
+  }
+
+  .result-list th {
+    background: #132239;
+    color: #9db0cb;
+  }
+
+  .result-list td {
+    border-bottom-color: #22324a;
+    color: #c5d3e5;
+  }
+
+  .result-list tbody tr:nth-child(even) {
+    background: #0e1b2d;
+  }
+
+  .toast {
+    background: rgba(23, 32, 49, 0.97);
+    color: #eef4ff;
+    border: 1px solid #384c68;
+  }
+
+  .classic-toast[data-tone="error"] {
+    background: rgba(126, 32, 42, 0.98);
+  }
+
+  .classic-toast[data-tone="success"] {
+    background: rgba(25, 103, 57, 0.98);
+  }
+
+  /* ------------------------------------------------------------
+     ATLAS
+     ------------------------------------------------------------ */
+
+  .atlas-screen {
+    background:
+      radial-gradient(800px 420px at 8% -10%, rgba(58, 91, 156, 0.22) 0%, rgba(7, 16, 29, 0) 62%),
+      linear-gradient(180deg, #0a1424 0%, #081220 52%, #07101d 100%);
+  }
+
+  .atlas-heading h1 {
+    color: #dbe8ff;
+  }
+
+  .atlas-heading p {
+    color: #9cafca;
+  }
+
+  .atlas-map-panel,
+  .atlas-list-panel {
+    background: #0f192a;
+    border-color: #263852;
+  }
+
+  .atlas-map {
+    background: #f0ecdf;
+    border-color: #33445d;
+  }
+
+  .atlas-map-img {
+    filter: brightness(0.97) contrast(1.01);
+  }
+
+  .atlas-map-footer {
+    border-top-color: #23344e;
+  }
+
+  .atlas-detail-name {
+    color: #e7effc;
+  }
+
+  .atlas-level-badge,
+  .city-level {
+    background: color-mix(in srgb, var(--level-color) 18%, #111d2e);
+    color: color-mix(in srgb, var(--level-color) 52%, #ffffff);
+  }
+
+  .atlas-distribution {
+    background: #20304a;
+  }
+
+  .atlas-list-head {
+    background: #101e31;
+    border-bottom-color: #263852;
+    color: #93a7c3;
+  }
+
+  .atlas-list-head .link-btn {
+    background: #142339;
+    border-color: #314663;
+    color: #b7c8e0;
+  }
+
+  .atlas-list-head .link-btn:hover {
+    background: #1c304d;
+  }
+
+  .city-row:hover {
+    background: #14243a;
+  }
+
+  .city-row.is-selected {
+    background: #172d4f;
+    border-color: #3d5d91;
+  }
+
+  .city-name {
+    color: #dce8fa;
+  }
+
+  .city-arrow {
+    color: #7186a5;
+  }
+
+  .atlas-floating {
+    background: rgba(14, 25, 42, 0.96);
+    border-color: #334763;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+  }
+
+  .atlas-floating-copy b {
+    color: #e4edfc;
+  }
+
+  .atlas-floating-copy span {
+    color: #99adc9;
+  }
+
+  /* ------------------------------------------------------------
+     GAME CHROME
+     ------------------------------------------------------------ */
+
+  .game-screen,
+  .classic-screen {
+    background: #07101d;
+  }
+
+  .game-topbar,
+  .classic-topbar,
+  .classic-screen .classic-topbar,
+  .game-screen .game-topbar {
+    background: linear-gradient(180deg, #1a2b46 0%, #132139 58%, #0e192b 100%);
+    border-bottom-color: #344863;
+  }
+
+  .game-title,
+  .classic-screen .classic-topbar .game-title {
+    color: #dbe8ff;
+  }
+
+  .question-line,
+  .classic-context,
+  .qnum {
+    color: #c4d3e6;
+  }
+
+  .question-text,
+  .question-text b {
+    color: #dfe9fa;
+  }
+
+  .question-text .entity {
+    color: #a8c4ff;
+  }
+
+  /* The original config embeds old <font color> tags. They are presentational
+     hints, so dark mode must override them explicitly. */
+  .question-text font[color],
+  .result-text font[color],
+  .dialog-body font[color],
+  .classic-result-dialog font[color] {
+    color: #c9d9ef !important;
+  }
+
+  .question-text font[color="#009900" i],
+  .result-text font[color="#009900" i],
+  .dialog-body font[color="#009900" i],
+  .classic-result-dialog font[color="#009900" i] {
+    color: #7ee787 !important;
+  }
+
+  .question-text font[color="#990000" i],
+  .result-text font[color="#990000" i],
+  .dialog-body font[color="#990000" i],
+  .classic-result-dialog font[color="#990000" i] {
+    color: #ff9a9a !important;
+  }
+
+  .question-text font[color="#000099" i],
+  .result-text font[color="#000099" i],
+  .dialog-body font[color="#000099" i],
+  .classic-result-dialog font[color="#000099" i] {
+    color: #a9c4ff !important;
+  }
+
+  .win-btn {
+    background: linear-gradient(#1b2b45, #121f33);
+    border-color: #3b506c;
+    color: #e0eaff;
+  }
+
+  .win-btn:hover:not(:disabled) {
+    background: linear-gradient(#233954, #182942);
+  }
+
+  .game-progress {
+    background: rgba(119, 158, 228, 0.16);
+  }
+
+  .score-panel {
+    background: linear-gradient(180deg, #26364e 0%, #142139 100%);
+    border-color: #3b4e68;
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.35);
+  }
+
+  .classic-game-meta {
+    border-bottom-color: #364a66;
+  }
+
+  .classic-game-label {
+    color: #9aadc7;
+  }
+
+  .classic-game-meta strong {
+    color: #d9e7ff;
+  }
+
+  .lcd {
+    color: #dce8f8;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+  }
+
+  .lcd-badge {
+    border-color: #4b7650;
+    background: #08150c;
+    color: #9aff72;
+  }
+
+  .clock {
+    border-color: #8cc96a;
+    background: radial-gradient(circle at 50% 42%, #193326 0 54%, #0d1d15 55% 100%);
+  }
+
+  .clock::before,
+  .clock::after {
+    background: #dce8f8;
+  }
+
+  .map-viewport,
+  .editor-map-viewport {
+    background: #ece7db;
+  }
+
+  .map-hint,
+  .map-tag {
+    background: rgba(12, 22, 38, 0.88);
+    border-color: #344964;
+    color: #d6e3f6;
+  }
+
+  .zoom-btn {
+    background: linear-gradient(#1c2d48, #111f33);
+    border-color: #3e5470;
+    color: #e2ecff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  }
+
+  .zoom-btn:hover {
+    background: linear-gradient(#253b5a, #192b45);
+  }
+
+  .zoom-btn:active {
+    background: #2a4162;
+  }
+
+  .zoom-value {
+    background: rgba(13, 24, 40, 0.92) !important;
+    border-color: #3a4e6a !important;
+    color: #d5e3f7 !important;
+  }
+
+  .classic-loading {
+    background: rgba(4, 10, 20, 0.72);
+  }
+
+  .loading-card {
+    background: #101f33;
+    border-color: #30445f;
+    color: #d7e5f8;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.48);
+  }
+
+  /* ------------------------------------------------------------
+     EDITOR
+     ------------------------------------------------------------ */
+
+  .editor-screen {
+    background: #07101d;
+  }
+
+  .editor-topbar {
+    background:
+      radial-gradient(600px 100px at 100% 0%, rgba(20, 184, 166, 0.14), transparent 70%),
+      linear-gradient(180deg, #152439, #0e1a2b);
+    border-bottom-color: #30445f;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
+  }
+
+  .editor-title-wrap h1 {
+    color: #e3edff;
+  }
+
+  .editor-file-label {
+    color: #b3c7e2;
+  }
+
+  .editor-btn {
+    background: #14233a;
+    border-color: #344a67;
+    color: #d7e4f8;
+  }
+
+  .editor-btn:hover {
+    background: #1b2f4b;
+    border-color: #5577a8;
+  }
+
+  .editor-btn.is-active {
+    background: #1b3a68;
+    border-color: #79a2ff;
+    color: #e1ebff;
+    box-shadow: 0 0 0 2px rgba(121, 162, 255, 0.16);
+  }
+
+  .editor-sidebar {
+    background: #0c1727;
+    border-right-color: #293c58;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.22);
+  }
+
+  .editor-sidebar-head {
+    border-bottom-color: #25364f;
+  }
+
+  .editor-panel-kicker,
+  .editor-file-meta {
+    color: #7f94b2;
+  }
+
+  .editor-sidebar-head h2 {
+    color: #e0eaff;
+  }
+
+  .editor-sidebar-head .icon-btn {
+    background: #172740;
+  }
+
+  .editor-search {
+    color: #dce8f8;
+  }
+
+  .editor-search input {
+    background: #0b1728;
+    border-color: #31445f;
+    color: #dce8f8;
+  }
+
+  .editor-tree-tools {
+    border-bottom-color: #20314a;
+  }
+
+  .editor-tree-count {
+    color: #8298b7;
+  }
+
+  .editor-tree {
+    color: #c3d2e5;
+    scrollbar-color: #324762 #0b1727;
+  }
+
+  .tree-row {
+    color: #c8d6e8;
+  }
+
+  .tree-row:hover {
+    background: #14243a;
+  }
+
+  .tree-row.is-selected {
+    background: #183155;
+    box-shadow: inset 0 0 0 1px rgba(121, 162, 255, 0.3);
+  }
+
+  .tree-row-branch > .tree-label {
+    color: #e3ecfa;
+  }
+
+  .tree-row-user > .tree-label {
+    color: #c3a7ff;
+  }
+
+  .tree-toggle,
+  .tree-icon-btn,
+  .tree-row-action {
+    color: #8096b5;
+  }
+
+  .tree-toggle:hover,
+  .tree-icon-btn:hover,
+  .tree-row-action:hover {
+    background: #1b2e48;
+    color: #cfe0ff;
+  }
+
+  .tree-icon-btn[data-state="visible"] {
+    color: #a9c4ff;
+  }
+
+  .tree-color:hover {
+    background: #1b2e48;
+  }
+
+  .tree-user-pin {
+    color: #c3a7ff;
+  }
+
+  .editor-sidebar-foot {
+    background: #0a1524;
+    border-top-color: #23344c;
+    color: #9aadc6;
+  }
+
+  .editor-sidebar-foot b {
+    color: #d4e2f4;
+  }
+
+  .editor-map-column {
+    background: #0b1626;
+  }
+
+  .editor-map-toolbar {
+    background: rgba(15, 26, 43, 0.96);
+    border-bottom-color: #2c405b;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+  }
+
+  .switch-label {
+    color: #b6c6dc;
+  }
+
+  .switch-track {
+    background: #2a3b54;
+  }
+
+  .switch-track::after {
+    background: #dce8f8;
+  }
+
+  .switch input:checked + .switch-track {
+    background: #2e66c7;
+  }
+
+  .editor-map-hint,
+  .editor-map-viewport .map-tag {
+    color: #d7e4f6;
+  }
+
+  .draw-toolbar {
+    background: rgba(13, 24, 41, 0.97);
+    border-color: #2f435e;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.48);
+  }
+
+  .draw-tools {
+    border-right-color: #293b55;
+  }
+
+  .draw-btn {
+    background: #132239;
+    border-color: #30445f;
+    color: #c9d8ec;
+  }
+
+  .draw-btn:hover,
+  .draw-btn.is-active {
+    background: #1b3761;
+    border-color: #79a2ff;
+    color: #e0ebff;
+  }
+
+  .draw-color-wrap,
+  .draw-range-wrap,
+  .draw-check {
+    color: #a8bad2;
+  }
+
+  .color-popover {
+    background: #111f33;
+    border-color: #334864;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.55);
+  }
+
+  .color-grid {
+    background: transparent;
+  }
+
+  .color-custom {
+    border-top-color: #293c56;
+    color: #aebfd6;
+  }
+
+  .context-menu {
+    background: #111f33;
+    border-color: #334864;
+    box-shadow: 0 16px 42px rgba(0, 0, 0, 0.55);
+  }
+
+  .context-item {
+    color: #d4e2f4;
+  }
+
+  .context-item:hover {
+    background: #1b2e48;
+  }
+
+  .context-item.is-danger {
+    color: #ff9a9a;
+  }
+
+  .context-item.is-danger:hover {
+    background: #361b20;
+  }
+
+  .mark-label-input {
+    background: #0e1a2b;
+    border-color: #79a2ff;
+    color: #e6efff;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5);
+  }
+
+  .editor-new-dialog {
+    background: #0d1829;
+  }
+
+  .export-body .export-fieldset {
+    border-color: #2b3e59;
+    background: #0f1c2e;
+  }
+
+  .export-fieldset legend,
+  .radio-line,
+  .export-watermark .switch-label {
+    color: #c7d6e9;
+  }
+
+  .radio-line span {
+    color: #93a8c4;
+  }
+
+  .setup-select option {
+    background: #0c192a;
+    color: #e5eeff;
+  }
+
+  /* ------------------------------------------------------------
+     MAP OVERLAYS + RESULT CARD
+     ------------------------------------------------------------ */
+
+  .map-mark .mark-halo {
+    fill: #f7f4ec;
+    stroke: currentColor;
+  }
+
+  .map-mark .mark-label-bg {
+    fill: rgba(10, 20, 35, 0.94);
+    stroke: rgba(147, 174, 217, 0.35);
+  }
+
+  .map-mark .mark-label-text {
+    fill: #e7effc;
+  }
+
+  .map-mark[data-state="edit"] .mark-halo,
+  .map-mark[data-state="user"] .mark-halo {
+    fill: #15233b;
+  }
+
+  .puzzle-handle circle {
+    stroke: rgba(247, 190, 101, 0.25);
+  }
+
+  .puzzle-handle:hover circle {
+    stroke: rgba(247, 190, 101, 0.95) !important;
+  }
+
+  .print-sheet {
+    background: #fff;
+  }
+
+  /* ------------------------------------------------------------
+     LEGACY ATLAS FLOATING BUTTONS AND MISC
+     ------------------------------------------------------------ */
+
+  .btn-small.btn-primary {
+    background: linear-gradient(180deg, #3f7cf3, #2858d8);
+  }
+
+  .atlas-floating .btn-soft {
+    background: #1a2940;
+  }
+
+  .empty-state,
+  .atlas-empty,
+  .atlas-empty-list {
+    color: #96a9c2;
+  }
+
+  .progress-note-top {
+    color: #96a9c2;
+  }
+}

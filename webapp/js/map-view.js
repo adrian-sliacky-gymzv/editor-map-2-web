@@ -215,7 +215,20 @@ export class MapView {
     if (mode === 'replace') {
       for (const path of el.querySelectorAll('[data-replace-fill]')) {
         const base = path.getAttribute('data-base-fill') || '#ffffff';
-        path.setAttribute('fill', color === '#010101' ? base : color);
+        if (!path.hasAttribute('data-base-fill-opacity')) {
+          path.setAttribute('data-base-fill-opacity', path.getAttribute('fill-opacity') || '');
+        }
+        const baseOpacity = path.getAttribute('data-base-fill-opacity');
+        if (color === '#010101') {
+          path.setAttribute('fill', base);
+          if (baseOpacity) path.setAttribute('fill-opacity', baseOpacity);
+          else path.removeAttribute('fill-opacity');
+        } else {
+          path.setAttribute('fill', color);
+          // MapEntity.replaceColor() uses alphaOffset = 255, making the
+          // replacement fill fully opaque just like the original editor.
+          path.setAttribute('fill-opacity', '1');
+        }
       }
     } else if (mode === 'add') {
       for (const path of el.querySelectorAll('[data-base-fill], [data-base-stroke]')) {

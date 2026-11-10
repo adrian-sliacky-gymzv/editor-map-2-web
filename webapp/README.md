@@ -194,8 +194,31 @@ Aktuálne **31 testov, 31 passing**. Testy pokrývajú:
 - prítomnosť dát, náhľadov, modulov a pôvodnej pomoci.
 
 Lighthouse (mobilná emulácia): domovská obrazovka, nastavenie aktivity, hra,
-výsledková karta, editor aj atlas majú **100 Accessibility, 100 Best Practices,
-100 SEO a 100 Agentic Browsing**.
+výsledková karta, editor, atlas, export aj pôvodná pomoc majú **100
+Accessibility, 100 Best Practices, 100 SEO a 100 Agentic Browsing** — v svetlej
+aj tmavej téme.
+
+### Automatická tmavá téma
+
+- Aplikácia deklaruje `color-scheme: light dark` a nadväzuje na systémové
+  nastavenie `prefers-color-scheme`; samostatný `dark.css` sa načíta až po
+  `styles.css` a `classic.css`, takže prepisuje pôvodné svetlé komponenty.
+- V hlavičke sú dve `theme-color` metas (svetlá a tmavá), takže aj lišta
+  prehliadača na telefóne mení farbu spolu s témou.
+- Tmavý je celý aplikačný rám — domov, nastavenia, hra, výsledky, editor,
+  strom, toolbary, export, atlas, dialógy, formuláre, scrollbary aj pomoc.
+  Mapové plátno zostáva zámerne na svetlom papieri (`#ece7db`), aby pôvodné
+  farby máp zostali čitateľné.
+- Pôvodné inline `<font color>` hodnoty z `config.xml` dostávajú v tmavom
+  režime explicitné sémantické farby, inak by boli nečitateľné.
+- Všetkých šesť pôvodných help stránok je prepísaných do HTML5, má responzívny
+  viewport, `<main>`, meta description a rovnakú automatickú tmavú tému.
+- Tmavý režim bol overený aj s Chromom spusteným s
+  `--force-dark-mode --enable-features=WebContentsForceDark` na šírkach
+  320, 390 a 1280 px: domov, nastavenie, hra, výsledok, editor, atlas aj pomoc.
+  Kurátorovaná téma zostáva konzistentná aj vtedy, keď Chrome zapne vlastný
+  auto-dark.
+- Svetlý režim zostal bez zmeny pôvodných farieb.
 
 ### Stress test a QA
 
@@ -234,6 +257,7 @@ webapp/
 ├─ index.html
 ├─ styles.css                 – pôvodný moderný vizuál atlasu a rýchlej hry
 ├─ classic.css                – štýly klonu, editora a aktivít
+├─ dark.css                   – automatická tmavá téma podľa systému
 ├─ js/
 │  ├─ app.js                  – pôvodná mestská hra + atlas + štatistiky
 │  ├─ cities.js               – 74 miest s pôvodnými súradnicami

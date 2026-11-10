@@ -108,3 +108,28 @@ a:hover {
 	color: #004C7F;
 	font-style: italic;
 }
+
+/* Web app integration: responsive help + automatic dark mode */
+html { color-scheme: light dark; }
+body { color: #1f2937; background: #ffffff; }
+img { max-width: 100%; height: auto; }
+
+@media (max-width: 700px) {
+	body { margin: 12px; }
+	.scrshot, .toplogo { float: none; max-width: 100%; margin: 10px 0; }
+	.scrshot p { text-align: left; }
+	.topmenu { line-height: 1.9; }
+}
+
+@media (prefers-color-scheme: dark) {
+	html { color-scheme: dark; }
+	body { background: #0b1220; color: #c9d7e8; }
+	h1 { color: #ff9a9a; }
+	h2, h3 { color: #a9c4ff; }
+	a, .buttonref, .toplogo p { color: #9ab7ff; }
+	a:hover { color: #c4d6ff; }
+	.topmenu { border-color: #344966; background: #0f1b2c; }
+	.topmenu a { color: #ffb0b0; }
+	.topmenu a:hover { color: #ffd0d0; }
+	.scrshot { border-color: #3a4e6a; background: #0f1a2a; }
+}
