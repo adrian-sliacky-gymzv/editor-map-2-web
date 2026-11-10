@@ -82,8 +82,14 @@ input {
   font: inherit;
 }
 
-button {
+button,
+a,
+input,
+select,
+textarea,
+label {
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 :focus-visible {
@@ -1832,6 +1838,95 @@ button {
   color: #12226e;
 }
 
+.map-next-float {
+  position: absolute;
+  left: 50%;
+  bottom: max(72px, calc(env(safe-area-inset-bottom) + 64px));
+  z-index: 8;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 20px;
+  border: 1px solid #1d4ed8;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #3b82f6, #1d4ed8);
+  color: #fff;
+  font: 800 14px var(--font);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.35);
+  transform: translateX(-50%);
+  cursor: pointer;
+}
+
+.map-next-float.is-top {
+  top: 16px;
+  bottom: auto;
+}
+
+.map-next-float:active {
+  transform: translateX(-50%) scale(0.97);
+}
+
+.distance-guide {
+  stroke: #475569;
+  stroke-width: 2;
+  stroke-dasharray: 6 5;
+  opacity: 0.8;
+  vector-effect: non-scaling-stroke;
+}
+
+.guess-label-text {
+  font-family: Tahoma, Arial, sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+@media (max-width: 700px) {
+  .map-next-float:not([hidden]) {
+    display: inline-flex;
+  }
+}
+
+@media (pointer: coarse) {
+  .zoom-btn {
+    width: 46px;
+    height: 46px;
+    font-size: 23px;
+  }
+
+  .classic-map-viewport .zoom-value {
+    min-width: 52px;
+    min-height: 46px;
+    display: grid;
+    place-items: center;
+  }
+
+  .win-btn {
+    min-height: 44px;
+    padding-inline: 12px;
+  }
+
+  .icon-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .dialog-x {
+    width: 40px;
+    height: 40px;
+  }
+
+  .link-btn {
+    padding-block: 10px;
+  }
+
+  .chip {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
 /* --- SVG markers: shared ------------------------------------- */
 
 .marker-target circle,
@@ -2564,5 +2659,28 @@ button {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* Keep the last touch-specific overrides after all width queries. */
+@media (pointer: coarse) {
+  .win-btn {
+    min-height: 44px;
+    padding-inline: 12px;
+  }
+
+  .dialog-x {
+    width: 40px;
+    height: 40px;
+  }
+
+  .link-btn {
+    padding-block: 12px;
+  }
+
+  .filter-chips .chip {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
   }
 }

@@ -87,6 +87,23 @@ aplikáciu otvoríš aj z telefónu na rovnakej Wi-Fi; adresu vypíše do konzol
 > Aplikáciu nespúšťaj cez `file://` — ES moduly, fetch a SVG scény vyžadujú
 > HTTP server.
 
+### GitHub Pages
+
+Repozitár obsahuje hotový workflow `.github/workflows/pages.yml`, ktorý
+publikuje obsah priečinka `webapp/` ako statickú stránku:
+
+1. V GitHub repozitári otvor **Settings → Pages**.
+2. Ako **Source** vyber **GitHub Actions**.
+3. Pushni do vetvy `master` alebo `main`; workflow `Deploy to GitHub Pages`
+   nahrá `webapp/` a zverejní ho.
+
+Všetky cesty sú relatívne, `manifest.webmanifest` používa `start_url: "./"`,
+priečinok obsahuje `.nojekyll` a `404.html`. Aplikácia preto funguje aj pod
+repozitárovou podcestou, napríklad
+`https://používateľ.github.io/Editor_map_GEG/`. Overené aj servovaním z
+`/Editor_map_GEG/webapp/`: všetky CSS, JS, dáta, mapy, manifest aj pomoc sa
+načítajú s HTTP 200 a hry fungujú. GitHub Pages nepotrebuje `server.mjs`.
+
 ## Ako hrať
 
 ### Vyskúšaj sa!
@@ -98,8 +115,11 @@ dostupných objektov v zvolenom teste.
 
 ### Traf sa!
 
-Klikni na mapu tam, kde si myslíš, že objekt leží. Zobrazí sa tvoj tip a správna
-poloha. Body sa počítajú pôvodnou formulou; skóre pod 5 bodov sa mení na 0.
+Ťukni alebo klikni na mapu tam, kde si myslíš, že objekt leží. Ihneď sa zobrazí
+červený tip, zelená správna poloha, spojnica a oba názvy. Body sa počítajú
+pôvodnou formulou; skóre pod 5 bodov sa mení na 0. Hra nevyžaduje potvrdenie
+tipu, takže tok zostáva rýchly; náhodné odpovede pri pinchi alebo posune
+zachytáva gestový filter.
 
 ### Poskladaj!
 
@@ -114,6 +134,31 @@ mapa; cez **Nová** vyberieš inú z ôsmich máp. Vľavo je strom objektov, vpr
 mapa. Kliknutím na oko meníš viditeľnosť, na pin viditeľnosť značky, na farebný
 štvorec farbu. Tlačidlom **+** pridáš vlastnú značku. Kreslenie zapneš tlačidlom
 **Kreslenie**.
+
+## Ovládanie a gestá
+
+Mapy sa ovládajú rovnako v hrách aj v editore:
+
+- **Jeden prst / ťahanie myšou** posúva mapu, keď je priblížená. Pri mierke
+  „celá mapa“ sa mapa neposúva, takže sa nič nehýbe omylom.
+- **Dva prsty** plynulo približujú a zároveň posúvajú mapu. Zoom je ukotvený
+  na stred medzi prstami, takže obsah pod prstami neujíde.
+- **Dvojité ťuknutie alebo dvojklik** priblíži mapu na približne 2,4× v mieste
+  dotyku. Druhé dvojité ťuknutie vráti celú mapu.
+- **Koliesko myši / trackpad** zoomuje plynulo okolo kurzora; `Ctrl` + koliesko
+  (pinch na trackpade) pracuje rovnako.
+- **Tlačidlá + / − / domov** a zobrazené percento sú vždy poruke. Na telefóne
+  majú 46 px a sú v jednom rade, aby neprekážali.
+- **Klávesy** `+`, `−` a `0` fungujú v hre aj v editore.
+- Po pinchi, posune alebo dvojitom ťuknutí sa koncový dotyk **nikdy
+  nevyhodnotí ako odpoveď**. Ťuknutie na ovládací prvok mapy tiež nikdy
+  neodpovedá. Pri testovacích značkách musí byť dotyk skutočný tap, nie
+  potiahnutie.
+- Každá nová otázka začne na celom výreze mapy; pri „Traf sa!“ sa výsledok
+  automaticky oddiali, ak by tip alebo správna poloha boli mimo obrazovky.
+
+Pri hrách sa po odpovedi na telefóne objaví plávajúce tlačidlo **Ďalej** nad
+ovládaním mapy, takže sa nemusíš naťahovať na hornú lištu.
 
 ## Bodovanie a pravidlá
 
@@ -182,21 +227,35 @@ Počas vývoja bolo overené:
 npm test
 ```
 
-Aktuálne **31 testov, 31 passing**. Testy pokrývajú:
+Aktuálne **61 testov, 61 passing**. Testy pokrývajú:
 
 - pôvodné bodovanie a prahy,
 - výber otázok bez opakovania,
 - puzzle toleranciu,
-- atlas a štatistiky,
+- atlas, štatistiky a tréning slabých miest,
+- matematiku pinchu, dvojitého ťuknutia, kolieska a ukotvenia zoomu,
 - prítomnosť všetkých 8 máp a presnú zhodu objektov medzi `.mef` a scénami,
 - existenciu všetkých testovacích skupín z `config.xml`,
 - zoznamy máp pre jednotlivé aktivity,
-- prítomnosť dát, náhľadov, modulov a pôvodnej pomoci.
+- prítomnosť dát, náhľadov, modulov a pôvodnej pomoci,
+- relatívne cesty, manifest, help stránky a GitHub Pages workflow.
 
 Lighthouse (mobilná emulácia): domovská obrazovka, nastavenie aktivity, hra,
 výsledková karta, editor, atlas, export aj pôvodná pomoc majú **100
 Accessibility, 100 Best Practices, 100 SEO a 100 Agentic Browsing** — v svetlej
 aj tmavej téme.
+
+### Dark Reader a ďalšie tmavé rozšírenia
+
+- Aplikácia má vlastnú automatickú tému, takže nepotrebuje „dark reader lock“.
+- Overené s **Dark Reader 4.9.135** v dynamickom režime, na svetlom aj tmavom
+  systémovom nastavení: domov, nastavenia, hry, výsledky, editor, atlas aj
+  pôvodná pomoc zostávajú čitateľné.
+- SVG štítky značiek používajú pri aktívnom Dark Readeri konzervatívny
+  `revert-layer` s explicitnými SVG farbami; bez rozšírenia zostáva pôvodná
+  svetlá/tmavá paleta bez zmeny.
+- Tmavé rozšírenie môže podľa svojho nastavenia stmaviť aj mapový podklad;
+  aplikácia sa tomu nebráni, ale štítky, ovládanie a text zostávajú čitateľné.
 
 ### Automatická tmavá téma
 
@@ -250,11 +309,34 @@ Počas testu boli opravené konkrétne problémy:
   otázok 1,
 - dočasné editačné inputy majú stabilné `id`/`name` a čistú konzolu.
 
+Následný mobilný a gestový audit pridal:
+
+- plynulý dvojprstový pinch s posunom stredu a ukotvením zoomu,
+- ochranu proti náhodnej odpovedi po pinchi, posune, dvojitom ťuknutí aj
+  ťuknutí na ovládanie mapy,
+- dvojité ťuknutie/dvojklik na priblíženie a návrat celej mapy,
+- väčšie dotykové plochy značiek (44 px), zoom tlačidiel (46 px) a tlačidiel
+  akcií (44 px),
+- mobilné plávajúce **Ďalej** a reset výrezu na celú mapu pri novej otázke,
+- automatické oddialenie Traf-sa výsledku, ak je tip alebo cieľ mimo obrazovky,
+- tap-safe puzzle drag (samotné ťuknutie objekt neodošle),
+- opravu svetlých štítkov značiek, ktoré predtým v svetlom režime splývali
+  s pozadím,
+- kompatibilitu s Dark Readerom cez `revert-layer` pre SVG štítky,
+- kompaktný editor toolbar na 320 px a v krátkom landscape režime,
+- relatívne cesty, `.nojekyll`, `404.html` a GitHub Pages workflow.
+
+Overené bolo 22 kombinácií aktivita × mapa, 8 máp editora, reálne dotykové
+gestá cez CDP (`touchStart`/`touchMove`/`touchEnd`), šírky 320, 390, 568
+(landscape), 768, 1024 a 1280 px, Dark Reader 4.9.135, forced-dark Chromium,
+GitHub Pages podcesta a finálne Lighthouse audity.
+
 ## Štruktúra
 
 ```text
 webapp/
 ├─ index.html
+├─ 404.html                   – GitHub Pages fallback
 ├─ styles.css                 – pôvodný moderný vizuál atlasu a rýchlej hry
 ├─ classic.css                – štýly klonu, editora a aktivít
 ├─ dark.css                   – automatická tmavá téma podľa systému
@@ -263,10 +345,11 @@ webapp/
 │  ├─ cities.js               – 74 miest s pôvodnými súradnicami
 │  ├─ scoring.js              – pôvodné mestské bodovanie
 │  ├─ modes.js                – kvíz, puzzle, filtre, štatistiky
+│  ├─ map-gestures.js         – testovateľná matematika pinchu a zoomu
 │  ├─ classic.js              – vstupný bod klonu + deep linky
 │  ├─ classic-data.js         – config.xml, .mef, XML helpery, skupiny
 │  ├─ classic-ui.js           – overlaye, toasty, potvrdenia
-│  ├─ map-view.js             – spoločný renderer máp, značiek a kresieb
+│  ├─ map-view.js             – spoločný renderer máp, značiek a gest
 │  ├─ classic-activities.js   – Vyskúšaj sa!, Traf sa!, Poskladaj!
 │  └─ editor.js               – strom, farby, značky, kreslenie, súbory, export
 ├─ data/
@@ -284,11 +367,17 @@ webapp/
 ├─ tests/
 │  ├─ scoring.test.mjs
 │  ├─ modes.test.mjs
-│  └─ clone.test.mjs
-├─ server.mjs
+│  ├─ clone.test.mjs
+│  ├─ practice-stats.test.mjs
+│  ├─ map-gestures.test.mjs
+│  └─ deployment.test.mjs
+├─ .nojekyll                  – vypne Jekyll na GitHub Pages
+├─ server.mjs                 – voliteľný lokálny/LAN server
 ├─ manifest.webmanifest
 └─ README.md
 ```
+
+Deploy workflow je v `.github/workflows/pages.yml`.
 
 ## Deep linky (bonus)
 

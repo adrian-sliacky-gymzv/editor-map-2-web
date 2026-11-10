@@ -20,6 +20,7 @@ import {
   averageStats,
   mergeStats,
 } from './modes.js';
+import { tapSlop } from './map-gestures.js';
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
@@ -31,7 +32,7 @@ const OLD_SETTINGS_KEY = 'trafSa.settings.v1';
 const MAX_ZOOM = 6;
 const MIN_ZOOM = 1;
 const TAP_MOVE_LIMIT = 8;
-const QUIZ_HIT_PX = 22;
+const QUIZ_HIT_PX = 26;
 const PUZZLE_TOLERANCE_PX = 20;
 const PUZZLE_MIN_TOLERANCE = 15;
 
@@ -88,6 +89,7 @@ const dom = {
   qnum: $('#qnum'),
   questionText: $('#questionText'),
   nextBtn: $('#nextBtn'),
+  nextFloat: $('#gameNextFloat'),
   endBtn: $('#endBtn'),
   progressFill: $('#progressFill'),
   scoreDistanceRow: $('#scoreDistanceRow'),
@@ -451,7 +453,32 @@ function showScreen(name) {
   dom.atlasScreen.hidden = name !== 'atlas';
   dom.gameScreen.hidden = name !== 'game';
   document.body.classList.toggle('game-active', name !== 'home');
+  syncNextFloat();
   if (name === 'game') requestAnimationFrame(() => layoutMap());
+}
+
+function syncNextFloat() {
+  if (!dom.nextFloat || !dom.nextBtn) return;
+  const visible = state.screen === 'game' && !dom.nextBtn.disabled && !dom.nextBtn.hidden && !state.final;
+  dom.nextFloat.hidden = !visible;
+  if (visible) requestAnimationFrame(positionNextFloat);
+}
+
+function positionNextFloat() {
+  if (!dom.nextFloat || dom.nextFloat.hidden) return;
+  const viewport = dom.mapViewport.getBoundingClientRect();
+  const markers = [...dom.markers.querySelectorAll('.marker-correct, .marker-guess')]
+    .map((marker) => marker.getBoundingClientRect())
+    .filter((rect) => rect.width || rect.height);
+  if (!markers.length) {
+    dom.nextFloat.classList.remove('is-top');
+    return;
+  }
+  const topZone = viewport.top + Math.min(150, viewport.height * 0.28);
+  const bottomZone = viewport.bottom - Math.min(170, viewport.height * 0.32);
+  const nearTop = markers.filter((rect) => rect.top < topZone).length;
+  const nearBottom = markers.filter((rect) => rect.top > bottomZone).length;
+  dom.nextFloat.classList.toggle('is-top', nearBottom > nearTop);
 }
 
 function resetGameState() {
@@ -1053,7 +1080,7 @@ function updateMarkerScale() {
 
 /* --- distance markers --------------------------------------------- */
 
-function makeRedMarker(x, y) {
+function makeRedMarker(x, y, label = 'Tvoj tip') {
   const group = svgElement('g', { class: 'marker marker-guess' });
   group.dataset.x = x;
   group.dataset.y = y;
@@ -1088,6 +1115,38 @@ function makeRedMarker(x, y) {
     },
     group
   );
+
+  const labelText = svgElement(
+    'text',
+    {
+      class: 'guess-label-text',
+      x: 8,
+      y: 17,
+      fill: '#7f1d1d',
+      'font-family': 'Tahoma, Arial, sans-serif',
+      'font-size': 10.5,
+      'text-anchor': 'start',
+    },
+    group
+  );
+  labelText.textContent = label;
+  const width = Math.max(12, labelText.getComputedTextLength ? labelText.getComputedTextLength() : label.length * 6);
+  const plate = svgElement(
+    'rect',
+    {
+      class: 'guess-label-bg',
+      x: -3,
+      y: 6,
+      width: width + 12,
+      height: 16,
+      rx: 3,
+      fill: '#ffffff',
+      stroke: '#b91c1c',
+      'stroke-width': 1,
+    },
+    group
+  );
+  group.insertBefore(plate, labelText);
 
   return group;
 }
@@ -1146,10 +1205,18 @@ function makeGreenMarker(x, y, label) {
 
 function drawDistanceMarkers(guess, target) {
   clearMarkers();
+  const guide = svgElement('line', {
+    class: 'distance-guide',
+    x1: guess.x,
+    y1: guess.y,
+    x2: target.x,
+    y2: target.y,
+  });
+  dom.markers.appendChild(guide);
   const green = makeGreenMarker(target.x, target.y, target.label);
   dom.markers.appendChild(green);
   sizeGreenLabel(green, target);
-  const red = makeRedMarker(guess.x, guess.y);
+  const red = makeRedMarker(guess.x, guess.y, 'Tvoj tip');
   dom.markers.appendChild(red);
   state.markerGroups = [green, red];
   updateMarkerScale();
@@ -1460,7 +1527,18 @@ function finishPuzzleVisual(drop, target, correct) {
 
 function bindGameEvents() {
   dom.nextBtn.addEventListener('click', onNext);
+  dom.nextFloat?.addEventListener('click', () => {
+    if (!dom.nextBtn.disabled) dom.nextBtn.click();
+  });
   dom.endBtn.addEventListener('click', onEnd);
+  if (dom.nextBtn) {
+    new MutationObserver(syncNextFloat).observe(dom.nextBtn, {
+      attributes: true,
+      attributeFilter: ['disabled', 'hidden'],
+    });
+  }
+  window.addEventListener('resize', () => requestAnimationFrame(positionNextFloat));
+  syncNextFloat();
 }
 
 /* ------------------------------------------------------------------ */
@@ -1523,7 +1601,7 @@ function onMapHover(event) {
 
 function onPointerDown(event) {
   if (state.screen !== 'game') return;
-  if (event.target.closest('.zoom-controls')) return;
+  if (event.target.closest('.zoom-controls, .map-next-float, button, a, input, select, textarea')) return;
   if (event.target.closest('.puzzle-token')) return;
   if (event.pointerType === 'mouse' && event.button !== 0) return;
 
@@ -1545,6 +1623,7 @@ function onPointerDown(event) {
       startY: event.clientY,
       lastX: event.clientX,
       lastY: event.clientY,
+      slop: tapSlop(event.pointerType),
       moved: false,
     };
   } else if (state.pointers.size === 2) {
@@ -1600,7 +1679,10 @@ function onPointerMove(event) {
     state.drag.lastX = event.clientX;
     state.drag.lastY = event.clientY;
 
-    if (travelled > TAP_MOVE_LIMIT) state.drag.moved = true;
+    if (travelled > (state.drag.slop ?? TAP_MOVE_LIMIT)) {
+      state.drag.moved = true;
+      state.suppressTap = true;
+    }
 
     if (state.drag.moved && state.view.zoom > 1) {
       state.view = clampView({

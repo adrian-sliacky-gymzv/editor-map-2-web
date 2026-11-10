@@ -208,11 +208,66 @@ body.editor-tree-open {
 }
 
 .map-mark .mark-halo {
+  fill: #fff;
+  stroke: currentColor;
+  stroke-width: 1.5;
   vector-effect: non-scaling-stroke;
+}
+
+.map-mark .mark-label-bg {
+  fill: rgba(255, 255, 255, 0.94);
+  stroke: rgba(15, 23, 42, 0.16);
+  stroke-width: 1;
+}
+
+.map-mark .mark-label-text {
+  fill: #0f172a;
+  font: 600 11.5px/1 "Segoe UI", system-ui, sans-serif;
+  dominant-baseline: middle;
+}
+
+/* Dark Reader treats SVG fills as foreground colours and can make a label
+   dark-on-dark. `revert-layer` makes it fall back to the explicit SVG
+   presentation attributes below; this is Dark Reader's documented escape
+   hatch and only applies while the extension is active. */
+html[data-darkreader-scheme] .map-mark .mark-label-bg,
+html[data-darkreader-scheme] .map-mark .mark-label-text,
+html[data-darkreader-scheme] .map-mark .mark-halo,
+html[data-darkreader-mode] .map-mark .mark-label-bg,
+html[data-darkreader-mode] .map-mark .mark-label-text,
+html[data-darkreader-mode] .map-mark .mark-halo {
+  fill: revert-layer !important;
+}
+
+html[data-darkreader-scheme] .map-mark .mark-label-bg,
+html[data-darkreader-mode] .map-mark .mark-label-bg {
+  stroke: revert-layer !important;
+}
+
+html[data-darkreader-scheme] .guess-label-bg,
+html[data-darkreader-scheme] .guess-label-text,
+html[data-darkreader-scheme] .marker-correct .label-bg,
+html[data-darkreader-scheme] .marker-correct .label-text,
+html[data-darkreader-mode] .guess-label-bg,
+html[data-darkreader-mode] .guess-label-text,
+html[data-darkreader-mode] .marker-correct .label-bg,
+html[data-darkreader-mode] .marker-correct .label-text {
+  fill: revert-layer !important;
+}
+
+.map-mark .mark-glyph {
+  color: currentColor;
 }
 
 .map-mark .mark-label {
   filter: drop-shadow(0 2px 3px rgba(15, 23, 42, 0.12));
+}
+
+.map-guide {
+  stroke: #3f4f66;
+  stroke-width: 2;
+  stroke-dasharray: 6 5;
+  opacity: 0.82;
 }
 
 .map-mark[data-state="ask"] .mark-halo {
@@ -1109,6 +1164,51 @@ body.editor-tree-open {
   }
 }
 
+@media (pointer: coarse) {
+  .map-mark .mark-hit {
+    r: 22px;
+  }
+
+  .tree-row {
+    min-height: 44px;
+  }
+
+  .tree-toggle,
+  .tree-icon-btn,
+  .tree-row-action,
+  .tree-color {
+    width: 34px;
+    height: 34px;
+  }
+
+  .tree-toggle-spacer {
+    width: 34px;
+    height: 34px;
+  }
+
+  .tree-toggle svg,
+  .tree-icon-btn svg,
+  .tree-row-action svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .editor-btn {
+    min-height: 38px;
+    padding-inline: 12px;
+  }
+
+  .editor-view-tools .zoom-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .draw-btn {
+    width: 40px;
+    height: 40px;
+  }
+}
+
 .tree-user-pin {
   display: inline-grid;
   place-items: center;
@@ -1391,6 +1491,15 @@ body.editor-tree-open {
   .editor-actions {
     flex-basis: 100%;
     justify-content: flex-start;
+    flex-wrap: wrap;
+    overflow: visible;
+    padding-bottom: 4px;
+  }
+
+  .editor-actions .editor-btn {
+    flex: 0 0 auto;
+    padding-inline: 8px;
+    font-size: 11px;
   }
 
   .editor-file-label {
@@ -1603,8 +1712,9 @@ body.editor-tree-open {
   }
 
   .classic-map-viewport .zoom-controls {
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
   }
 }
 
@@ -1618,12 +1728,54 @@ body.editor-tree-open {
   }
 
   .classic-map-viewport .zoom-btn {
-    width: 36px;
-    height: 36px;
-    font-size: 18px;
+    width: 42px;
+    height: 42px;
+    font-size: 19px;
   }
 
   .classic-map-viewport .zoom-value {
+    display: grid;
+    min-width: 48px;
+    min-height: 42px;
+    place-items: center;
+  }
+}
+
+@media (pointer: coarse) {
+  .classic-map-viewport .zoom-btn {
+    width: 46px;
+    height: 46px;
+    font-size: 21px;
+  }
+
+  .classic-map-viewport .zoom-value {
+    min-width: 54px;
+    min-height: 46px;
+  }
+}
+
+/* Short landscape phones: keep the editor toolbar in one row so the map
+   still has usable height. */
+@media (max-height: 430px) and (max-width: 900px) {
+  .editor-map-toolbar {
+    flex-wrap: nowrap;
+    min-height: 46px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .editor-map-toolbar::-webkit-scrollbar {
     display: none;
+  }
+
+  .editor-view-toggles {
+    width: auto;
+    flex: 1 0 auto;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+  }
+
+  .editor-map-viewport {
+    inset: 47px 0 0 0;
   }
 }

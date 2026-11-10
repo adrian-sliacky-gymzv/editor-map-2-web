@@ -21,6 +21,7 @@ import {
 } from './classic-data.js';
 import { MapView } from './map-view.js';
 import { practiceStats } from './practice-stats.js';
+import { tapSlop } from './map-gestures.js';
 import { FORMAT_LABELS, answerSuccess } from './practice-stats-core.js';
 import {
   $,
@@ -141,6 +142,7 @@ export async function initActivities() {
   bindSetupEvents();
   bindGameEvents();
   bindResultEvents();
+  watchNextState();
   document.addEventListener('click', (event) => {
     const trigger = event.target.closest('[data-classic-mode]');
     if (trigger) {
@@ -178,6 +180,7 @@ function cacheDom() {
   dom.qnum = $('#classicQnum');
   dom.question = $('#classicQuestion');
   dom.next = $('#classicNextBtn');
+  dom.nextFloat = $('#classicNextFloat');
   dom.end = $('#classicEndBtn');
   dom.progress = $('#classicProgressFill');
   dom.scoreDistance = $('#classicScoreDistanceRow');
@@ -577,12 +580,10 @@ export async function startActivityGame(params) {
   dom.timeValue.textContent = '00:00';
   dom.scoreDistance.hidden = params.mode !== 'distance';
   dom.scoreCounts.hidden = params.mode === 'distance';
-  dom.hint.textContent = params.mode === 'distance'
-    ? 'Klikni na mapu'
-    : params.mode === 'puzzle'
-      ? 'Potiahni žltý objekt na správne miesto'
-      : 'Klikni na správnu značku';
   dom.zoomValue.textContent = '100%';
+  dom.mapViewportWrap.classList.remove('is-answered');
+  showMapHint();
+  syncNextFloat();
 
   try {
     const [doc, scene] = await Promise.all([
@@ -658,7 +659,55 @@ function showClassicScreen() {
   document.body.classList.remove('game-active');
   document.body.classList.add('classic-active');
   dom.classicScreen.focus?.();
+  syncNextFloat();
   window.scrollTo({ top: 0 });
+}
+
+function showMapHint() {
+  if (!dom.hint) return;
+  dom.hint.hidden = false;
+  if (GAME.mode === 'distance' || (GAME.mode === 'practice' && GAME.practiceFormat === 'distance')) {
+    dom.hint.textContent = 'Klikni na miesto na mape';
+  } else if (GAME.mode === 'puzzle' || (GAME.mode === 'practice' && GAME.practiceFormat === 'puzzle')) {
+    dom.hint.textContent = 'Potiahni žltý objekt na správne miesto';
+  } else {
+    dom.hint.textContent = 'Klikni na správnu značku';
+  }
+}
+
+function hideMapHint() {
+  if (dom.hint) dom.hint.hidden = true;
+}
+
+function syncNextFloat() {
+  if (!dom.nextFloat || !dom.next) return;
+  const visible = !dom.next.disabled && !dom.next.hidden && !dom.classicScreen?.hidden && !GAME.finalShown;
+  dom.nextFloat.hidden = !visible;
+  if (visible) requestAnimationFrame(positionNextFloat);
+}
+
+function positionNextFloat() {
+  if (!dom.nextFloat || dom.nextFloat.hidden || !GAME.mapView) return;
+  const points = [...GAME.marks.values()]
+    .filter((mark) => mark.labelVisible)
+    .map((mark) => GAME.mapView.mapToScreen(mark.x, mark.y));
+  if (!points.length) {
+    dom.nextFloat.classList.remove('is-top');
+    return;
+  }
+  const rect = dom.mapViewportWrap.getBoundingClientRect();
+  const topZone = rect.top + Math.min(150, rect.height * 0.28);
+  const bottomZone = rect.bottom - Math.min(170, rect.height * 0.32);
+  const nearTop = points.filter((point) => point.y < topZone).length;
+  const nearBottom = points.filter((point) => point.y > bottomZone).length;
+  dom.nextFloat.classList.toggle('is-top', nearBottom > nearTop);
+}
+
+function watchNextState() {
+  if (!dom.next || !dom.nextFloat) return;
+  const observer = new MutationObserver(syncNextFloat);
+  observer.observe(dom.next, { attributes: true, attributeFilter: ['disabled', 'hidden'] });
+  syncNextFloat();
 }
 
 function setLoading(visible, text = 'Načítavam…') {
@@ -839,6 +888,9 @@ function nextTestQuestion() {
   clearMarks();
   hideCandidates();
   GAME.candidates = [];
+  dom.mapViewportWrap.classList.remove('is-answered');
+  showMapHint();
+  GAME.mapView.fit();
 
   const group = nextTestGroup();
   if (!group) {
@@ -900,6 +952,8 @@ function nextTestGroup() {
 function answerTestQuestion(clickedNode) {
   if (!GAME.active || GAME.answered) return;
   GAME.answered = true;
+  dom.mapViewportWrap.classList.add('is-answered');
+  hideMapHint();
   const correct = clickedNode === GAME.targetNode;
   for (const mark of GAME.marks) {
     if (mark.meta.node === GAME.targetNode) {
@@ -958,6 +1012,7 @@ function showTestFinal() {
   GAME.finalShown = true;
   GAME.active = false;
   stopClock();
+  hideMapHint();
   // The original leaves the last question's marks and shapes on screen.
   setQuestionNumber(0);
   const percent = Math.round((GAME.correct / GAME.numQ) * 100);
@@ -1007,6 +1062,9 @@ function nextDistanceQuestion() {
   GAME.finalShown = false;
   GAME.questionIndex += 1;
   clearMarks();
+  dom.mapViewportWrap.classList.remove('is-answered');
+  showMapHint();
+  GAME.mapView.fit();
   const targetIndex = GAME.distanceSeq[GAME.questionIndex - 1];
   const target = GAME.distancePool[targetIndex];
   GAME.targetNode = target;
@@ -1027,6 +1085,8 @@ function onDistanceClick(point) {
   if (!GAME.active || GAME.answered) return;
   if (GAME.mode !== 'distance' && !(GAME.mode === 'practice' && GAME.practiceFormat === 'distance')) return;
   GAME.answered = true;
+  dom.mapViewportWrap.classList.add('is-answered');
+  hideMapHint();
   const target = GAME.targetNode;
   const targetX = getNumberAttr(target, 'markX');
   const targetY = getNumberAttr(target, 'markY');
@@ -1048,7 +1108,7 @@ function onDistanceClick(point) {
     label: 'Tvoj tip',
     symbol: 'town',
     state: 'incorrect',
-    labelVisible: false,
+    labelVisible: true,
   });
   GAME.mapView.addMark({
     x: targetX,
@@ -1058,6 +1118,8 @@ function onDistanceClick(point) {
     state: 'correct',
     labelVisible: true,
   });
+  GAME.mapView.addGuide({ x1: point.x, y1: point.y, x2: targetX, y2: targetY });
+  GAME.mapView.ensurePointsVisible([point, { x: targetX, y: targetY }]);
 
   const answer = distanceAnswerFor(score);
   setQuestionHtml(answer.html);
@@ -1101,6 +1163,7 @@ function showDistanceFinal() {
   GAME.finalShown = true;
   GAME.active = false;
   stopClock();
+  hideMapHint();
   // Keep the final guess and correct position visible for review.
   setQuestionNumber(0);
   const percent = Math.round(GAME.totalScore / GAME.numQ);
@@ -1150,6 +1213,9 @@ function nextPuzzleQuestion() {
   GAME.questionIndex += 1;
   removePuzzleHandle();
   clearMarks();
+  dom.mapViewportWrap.classList.remove('is-answered');
+  showMapHint();
+  GAME.mapView.fit();
 
   if (GAME.puzzlePrevious && GAME.puzzlePrevious.wasIncorrect) {
     GAME.mapView.setEntityColor(GAME.puzzlePrevious.entity, '#ff7777');
@@ -1233,6 +1299,11 @@ function createPuzzleHandle(entityName, targetNode) {
   const move = (event) => {
     if (!drag) return;
     event.preventDefault();
+    if (!drag.moved) {
+      const travelled = Math.hypot(event.clientX - drag.startClientX, event.clientY - drag.startClientY);
+      if (travelled <= tapSlop(event.pointerType)) return;
+      drag.moved = true;
+    }
     const pt = GAME.mapView.toMapPoint(event.clientX, event.clientY);
     GAME.mapView.setEntityTranslation(entityName, drag.origX + pt.x - drag.startX, drag.origY + pt.y - drag.startY);
     const newBox = GAME.mapView.entityBBox(entityName);
@@ -1258,9 +1329,16 @@ function createPuzzleHandle(entityName, targetNode) {
   const finish = (event) => {
     if (!drag) return;
     event.preventDefault();
+    const moved = drag.moved;
+    const cancelled = event.type === 'pointercancel';
     cleanup();
     circle.style.cursor = 'grab';
     circle.style.stroke = 'rgba(202, 138, 4, 0)';
+    if (cancelled) return;
+    if (!moved) {
+      announce('Objekt sa neposunul. Potiahni ho na správne miesto.');
+      return;
+    }
     answerPuzzle(targetNode);
   };
   const start = (event) => {
@@ -1272,6 +1350,9 @@ function createPuzzleHandle(entityName, targetNode) {
     drag = {
       startX: pt.x,
       startY: pt.y,
+      startClientX: event.clientX,
+      startClientY: event.clientY,
+      moved: false,
       origX: GAME.mapView.entityPosition(entityName).x,
       origY: GAME.mapView.entityPosition(entityName).y,
     };
@@ -1299,6 +1380,8 @@ function removePuzzleHandle() {
 function answerPuzzle(targetNode) {
   if (!GAME.active || GAME.answered) return;
   GAME.answered = true;
+  dom.mapViewportWrap.classList.add('is-answered');
+  hideMapHint();
   removePuzzleHandle();
 
   const key = nodeEntity(targetNode);
@@ -1358,6 +1441,7 @@ function showPuzzleFinal() {
   GAME.finalShown = true;
   GAME.active = false;
   stopClock();
+  hideMapHint();
   removePuzzleHandle();
   clearMarks();
   if (GAME.puzzlePrevious && GAME.puzzlePrevious.wasIncorrect) {
@@ -1398,22 +1482,26 @@ function showPuzzleFinal() {
 /* next / end                                                                */
 /* ------------------------------------------------------------------------- */
 
+function advanceGame() {
+  if (!GAME.active && !GAME.finalShown) return;
+  if (GAME.finalShown) return;
+  if (!GAME.answered) return;
+  if (GAME.mode === 'test') {
+    if (GAME.questionIndex >= GAME.numQ) showTestFinal();
+    else nextTestQuestion();
+  } else if (GAME.mode === 'distance') {
+    if (GAME.questionIndex >= GAME.numQ) showDistanceFinal();
+    else nextDistanceQuestion();
+  } else if (GAME.mode === 'puzzle') {
+    if (GAME.questionIndex >= GAME.numQ) showPuzzleFinal();
+    else nextPuzzleQuestion();
+  }
+}
+
 function bindGameEvents() {
-  dom.next.addEventListener('click', () => {
-    if (!GAME.active && !GAME.finalShown) return;
-    if (GAME.finalShown) return;
-    if (!GAME.answered) return;
-    if (GAME.mode === 'test') {
-      if (GAME.questionIndex >= GAME.numQ) showTestFinal();
-      else nextTestQuestion();
-    } else if (GAME.mode === 'distance') {
-      if (GAME.questionIndex >= GAME.numQ) showDistanceFinal();
-      else nextDistanceQuestion();
-    } else if (GAME.mode === 'puzzle') {
-      if (GAME.questionIndex >= GAME.numQ) showPuzzleFinal();
-      else nextPuzzleQuestion();
-    }
-  });
+  dom.next.addEventListener('click', advanceGame);
+  dom.nextFloat?.addEventListener('click', advanceGame);
+  window.addEventListener('resize', () => requestAnimationFrame(positionNextFloat));
   dom.end.addEventListener('click', () => endActivity());
   dom.homeBtn?.addEventListener('click', () => endActivity());
   dom.zoomIn.addEventListener('click', () => GAME.mapView?.zoomIn());
@@ -1422,7 +1510,8 @@ function bindGameEvents() {
   document.addEventListener('keydown', (event) => {
     if (dom.classicScreen.hidden) return;
     if (document.querySelector('.overlay.is-open')) return;
-    if (event.key === 'Enter' && !dom.next.disabled && !dom.next.hidden) {
+    const inControl = event.target.closest?.('button, a, input, select, textarea, [contenteditable]');
+    if (event.key === 'Enter' && !inControl && !dom.next.disabled && !dom.next.hidden) {
       event.preventDefault();
       dom.next.click();
     } else if (event.key === 'Escape') {

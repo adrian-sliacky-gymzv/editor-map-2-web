@@ -1224,6 +1224,10 @@
     fill: #e7effc;
   }
 
+  .map-guide {
+    stroke: #9fb3d1;
+  }
+
   .map-mark[data-state="edit"] .mark-halo,
   .map-mark[data-state="user"] .mark-halo {
     fill: #15233b;

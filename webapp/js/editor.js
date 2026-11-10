@@ -1608,10 +1608,6 @@ function bindToolbar() {
   D.zoomIn.addEventListener('click', () => E.mapView?.zoomIn());
   D.zoomOut.addEventListener('click', () => E.mapView?.zoomOut());
   D.zoomFit.addEventListener('click', () => E.mapView?.fit());
-  D.mapHost.addEventListener('dblclick', (event) => {
-    if (!E.mapView || E.drawTool || event.target.closest('.map-mark')) return;
-    E.mapView.setZoom(E.mapView.zoom * 1.5, { x: event.clientX, y: event.clientY });
-  });
 }
 
 function handleAction(action) {
@@ -1696,6 +1692,7 @@ function bindAbout() {
 function bindKeyboard() {
   document.addEventListener('keydown', (event) => {
     if (D.screen.hidden) return;
+    const inControl = event.target.closest?.('input, select, textarea, [contenteditable]');
     const mod = event.ctrlKey || event.metaKey;
     if (mod && event.key.toLowerCase() === 's') {
       event.preventDefault();
@@ -1743,8 +1740,14 @@ function bindKeyboard() {
       closeContextMenu();
       closeColorPopover();
     }
-    if (event.key === '0' && !mod) {
-      E.mapView?.fit();
+    if (!inControl) {
+      if (event.key === '0' && !mod) {
+        E.mapView?.fit();
+      } else if ((event.key === '+' || event.key === '=') && !mod) {
+        E.mapView?.zoomIn();
+      } else if (event.key === '-' && !mod) {
+        E.mapView?.zoomOut();
+      }
     }
   });
 }

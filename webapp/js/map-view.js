@@ -6,6 +6,15 @@
 /* ------------------------------------------------------------------------- */
 
 import { normalizeHex, hexFromValue } from './classic-data.js';
+import {
+  MAX_MAP_ZOOM,
+  MIN_MAP_ZOOM,
+  doubleTapTargetZoom,
+  isDoubleTap,
+  pinchView,
+  tapSlop,
+  wheelZoomFactor,
+} from './map-gestures.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -85,6 +94,8 @@ export class MapView {
     this.panning = null;
     this.pinch = null;
     this.pointerDragged = false;
+    this.suppressClickUntil = 0;
+    this.lastTap = null;
     this.lastLayout = { w: 0, h: 0 };
     this.mapClickHandler = options.onMapClick || null;
     this.markScale = 1;
@@ -146,9 +157,11 @@ export class MapView {
     this.overlay.style.overflow = 'visible';
     this.drawLayer = document.createElementNS(SVG_NS, 'g');
     this.drawLayer.classList.add('drawing-layer');
+    this.guideLayer = document.createElementNS(SVG_NS, 'g');
+    this.guideLayer.classList.add('guide-layer');
     this.markLayer = document.createElementNS(SVG_NS, 'g');
     this.markLayer.classList.add('mark-layer');
-    this.overlay.append(this.drawLayer, this.markLayer);
+    this.overlay.append(this.drawLayer, this.guideLayer, this.markLayer);
     this.canvas.append(this.overlay);
 
     this.scene = svg;
@@ -399,7 +412,7 @@ export class MapView {
     const icon = svgEl('g');
     icon.classList.add('mark-icon');
     icon.setAttribute('aria-hidden', 'true');
-    icon.innerHTML = `<circle class="mark-hit" r="15" fill="transparent"></circle><circle class="mark-halo" r="9.5"></circle><g transform="translate(-8 -8)" class="mark-glyph">${MARK_ICONS[data.symbol] || MARK_ICONS.default}</g>`;
+    icon.innerHTML = `<circle class="mark-hit" r="15" fill="transparent"></circle><circle class="mark-halo" r="9.5" fill="#ffffff"></circle><g transform="translate(-8 -8)" class="mark-glyph">${MARK_ICONS[data.symbol] || MARK_ICONS.default}</g>`;
     el.append(icon);
 
     const label = svgEl('g');
@@ -410,10 +423,13 @@ export class MapView {
     bg.setAttribute('y', '-10');
     bg.setAttribute('height', '20');
     bg.setAttribute('rx', '6');
+    bg.setAttribute('fill', 'rgba(255, 255, 255, 0.94)');
+    bg.setAttribute('stroke', 'rgba(15, 23, 42, 0.16)');
     const text = svgEl('text');
     text.classList.add('mark-label-text');
     text.setAttribute('x', '20');
     text.setAttribute('y', '0');
+    text.setAttribute('fill', '#0f172a');
     text.textContent = data.label || '';
     label.append(bg, text);
     el.append(label);
@@ -459,8 +475,41 @@ export class MapView {
       });
     }
     if (mark.onClick) {
+      // A touch that starts on a marker cannot pan the map (the marker owns
+      // the gesture), so make sure a deliberate drag does not become a tap.
+      let tapGuard = null;
+      let tapResetTimer = 0;
+      el.addEventListener('pointerdown', (event) => {
+        clearTimeout(tapResetTimer);
+        tapGuard = {
+          x: event.clientX,
+          y: event.clientY,
+          pointerType: event.pointerType || 'mouse',
+          moved: false,
+        };
+      });
+      el.addEventListener('pointermove', (event) => {
+        if (!tapGuard) return;
+        if (Math.hypot(event.clientX - tapGuard.x, event.clientY - tapGuard.y) > tapSlop(tapGuard.pointerType)) {
+          tapGuard.moved = true;
+        }
+      });
+      el.addEventListener('pointercancel', () => {
+        if (tapGuard) tapGuard.moved = true;
+      });
+      el.addEventListener('pointerup', () => {
+        tapResetTimer = setTimeout(() => {
+          if (tapGuard) tapGuard.moved = false;
+        }, 500);
+      });
       el.addEventListener('click', (event) => {
         event.stopPropagation();
+        if (tapGuard?.moved) {
+          tapGuard.moved = false;
+          event.preventDefault();
+          return;
+        }
+        tapGuard = null;
         mark.onClick(mark, event);
       });
     }
@@ -577,6 +626,25 @@ export class MapView {
   clearMarks() {
     this.markLayer.replaceChildren();
     this.marks.clear();
+    this.clearGuides();
+  }
+
+  addGuide({ x1, y1, x2, y2, className = '' } = {}) {
+    if (!this.guideLayer) return null;
+    const line = svgEl('line');
+    line.classList.add('map-guide');
+    if (className) line.classList.add(className);
+    line.setAttribute('x1', String(Number(x1) || 0));
+    line.setAttribute('y1', String(Number(y1) || 0));
+    line.setAttribute('x2', String(Number(x2) || 0));
+    line.setAttribute('y2', String(Number(y2) || 0));
+    line.setAttribute('vector-effect', 'non-scaling-stroke');
+    this.guideLayer.append(line);
+    return line;
+  }
+
+  clearGuides() {
+    this.guideLayer?.replaceChildren();
   }
 
   setMarksVisible(visible) {
@@ -608,6 +676,28 @@ export class MapView {
     const bbox = this.entityBBox(name);
     if (!bbox) return;
     this.focusPoint(bbox.x + bbox.width / 2, bbox.y + bbox.height / 2, zoomAtLeast);
+  }
+
+  /**
+   * Avoid leaving an important pair of points outside a zoomed viewport.
+   * If both are already comfortably visible, keep the user's current view.
+   */
+  ensurePointsVisible(points, { padding = 64 } = {}) {
+    if (!Array.isArray(points) || !points.length || !this.scene) return false;
+    const rect = this.viewport.getBoundingClientRect();
+    if (rect.width < 2 || rect.height < 2) return false;
+    const visible = points.every((point) => {
+      const screen = this.mapToScreen(point.x, point.y);
+      return (
+        screen.x >= rect.left + padding
+        && screen.x <= rect.right - padding
+        && screen.y >= rect.top + padding
+        && screen.y <= rect.bottom - padding
+      );
+    });
+    if (visible) return false;
+    this.fit();
+    return true;
   }
 
   _editMarkLabel(mark) {
@@ -666,6 +756,7 @@ export class MapView {
     this.viewport.addEventListener('pointerup', (event) => this._onPointerUp(event), { signal });
     this.viewport.addEventListener('pointercancel', (event) => this._onPointerCancel(event), { signal });
     this.viewport.addEventListener('wheel', (event) => this._onWheel(event), { passive: false, signal });
+    this.viewport.addEventListener('dblclick', (event) => this._onDoubleClick(event), { signal });
     this.viewport.addEventListener('contextmenu', (event) => {
       if (event.target.closest('.map-mark')) return;
       event.preventDefault();
@@ -673,8 +764,13 @@ export class MapView {
   }
 
   _onPointerDown(event) {
-    if (event.target.closest('.map-mark')) return;
-    this.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    if (event.target.closest('.map-mark, .zoom-controls, button, a, input, select, textarea, label, [role="button"]')) return;
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+    this.pointers.set(event.pointerId, {
+      x: event.clientX,
+      y: event.clientY,
+      pointerType: event.pointerType || 'mouse',
+    });
     if (this.pointers.size === 1) {
       this.panning = {
         startX: event.clientX,
@@ -682,6 +778,8 @@ export class MapView {
         panX: this.panX,
         panY: this.panY,
         moved: false,
+        slop: tapSlop(event.pointerType),
+        pointerType: event.pointerType || 'mouse',
       };
       this.pointerDragged = false;
       if (this.interaction !== 'draw') {
@@ -692,49 +790,90 @@ export class MapView {
     } else if (this.pointers.size === 2) {
       this.panning = null;
       const [a, b] = [...this.pointers.values()];
+      const startMidpoint = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+      const anchor = this.toMapPoint(startMidpoint.x, startMidpoint.y);
       this.pinch = {
         distance: Math.hypot(a.x - b.x, a.y - b.y),
         zoom: this.zoom,
-        center: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 },
-        panX: this.panX,
-        panY: this.panY,
+        startMidpoint,
+        anchorMapX: anchor.x,
+        anchorMapY: anchor.y,
+        fitScale: this.fitScale,
+        viewportRect: this.viewport.getBoundingClientRect(),
+        baseX: this.baseX,
+        baseY: this.baseY,
       };
+      this.pointerDragged = true;
+      this.suppressClickUntil = performance.now() + 220;
+      this.lastTap = null;
+      try {
+        this.viewport.setPointerCapture?.(event.pointerId);
+      } catch {}
     }
   }
 
   _onPointerMove(event) {
     if (this.pointers.has(event.pointerId)) {
-      this.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      this.pointers.set(event.pointerId, {
+        x: event.clientX,
+        y: event.clientY,
+        pointerType: event.pointerType || this.pointers.get(event.pointerId)?.pointerType || 'mouse',
+      });
     }
     if (this.pinch && this.pointers.size >= 2) {
       const [a, b] = [...this.pointers.values()];
       const distance = Math.hypot(a.x - b.x, a.y - b.y);
-      if (this.pinch.distance > 0) {
-        const factor = distance / this.pinch.distance;
-        const center = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
-        this.setZoom(this.pinch.zoom * factor, center, { silent: true });
-      }
+      const midpoint = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+      const next = pinchView({
+        startZoom: this.pinch.zoom,
+        startDistance: this.pinch.distance,
+        currentDistance: distance,
+        fitScale: this.pinch.fitScale,
+        startMidpoint: this.pinch.startMidpoint,
+        currentMidpoint: midpoint,
+        viewportLeft: this.pinch.viewportRect.left,
+        viewportTop: this.pinch.viewportRect.top,
+        baseX: this.pinch.baseX,
+        baseY: this.pinch.baseY,
+        anchorMapX: this.pinch.anchorMapX,
+        anchorMapY: this.pinch.anchorMapY,
+        minZoom: MIN_MAP_ZOOM,
+        maxZoom: MAX_MAP_ZOOM,
+      });
+      this.zoom = next.zoom;
+      this.panX = next.panX;
+      this.panY = next.panY;
+      this.suppressClickUntil = performance.now() + 220;
+      this._clampPan();
+      this._applyTransform();
+      this._notifyZoom();
       return;
     }
     if (!this.panning) return;
     const dx = event.clientX - this.panning.startX;
     const dy = event.clientY - this.panning.startY;
-    if (Math.abs(dx) + Math.abs(dy) > 6) {
+    if (!this.panning.moved && Math.hypot(dx, dy) > (this.panning.slop ?? 6)) {
       this.panning.moved = true;
       this.pointerDragged = true;
+      this.suppressClickUntil = performance.now() + 180;
     }
     if (this.panning.moved && this.interaction !== 'draw') {
       this.panX = this.panning.panX + dx;
       this.panY = this.panning.panY + dy;
+      this._clampPan();
       this._applyTransform();
     }
   }
 
   _onPointerUp(event) {
     const had = this.pointers.has(event.pointerId);
+    const wasPinching = Boolean(this.pinch);
+    const pointerType = this.pointers.get(event.pointerId)?.pointerType || event.pointerType || 'mouse';
     this.pointers.delete(event.pointerId);
     if (this.pinch && this.pointers.size < 2) {
       this.pinch = null;
+      this.pointerDragged = true;
+      this.suppressClickUntil = performance.now() + 220;
       const remaining = [...this.pointers.values()][0];
       if (remaining) {
         this.panning = {
@@ -743,6 +882,8 @@ export class MapView {
           panX: this.panX,
           panY: this.panY,
           moved: false,
+          slop: tapSlop(remaining.pointerType),
+          pointerType: remaining.pointerType,
         };
       }
     }
@@ -752,10 +893,25 @@ export class MapView {
       try {
         this.viewport.releasePointerCapture?.(event.pointerId);
       } catch {}
-      if (had && !wasDrag && this.interaction === 'click') {
-        const pt = this.toMapPoint(event.clientX, event.clientY);
-        this.mapClickHandler?.(pt, event);
-        this.viewport.dispatchEvent(new CustomEvent('map-click', { detail: { ...pt, originalEvent: event }, bubbles: true }));
+      const now = performance.now();
+      if (had && !wasPinching && !wasDrag && !this.pointerDragged && now >= this.suppressClickUntil) {
+        if (this.interaction === 'click') {
+          const pt = this.toMapPoint(event.clientX, event.clientY);
+          this.mapClickHandler?.(pt, event);
+          this.viewport.dispatchEvent(new CustomEvent('map-click', {
+            detail: { ...pt, originalEvent: event },
+            bubbles: true,
+          }));
+        } else if (this.interaction === 'pan' && pointerType === 'touch') {
+          const tap = { x: event.clientX, y: event.clientY, time: now };
+          if (isDoubleTap(this.lastTap, tap, { maxDelay: 320, slop: 30 })) {
+            this.lastTap = null;
+            this._lastTouchDoubleTapAt = now;
+            this._zoomFromDoubleTap(tap);
+            return;
+          }
+          this.lastTap = tap;
+        }
       }
     }
   }
@@ -764,13 +920,39 @@ export class MapView {
     this.pointers.delete(event.pointerId);
     this.panning = null;
     this.pinch = null;
+    this.pointerDragged = true;
+    this.suppressClickUntil = performance.now() + 220;
   }
 
   _onWheel(event) {
     if (this.interaction === 'draw') return;
     event.preventDefault();
-    const factor = event.deltaY < 0 ? 1.14 : 1 / 1.14;
+    const factor = wheelZoomFactor(
+      event.deltaY,
+      event.deltaMode,
+      event.ctrlKey,
+      this.lastLayout.h || this.viewport.clientHeight || 800,
+    );
     this.setZoom(this.zoom * factor, { x: event.clientX, y: event.clientY });
+  }
+
+  _onDoubleClick(event) {
+    if (this.interaction !== 'pan') return;
+    if (event.target.closest('.map-mark, .zoom-controls, button, a, input, select, textarea')) return;
+    // A touch double tap already zooms on pointerup. Ignore the synthetic
+    // dblclick that some browsers fire immediately afterwards.
+    if (performance.now() - (this._lastTouchDoubleTapAt || 0) < 500) return;
+    event.preventDefault();
+    this._zoomFromDoubleTap({ x: event.clientX, y: event.clientY });
+  }
+
+  _zoomFromDoubleTap(point) {
+    const targetZoom = doubleTapTargetZoom(this.zoom);
+    if (targetZoom <= 1.001) {
+      this.fit();
+      return;
+    }
+    this.setZoom(targetZoom, point);
   }
 
   layout() {
@@ -785,18 +967,27 @@ export class MapView {
     this.baseY = (h - this.H * this.fitScale) / 2;
     this.lastLayout = { w, h };
     this._applyTransform();
+    this._notifyZoom();
   }
 
   _applyTransform() {
     const scale = this.fitScale * this.zoom;
     this.canvas.style.transformOrigin = '0 0';
     this.canvas.style.transform = `translate(${this.baseX + this.panX}px, ${this.baseY + this.panY}px) scale(${scale})`;
-    this.updateMarkScale();
+    const markScale = 1 / Math.max(0.001, scale);
+    if (Math.abs(markScale - this.markScale) > 0.0001) this.updateMarkScale();
     this.options.onTransform?.(this);
   }
 
+  _notifyZoom() {
+    const percent = this.percent();
+    if (percent === this._lastZoomPercent) return;
+    this._lastZoomPercent = percent;
+    this.options.onZoom?.(this.zoom);
+  }
+
   setZoom(zoom, anchorClient = null, { silent = false } = {}) {
-    const next = clamp(zoom, 0.6, 10);
+    const next = clamp(zoom, MIN_MAP_ZOOM, MAX_MAP_ZOOM);
     if (Math.abs(next - this.zoom) < 0.0001) return;
     if (anchorClient) {
       const rect = this.viewport.getBoundingClientRect();
@@ -814,7 +1005,7 @@ export class MapView {
     }
     this._clampPan();
     this._applyTransform();
-    if (!silent) this.options.onZoom?.(this.zoom);
+    if (!silent) this._notifyZoom();
   }
 
   zoomIn(anchor = null) {
@@ -830,7 +1021,7 @@ export class MapView {
     this.panX = 0;
     this.panY = 0;
     this._applyTransform();
-    this.options.onZoom?.(this.zoom);
+    this._notifyZoom();
   }
 
   _clampPan() {
@@ -839,8 +1030,8 @@ export class MapView {
     const mapW = this.W * scale;
     const mapH = this.H * scale;
     const rect = this.lastLayout;
-    const maxX = Math.max(0, (mapW - rect.w) / 2) + 60;
-    const maxY = Math.max(0, (mapH - rect.h) / 2) + 60;
+    const maxX = Math.max(0, (mapW - rect.w) / 2);
+    const maxY = Math.max(0, (mapH - rect.h) / 2);
     this.panX = clamp(this.panX, -maxX, maxX);
     this.panY = clamp(this.panY, -maxY, maxY);
   }
