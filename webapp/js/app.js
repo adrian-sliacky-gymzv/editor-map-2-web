@@ -22,6 +22,7 @@ import {
 } from './modes.js';
 import { tapSlop } from './map-gestures.js';
 import { initI18n, t } from './i18n.js';
+import { dismissTopOverlay, navigate, pushOverlay, registerRoute } from './navigation.js';
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
@@ -521,6 +522,12 @@ function bindHomeEvents() {
   dom.quickPlayBtn?.addEventListener('click', () => startGame('distance'));
   dom.heroAtlasBtn?.addEventListener('click', goAtlas);
   dom.atlasCardBtn?.addEventListener('click', goAtlas);
+  $$('[data-nav-atlas]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      goAtlas();
+    });
+  });
   dom.homeHelpBtn?.addEventListener('click', openHelp);
   dom.resetStatsBtn?.addEventListener('click', resetStats);
 }
@@ -534,7 +541,13 @@ function showScreen(name) {
   dom.homeScreen.hidden = name !== 'home';
   dom.atlasScreen.hidden = name !== 'atlas';
   dom.gameScreen.hidden = name !== 'game';
+  for (const [key, selector] of [['classic', '#classicScreen'], ['editor', '#editorScreen']]) {
+    const screen = $(selector);
+    if (screen) screen.hidden = key !== name;
+  }
   document.body.classList.toggle('game-active', name !== 'home');
+  if (name !== 'classic') document.body.classList.remove('classic-active');
+  if (name !== 'editor') document.body.classList.remove('editor-active');
   syncNextFloat();
   if (name === 'game') requestAnimationFrame(() => layoutMap());
 }
@@ -598,29 +611,35 @@ function resetGameState() {
   state.view = { zoom: 1, panX: 0, panY: 0 };
 }
 
-function goHome() {
+function goHome(options = {}) {
   resetGameState();
   closeAllOverlays();
   showScreen('home');
   renderProgress();
+  if (options.history !== false) {
+    navigate({ screen: 'home' }, { replace: options.replace === true, silent: true });
+  }
   requestAnimationFrame(() => {
     const target = dom.quickPlayBtn || $('[data-classic-mode="test"]') || dom.homeHelpBtn;
     target?.focus({ preventScroll: true });
   });
 }
 
-function goAtlas() {
+function goAtlas(options = {}) {
   resetGameState();
   closeAllOverlays();
   syncVucUI();
   showScreen('atlas');
   renderAtlas();
+  if (options.history !== false) {
+    navigate({ screen: 'atlas' }, { replace: options.replace === true, silent: true });
+  }
   requestAnimationFrame(() => dom.atlasBackBtn.focus({ preventScroll: true }));
 }
 
 function finishReturn() {
-  if (state.returnScreen === 'atlas') goAtlas();
-  else goHome();
+  if (state.returnScreen === 'atlas') goAtlas({ replace: true });
+  else goHome({ replace: true });
 }
 
 /* ------------------------------------------------------------------ */
@@ -748,10 +767,44 @@ function startGame(mode, options = {}) {
   layoutMap();
   showQuestion();
 
+  if (options.history !== false) {
+    navigate({
+      screen: 'game',
+      mode,
+      pool: pool.map((city) => city.entity),
+      numQ: state.gameNumQ,
+      returnScreen: state.returnScreen,
+      contextLabel: state.contextLabel,
+    }, { replace: options.replace === true, silent: true });
+  }
+
   requestAnimationFrame(() => {
     dom.gameScreen.focus({ preventScroll: true });
     layoutMap();
   });
+}
+
+function restoreGameRoute(route) {
+  const pool = (route.pool || [])
+    .map((entity) => CITIES.find((city) => city.entity === entity))
+    .filter(Boolean);
+  if (!pool.length) {
+    goHome({ history: false });
+    return;
+  }
+  startGame(route.mode, {
+    pool,
+    numQ: route.numQ,
+    returnScreen: route.returnScreen,
+    contextLabel: route.contextLabel,
+    history: false,
+  });
+}
+
+function registerAppRoutes() {
+  registerRoute('home', () => goHome({ history: false }));
+  registerRoute('atlas', () => goAtlas({ history: false }));
+  registerRoute('game', restoreGameRoute);
 }
 
 function showQuestion() {
@@ -1985,7 +2038,7 @@ function handleTap(clientX, clientY) {
 /* ------------------------------------------------------------------ */
 
 function bindAtlasEvents() {
-  dom.atlasBackBtn.addEventListener('click', goHome);
+  dom.atlasBackBtn.addEventListener('click', () => goHome({ replace: true }));
   dom.atlasHelpBtn.addEventListener('click', openHelp);
   dom.atlasCsvBtn.addEventListener('click', downloadCsv);
 
@@ -2253,6 +2306,12 @@ function resetStats() {
 
 function openHelp() {
   openOverlay(dom.helpOverlay, $('[data-close="help"]', dom.helpOverlay));
+  pushOverlay('helpOverlay');
+}
+
+function closeHelp() {
+  closeOverlay(dom.helpOverlay);
+  dismissTopOverlay('helpOverlay');
 }
 
 function openConfirm({ title, message, okLabel, cancelLabel, onConfirm }) {
@@ -2266,15 +2325,22 @@ function openConfirm({ title, message, okLabel, cancelLabel, onConfirm }) {
 
 function bindOverlayEvents() {
   dom.helpOverlay.addEventListener('click', (event) => {
-    if (event.target === dom.helpOverlay) closeOverlay(dom.helpOverlay);
+    if (event.target === dom.helpOverlay) closeHelp();
   });
 
-  const openSettings = () => openOverlay(dom.settingsOverlay, dom.settingsDone);
+  const closeSettings = () => {
+    closeOverlay(dom.settingsOverlay);
+    dismissTopOverlay('settingsOverlay');
+  };
+  const openSettings = () => {
+    openOverlay(dom.settingsOverlay, dom.settingsDone);
+    pushOverlay('settingsOverlay');
+  };
   dom.settingsBtn?.addEventListener('click', openSettings);
-  dom.settingsClose?.addEventListener('click', () => closeOverlay(dom.settingsOverlay));
-  dom.settingsDone?.addEventListener('click', () => closeOverlay(dom.settingsOverlay));
+  dom.settingsClose?.addEventListener('click', closeSettings);
+  dom.settingsDone?.addEventListener('click', closeSettings);
   dom.settingsOverlay?.addEventListener('click', (event) => {
-    if (event.target === dom.settingsOverlay) closeOverlay(dom.settingsOverlay);
+    if (event.target === dom.settingsOverlay) closeSettings();
   });
   dom.gameResultBtn?.addEventListener('click', () => {
     openOverlay(dom.resultOverlay, dom.playAgainBtn);
@@ -2294,7 +2360,7 @@ function bindOverlayEvents() {
   });
 
   $$('[data-close="help"]').forEach((button) => {
-    button.addEventListener('click', () => closeOverlay(dom.helpOverlay));
+    button.addEventListener('click', closeHelp);
   });
 
   dom.confirmCancelBtn.addEventListener('click', () => {
@@ -2497,7 +2563,7 @@ function bindGlobalEvents() {
       if (!dom.helpOverlay.hidden) {
         event.preventDefault();
         event.stopImmediatePropagation();
-        closeOverlay(dom.helpOverlay);
+        closeHelp();
         return;
       }
       if (!dom.resultOverlay.hidden) {
@@ -2522,7 +2588,7 @@ function bindGlobalEvents() {
       || (event.code === 'Slash' && event.shiftKey);
     if (helpKey && !event.repeat && !typing && !event.ctrlKey && !event.metaKey && !event.altKey) {
       event.preventDefault();
-      if (!dom.helpOverlay.hidden) closeOverlay(dom.helpOverlay);
+      if (!dom.helpOverlay.hidden) closeHelp();
       else if (!hasBlockingOverlay()) openHelp();
       return;
     }
@@ -2593,6 +2659,7 @@ function bindGlobalEvents() {
 
 function init() {
   initI18n();
+  registerAppRoutes();
   const settings = loadSettings();
   state.level = settings.level;
   state.numQ = settings.numQ;

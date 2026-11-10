@@ -36,6 +36,8 @@
           <nav class="home-nav" aria-label="Sekcie na stránke">
             <a href="#aktivity">Hry</a>
             <a href="#mapy">Mapy</a>
+            <a href="?view=atlas" data-nav-atlas>Atlas</a>
+            <a href="?editor=1" data-editor-open>Editor</a>
             <a href="#postup">Postup</a>
           </nav>
           <div class="home-header-actions">
@@ -261,7 +263,9 @@
          ============================================================ -->
     <section id="atlasScreen" class="screen atlas-screen" hidden aria-labelledby="atlasTitle">
       <header class="atlas-header">
-        <button type="button" id="atlasBackBtn" class="icon-btn" aria-label="Späť na úvod" title="Späť">←</button>
+        <button type="button" id="atlasBackBtn" class="nav-back" aria-label="Späť na úvod" title="Domov">
+          <span class="nav-back-arrow" aria-hidden="true">←</span><span class="nav-back-text">Domov</span>
+        </button>
         <div class="atlas-heading">
           <h1 id="atlasTitle">Mestá Slovenska</h1>
           <p>Atlas pôvodných 74 miest · zobrazených <span id="atlasCount" aria-live="polite">74 miest</span></p>
@@ -570,7 +574,9 @@
     <section id="editorScreen" class="screen editor-screen" hidden tabindex="-1" aria-labelledby="editorTitle">
       <header class="editor-topbar">
         <div class="editor-title-wrap">
-          <button type="button" id="editorBackBtn" class="icon-btn" aria-label="Späť na úvod" title="Späť">←</button>
+          <button type="button" id="editorBackBtn" class="nav-back" aria-label="Späť na úvod" title="Domov">
+            <span class="nav-back-arrow" aria-hidden="true">←</span><span class="nav-back-text">Domov</span>
+          </button>
           <div>
             <h1 id="editorTitle">Editor máp</h1>
             <p id="editorFileLabel" class="editor-file-label">Slovensko.mef</p>

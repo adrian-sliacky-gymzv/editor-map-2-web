@@ -242,6 +242,24 @@ The source language is Slovak. English is applied by
   `localStorage` under `editorMap2.language`.
 - **Auto** resolves to Slovak only when the browser language starts with `sk`;
   all other languages get English.
+
+## 8. Navigation and browser history
+
+Screens are reflected in the URL and in `history.state`, so the browser back and
+forward buttons move between the app screens instead of leaving the page:
+
+- Home — `/`
+- Atlas — `?view=atlas`
+- Activity setup — `?mode=test|distance|puzzle&map=...`
+- Activity game — the same URL with `autostart=1`
+- Editor — `?editor=1&map=...`
+- Legacy city training — `?view=game` with a game snapshot in history state
+
+Changing the setup map/test/level/question count uses `replaceState`, so review
+history stays clean. Browser navigation to another screen closes open overlays
+first. The Settings and Help dialogs are history entries too, so **Back** closes
+them and **Forward** reopens them without leaving the current screen. The
+visible **← Home** component appears on the atlas and editor screens.
 - Static markup is localised through exact source-string keys and, for mixed
   inline markup, `data-i18n-html` attributes.
 - Dynamically generated game/editor text is translated by the same dictionary,
@@ -258,7 +276,7 @@ version in `EN_HTML`). If it contains a number or a name, add a pattern in
 
 ---
 
-## 8. Deep links
+## 9. Deep links
 
 - `/?mode=test` — open the setup for **Vyskúšaj sa!**
 - `/?mode=distance&map=svet` — open the setup for **Traf sa!** on the world map
@@ -272,7 +290,7 @@ Supported map keys: `slovensko`, `svet`, `europa`, `afrika`, `azia`,
 
 ---
 
-## 9. Persistence and privacy
+## 10. Persistence and privacy
 
 - Activity setup, the last editor map and quick-game statistics are stored in
   `localStorage` in the browser.
@@ -282,7 +300,7 @@ Supported map keys: `slovensko`, `svet`, `europa`, `afrika`, `azia`,
 
 ---
 
-## 10. Accessibility, themes and responsive design
+## 11. Accessibility, themes and responsive design
 
 - Semantic landmarks, visible focus rings and keyboard operation.
 - `prefers-color-scheme` light/dark themes; the dark theme uses a dark map
@@ -300,13 +318,13 @@ Supported map keys: `slovensko`, `svet`, `europa`, `afrika`, `azia`,
 
 ---
 
-## 11. Tests and QA
+## 12. Tests and QA
 
 ```bash
 npm test
 ```
 
-Current status: **96 tests, 96 passing**. Coverage includes:
+Current status: **102 tests, 102 passing**. Coverage includes:
 
 - original scoring, per-map maximum distance and puzzle tolerance;
 - original quiz group cycling, unused targets and candidate sampling;
@@ -330,7 +348,7 @@ pinch anchoring, panning in both directions, inertia and the fixed fitted view.
 
 ---
 
-## 12. Deployment
+## 13. Deployment
 
 The project is deployed with GitHub Actions to GitHub Pages. The workflow is
 [`../.github/workflows/pages.yml`](../.github/workflows/pages.yml) and publishes
@@ -347,7 +365,7 @@ loop is documented in [`../DEVELOPMENT.md`](../DEVELOPMENT.md).
 
 ---
 
-## 13. Credits and licence
+## 14. Credits and licence
 
 Original application: **Editor máp 2.0** (mxm.blindmaps), 2010.
 

@@ -30,6 +30,7 @@ import {
 } from './classic-ui.js';
 import { goHome } from './classic-activities.js';
 import { defaultTitleForLanguage, getLanguage, t } from './i18n.js';
+import { navigate } from './navigation.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const LAST_MAP_KEY = 'editorMap2.lastMap.v1';
@@ -163,11 +164,11 @@ async function openEditor() {
   await openEditorAt(null);
 }
 
-export async function openEditorAt(mapKey = null) {
+export async function openEditorAt(mapKey = null, options = {}) {
   await classicData.init();
   showEditorScreen();
   if (mapKey) {
-    await loadNewMap(mapKey, { initial: true });
+    await loadNewMap(mapKey, { initial: true, history: options.history });
     return;
   }
   if (!E.doc) {
@@ -176,13 +177,22 @@ export async function openEditorAt(mapKey = null) {
       const saved = localStorage.getItem(LAST_MAP_KEY);
       if (saved && classicData.mapDef(saved)) key = saved;
     } catch {}
-    await loadNewMap(key, { initial: true });
+    await loadNewMap(key, { initial: true, history: options.history });
   } else {
+    syncEditorRoute({ replace: true });
     requestAnimationFrame(() => {
       E.mapView?.layout();
       updateZoomLabel();
     });
   }
+}
+
+function syncEditorRoute(options = {}) {
+  if (!E.mapKey) return;
+  navigate({ screen: 'editor', mapKey: E.mapKey }, {
+    replace: options.replace !== false,
+    silent: true,
+  });
 }
 
 function showEditorScreen() {
@@ -208,6 +218,7 @@ function hideEditorScreen() {
   cancelCurrentDrawing();
   closeContextMenu();
   closeColorPopover();
+  [D.newOverlay, D.exportOverlay, D.aboutOverlay].forEach((overlay) => closeOverlay(overlay));
   document.body.classList.remove('editor-tree-open');
   D.screen.hidden = true;
   document.body.classList.remove('editor-active');
@@ -225,7 +236,7 @@ function setLoading(visible, text = 'Načítavam…') {
 /* documents                                                                 */
 /* ------------------------------------------------------------------------- */
 
-async function loadNewMap(key, { initial = false } = {}) {
+async function loadNewMap(key, { initial = false, history = true } = {}) {
   const def = classicData.mapDef(key);
   if (!def) {
     toast('Neznáma mapa.', 'error');
@@ -253,6 +264,7 @@ async function loadNewMap(key, { initial = false } = {}) {
       localStorage.setItem(LAST_MAP_KEY, key);
     } catch {}
     updateDocumentChrome();
+    if (history !== false) syncEditorRoute({ replace: !initial });
     if (!initial) toast(`Nová mapa: ${def.label}`, 'success');
   } catch (error) {
     if (loadToken !== E.loadToken) return;
@@ -338,6 +350,7 @@ async function openFileFromFile(file, handle) {
       localStorage.setItem(LAST_MAP_KEY, key);
     } catch {}
     updateDocumentChrome();
+    syncEditorRoute({ replace: true });
     toast(`Otvorené: ${E.filename}`, 'success');
   } finally {
     if (loadToken === E.loadToken) setLoading(false);

@@ -30,6 +30,7 @@ import {
   scoreForDistance,
 } from './scoring.js';
 import { gameMessage, getLanguage, t } from './i18n.js';
+import { navigate } from './navigation.js';
 import {
   $,
   announce,
@@ -176,6 +177,7 @@ const SETUP = {
   totalNodes: 0,
   levels: [],
   loadToken: 0,
+  routeReady: false,
 };
 
 const GAME = {
@@ -348,11 +350,21 @@ function cacheDom() {
 /* setup                                                                     */
 /* ------------------------------------------------------------------------- */
 
-export async function openActivitySetup(modeKey, preset = null) {
+export async function openActivitySetup(modeKey, preset = null, options = {}) {
   const mode = MODES[modeKey];
   if (!mode) return;
   await classicData.init();
+  closeOverlay(dom.resultOverlay);
+  dom.classicScreen.hidden = true;
+  document.body.classList.remove('classic-active');
+  for (const selector of ['#atlasScreen', '#gameScreen', '#editorScreen']) {
+    const screen = $(selector);
+    if (screen) screen.hidden = true;
+  }
+  const home = $('#homeScreen');
+  if (home) home.hidden = false;
   SETUP.mode = modeKey;
+  SETUP.routeReady = false;
   SETUP.mapList = childrenByTag(classicData.cfgEl(mode.listName), 'map');
   if (!SETUP.mapList.length) {
     toast('V konfigurácii sa nenašla žiadna mapa pre túto aktivitu.', 'error');
@@ -374,9 +386,11 @@ export async function openActivitySetup(modeKey, preset = null) {
   renderMapCards();
   await selectMap(SETUP.mapIndex, SETUP.testIndex, SETUP.levelIndex, SETUP.numQ);
   openOverlay(dom.overlay, dom.start);
+  navigate(setupRoute(), { replace: options.replace === true, silent: true });
+  SETUP.routeReady = true;
 }
 
-export async function openActivityFromQuery(params = {}) {
+export async function openActivityFromQuery(params = {}, options = {}) {
   const mode = MODES[params.mode] ? params.mode : 'distance';
   await classicData.init();
   const list = childrenByTag(classicData.cfgEl(MODES[mode].listName), 'map');
@@ -398,9 +412,11 @@ export async function openActivityFromQuery(params = {}) {
       testIndex: preset.testIndex,
       levelIndex: preset.levelIndex,
       numQ: preset.numQ,
+      history: options.history,
+      replace: options.replace,
     });
   } else {
-    await openActivitySetup(mode, preset);
+    await openActivitySetup(mode, preset, options);
   }
 }
 
@@ -422,6 +438,24 @@ function saveSetup() {
       numQ: SETUP.numQ,
     }));
   } catch {}
+}
+
+function setupRoute() {
+  const mapEl = SETUP.mapList[SETUP.mapIndex];
+  return {
+    screen: 'classic-setup',
+    mode: SETUP.mode || 'distance',
+    mapKey: classicData.keyForConfigMap(mapEl),
+    mapIndex: SETUP.mapIndex,
+    testIndex: SETUP.testIndex,
+    levelIndex: SETUP.levelIndex,
+    numQ: SETUP.numQ,
+  };
+}
+
+function syncSetupRoute() {
+  if (!SETUP.routeReady || !SETUP.mode || !SETUP.mapList?.length) return;
+  navigate(setupRoute(), { replace: true, silent: true });
 }
 
 function renderMapCards() {
@@ -581,6 +615,13 @@ function updateSetupSummary() {
     button.classList.toggle('is-active', active);
     button.setAttribute('aria-pressed', active ? 'true' : 'false');
   });
+  syncSetupRoute();
+}
+
+function closeActivitySetup() {
+  SETUP.routeReady = false;
+  closeOverlay(dom.overlay);
+  navigate({ screen: 'home' }, { replace: true });
 }
 
 function bindSetupEvents() {
@@ -615,9 +656,9 @@ function bindSetupEvents() {
     closeOverlay(dom.overlay);
     startActivityGame(params);
   });
-  [dom.cancel, dom.close].forEach((button) => button?.addEventListener('click', () => closeOverlay(dom.overlay)));
+  [dom.cancel, dom.close].forEach((button) => button?.addEventListener('click', closeActivitySetup));
   dom.overlay.addEventListener('click', (event) => {
-    if (event.target === dom.overlay) closeOverlay(dom.overlay);
+    if (event.target === dom.overlay) closeActivitySetup();
   });
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
@@ -625,7 +666,7 @@ function bindSetupEvents() {
     if (!dom.overlay.hidden) {
       event.preventDefault();
       event.stopImmediatePropagation();
-      closeOverlay(dom.overlay);
+      closeActivitySetup();
       return;
     }
     if (!dom.resultOverlay?.hidden) {
@@ -738,6 +779,18 @@ export async function startActivityGame(params) {
   hideDistanceLegend();
   showMapHint();
   syncNextFloat();
+
+  if (params.history !== false) {
+    navigate({
+      screen: 'classic-game',
+      mode: params.mode,
+      mapKey,
+      mapIndex: GAME.params.mapIndex,
+      testIndex: GAME.params.testIndex,
+      levelIndex: clamp(Number(params.levelIndex) || 0, 0, levels.length - 1),
+      numQ: GAME.numQ,
+    }, { replace: params.replace === true, silent: true });
+  }
 
   try {
     const [doc, scene] = await Promise.all([
@@ -1893,7 +1946,7 @@ async function endActivity() {
   goHome();
 }
 
-export function goHome() {
+function disposeClassicGame() {
   GAME.loadToken += 1;
   stopClock();
   GAME.active = false;
@@ -1918,6 +1971,17 @@ export function goHome() {
   if (editor) editor.hidden = true;
   document.body.classList.remove('game-active');
   window.scrollTo({ top: 0 });
+}
+
+export function goHome() {
+  disposeClassicGame();
+  navigate({ screen: 'home' }, { replace: true });
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('route:change', (event) => {
+    if (event.detail?.route?.screen !== 'classic-game') disposeClassicGame();
+  });
 }
 
 /* ------------------------------------------------------------------------- */

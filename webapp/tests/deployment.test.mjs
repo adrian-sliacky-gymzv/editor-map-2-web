@@ -177,6 +177,30 @@ test('the redesign stays deployment-safe', () => {
   assert.match(html, /id="postup"/);
 });
 
+test('screens participate in browser history and expose visible back navigation', () => {
+  const html = read('index.html');
+  const app = read('js/app.js');
+  const classic = read('js/classic.js');
+  const activities = read('js/classic-activities.js');
+  const editor = read('js/editor.js');
+  const css = read('redesign.css');
+  assert.match(html, /id="atlasBackBtn" class="nav-back"/);
+  assert.match(html, /id="editorBackBtn" class="nav-back"/);
+  assert.match(html, /class="nav-back-text">Domov</);
+  assert.match(html, /data-nav-atlas/);
+  assert.match(html, /data-editor-open/);
+  assert.match(app, /registerRoute\('home'/);
+  assert.match(app, /registerRoute\('atlas'/);
+  assert.match(app, /registerRoute\('game'/);
+  assert.match(classic, /registerRoute\('classic-setup'/);
+  assert.match(classic, /registerRoute\('classic-game'/);
+  assert.match(classic, /registerRoute\('editor'/);
+  assert.match(classic, /startRouter\(\)/);
+  assert.match(activities, /screen: 'classic-game'/);
+  assert.match(editor, /screen: 'editor', mapKey: E\.mapKey/);
+  assert.match(css, /\.nav-back\b/);
+});
+
 test('repository link and reimplementation credit are present', () => {
   const html = read('index.html');
   assert.match(html, /class="footer-github"/);

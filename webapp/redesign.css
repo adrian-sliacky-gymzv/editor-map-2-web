@@ -214,6 +214,40 @@ kbd {
   background: var(--paper-2);
 }
 
+.nav-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--line-2);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.nav-back:hover {
+  border-color: var(--ink);
+  background: var(--paper-2);
+}
+
+.nav-back-arrow {
+  color: var(--blue);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1;
+}
+
+.nav-back:active {
+  transform: translateY(1px) scale(0.985);
+}
+
 .link-btn {
   border: 0;
   border-bottom: 1px solid currentColor;
@@ -4625,6 +4659,19 @@ kbd {
     padding: 5px 8px;
   }
 
+  .nav-back {
+    width: 30px;
+    min-width: 30px;
+    height: 30px;
+    min-height: 30px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .nav-back-text {
+    display: none;
+  }
+
   .editor-title-wrap {
     flex: 0 0 auto;
     gap: 6px;
@@ -5236,6 +5283,7 @@ kbd {
 .win-btn,
 .zoom-btn,
 .icon-btn,
+.nav-back,
 .chip,
 .seg-btn,
 .editor-btn,
@@ -5254,6 +5302,7 @@ kbd {
 .win-btn,
 .zoom-btn,
 .icon-btn,
+.nav-back,
 .chip,
 .seg-btn,
 .editor-btn,
@@ -5292,6 +5341,7 @@ kbd {
 .win-btn:active:not(:disabled),
 .zoom-btn:active:not(:disabled),
 .icon-btn:active:not(:disabled),
+.nav-back:active:not(:disabled),
 .chip:active:not(:disabled),
 .seg-btn:active:not(:disabled),
 .home-card-btn:active:not(:disabled),
@@ -5312,5 +5362,164 @@ kbd {
     transition-duration: 1ms !important;
     transition-delay: 0ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* ---------------------------------------------------------- */
+/* readability                                                */
+/* ---------------------------------------------------------- */
+
+/*
+ * The editorial style leans on small mono labels. These minimums keep the
+ * hierarchy without making the important copy or controls hard to read.
+ */
+
+body {
+  font-size: 16px;
+}
+
+.hero-lead {
+  font-size: 16px;
+}
+
+.section-lead {
+  font-size: 14.5px;
+}
+
+.home-card p {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.brand-kicker,
+.hero-kicker,
+.hero-quickfacts,
+.home-nav a,
+.section-index {
+  font-size: 10px;
+}
+
+.home-card-tag {
+  font-size: 9px;
+}
+
+.home-card-foot > span,
+.home-card-btn {
+  font-size: 9px;
+}
+
+.plate-head span,
+.plate-key,
+.plate-scale,
+.plate-caption,
+.plate-coords {
+  font-size: 9px;
+}
+
+.progress-meta {
+  font-size: 9.5px;
+}
+
+.progress-aside p {
+  font-size: 10px;
+}
+
+.footer-github {
+  font-size: 9.5px;
+}
+
+.footer-credits {
+  font-size: 9px;
+  line-height: 1.65;
+}
+
+.atlas-heading p {
+  font-size: 9.5px;
+}
+
+.atlas-list-head {
+  font-size: 10px;
+}
+
+.atlas-tip {
+  font-size: 11px;
+}
+
+.city-row {
+  font-size: 13px;
+}
+
+.city-level {
+  font-size: 8.5px;
+}
+
+.classic-context {
+  font-size: 9.5px;
+}
+
+.mission-kicker {
+  font-size: 9px;
+}
+
+.mission-type {
+  font-size: 9px;
+}
+
+.mission-stat-label {
+  font-size: 8.5px;
+}
+
+.map-hint,
+.map-tag {
+  font-size: 9px;
+}
+
+.editor-panel-kicker,
+.editor-tree-tools,
+.editor-tree-count {
+  font-size: 9px;
+}
+
+.tree-label {
+  font-size: 12px;
+}
+
+.editor-file-meta {
+  font-size: 8.5px;
+}
+
+.setup-label {
+  font-size: 9px;
+}
+
+.setup-subtitle {
+  font-size: 10px;
+}
+
+.setup-field-hint {
+  font-size: 8.5px;
+}
+
+.setup-summary {
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+@media (orientation: landscape) and (max-height: 600px) {
+  /* Keep the compact rail usable, but never below the readable floor. */
+  .classic-context {
+    font-size: 8px;
+  }
+
+  .mission-kicker {
+    font-size: 8px;
+  }
+
+  .mission-stat-label {
+    font-size: 8px;
+  }
+
+  .setup-summary {
+    font-size: 9px;
   }
 }
