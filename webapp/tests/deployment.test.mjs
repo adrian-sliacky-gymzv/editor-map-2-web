@@ -140,7 +140,9 @@ test('every map exposes a recenter control', () => {
   assert.match(read('js/classic-activities.js'), /zoomCenter\?\.addEventListener/);
   assert.match(read('js/app.js'), /zoomCenter\?\.addEventListener/);
   assert.match(read('js/editor.js'), /zoomCenter\?\.addEventListener/);
-  assert.match(read('js/map-view.js'), /center\(\)\s*\{/);
+  const mapView = read('js/map-view.js');
+  assert.match(mapView, /center\(\)\s*\{[\s\S]*?this\.zoom = 1;[\s\S]*?this\.panX = 0;/);
+  assert.match(read('js/app.js'), /function recenterView\(\)[\s\S]*?zoom: 1[\s\S]*?panX: 0/);
 });
 
 test('the hero starts Traf sa on hard with ten questions', () => {

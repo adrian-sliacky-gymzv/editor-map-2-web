@@ -233,8 +233,8 @@ Pri otočení telefónu na šírku sa HUD presunie do **ľavého postranného pa
 a mapa vyplní celú zostávajúcu plochu. Rovnaké pravidlo platí pre rýchlu hru aj
 editor, ktorý v landscape zbalí toolbar do jedného riadku.
 
-Každá mapa má tlačidlo **◎ Vycentrovať mapu**: zachová aktuálny zoom a vráti
-mapu do stredu. Tlačidlo **⌂** naďalej zobrazí celú mapu.
+Každá mapa má tlačidlo **◎ Vycentrovať mapu**: vráti mapu do stredu a súčasne
+obnoví celú mapu (rovnaký stav ako tlačidlo **⌂** a skratka `0`).
 
 ## Klávesové skratky
 
@@ -465,8 +465,8 @@ Posledný redizajn a oprava zoomu pridali:
 - prehľadnejší domov: kompaktný hero so **všeobecnou svetovou mapou**, jasné
   CTA, sticky navigácia, rýchle **Hrať** tlačidlo a prehľadné karty aktivít,
 - klikateľný výber mapy otvorí **Vyskúšaj sa!** pre zvolenú mapu,
-- **◎ Vycentrovať mapu** zachová zoom a vráti mapu do stredu; **⌂** zostáva
-  na zobrazenie celej mapy,
+- **◎ Vycentrovať mapu** vráti mapu do stredu a súčasne obnoví celú mapu;
+  **⌂** a skratka `0` sú jej ekvivalent,
 - mobilný portrait HUD je jeden riadok: cieľ + menšie body a číslo otázky;
   priemer a čas sú skryté,
 - v landscape sa HUD presunie do ľavého postranného panelu, mapa dostane celú

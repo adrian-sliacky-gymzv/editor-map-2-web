@@ -1232,7 +1232,7 @@ function setView(view) {
 
 function recenterView() {
   clearViewSettle();
-  state.view = clampView({ ...state.view, panX: 0, panY: 0 });
+  state.view = clampView({ zoom: 1, panX: 0, panY: 0 });
   applyView();
 }
 
