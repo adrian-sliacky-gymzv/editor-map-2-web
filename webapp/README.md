@@ -287,6 +287,8 @@ Supported map keys: `slovensko`, `svet`, `europa`, `afrika`, `azia`,
 - Semantic landmarks, visible focus rings and keyboard operation.
 - `prefers-color-scheme` light/dark themes; the dark theme uses a dark map
   table with inverted map linework for contrast.
+- Fast 110–180 ms opacity/transform motion for screens, dialogs, toasts and
+  button feedback; disabled by `prefers-reduced-motion: reduce`.
 - Responsive breakpoints tested at 320, 390, 568 (landscape), 768, 1024 and
   1280+ px.
 - `aria-keyshortcuts` on the main shortcuts; the help dialog is keyboard
@@ -304,7 +306,7 @@ Supported map keys: `slovensko`, `svet`, `europa`, `afrika`, `azia`,
 npm test
 ```
 
-Current status: **93 tests, 93 passing**. Coverage includes:
+Current status: **96 tests, 96 passing**. Coverage includes:
 
 - original scoring, per-map maximum distance and puzzle tolerance;
 - original quiz group cycling, unused targets and candidate sampling;
@@ -352,6 +354,8 @@ Original application: **Editor máp 2.0** (mxm.blindmaps), 2010.
 - Author: **RNDr. Štefan Karolčík, PhD**
 - Design and programming: **Ing. Juraj Hrabovec — MAX MEDIA**
 - Map data: **RNDr. Daniel Gurňák, PhD**
+- Web reimplementation, design and development: **Adrian Sliacky**
+- Source code: <https://github.com/adrian-sliacky-gymzv/editor-map-2-web>
 
 This is a non-commercial educational reimplementation. Original names, map
 data and trademarks remain the property of their respective authors. The

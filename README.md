@@ -35,7 +35,7 @@ The green button on the homepage starts a recommended game immediately: **Traf s
 - **Bilingual interface**: Slovak and English, automatic browser-language detection on the first visit and a language selector in Settings.
 - **Mobile-first controls**: pinch zoom, one-finger pan after zooming, double-tap zoom, inertia, a dedicated recenter button and a locked full-map view.
 - **Portrait and landscape layouts**: in landscape the game controls move to a compact side rail (156–196 px) and the map gets the full height.
-- **Light and dark themes**, keyboard shortcuts and an accessible focus order.
+- **Light and dark themes**, keyboard shortcuts, an accessible focus order and fast motion that respects reduced-motion settings.
 - **Static site** — no backend, database, tracking or build server.
 
 ### Screenshots
@@ -69,6 +69,8 @@ The green button on the homepage starts a recommended game immediately: **Traf s
 ### Credits
 
 Original game: **RNDr. Štefan Karolčík, PhD** (author), **Ing. Juraj Hrabovec — MAX MEDIA** (design and programming), **RNDr. Daniel Gurňák, PhD** (map data), © 2010. This is a non-commercial educational reimplementation. The original names and map data remain the property of their authors.
+
+Web reimplementation, design and development: **Adrian Sliacky**. Source code: [github.com/adrian-sliacky-gymzv/editor-map-2-web](https://github.com/adrian-sliacky-gymzv/editor-map-2-web).
 
 ---
 
@@ -105,7 +107,7 @@ Zelené tlačidlo na domovskej stránke hneď spustí odporúčanú hru: **Traf 
 - **Dvojjazyčné rozhranie**: slovenčina a angličtina, automatické rozpoznanie jazyka prehliadača pri prvej návšteve a výber jazyka v nastaveniach.
 - **Ovládanie na mobil**: pinch zoom, posun po priblížení, dvojité ťuknutie, zotrvačnosť, tlačidlo na vycentrovanie a pevná mapa pri predvolenom oddialení.
 - **Portrait aj landscape**: v landscape sa ovládanie presunie do kompaktného bočného panelu (156–196 px) a mapa dostane celú výšku.
-- **Svetlá a tmavá téma**, klávesové skratky a prístupný fokus.
+- **Svetlá a tmavá téma**, klávesové skratky, prístupný fokus a rýchle animácie s rešpektovaním nastavenia zníženého pohybu.
 - **Statická stránka** — bez servera, databázy, sledovania a bez build kroku.
 
 ### Obrázky
@@ -125,3 +127,5 @@ Rovnaká galéria ako v anglickej časti je v priečinku [`screenshots/`](screen
 ### Autori
 
 Pôvodná hra: **RNDr. Štefan Karolčík, PhD** (autor), **Ing. Juraj Hrabovec — MAX MEDIA** (dizajn a programovanie), **RNDr. Daniel Gurňák, PhD** (mapové podklady), © 2010. Ide o nekomerčnú edukačnú reimplementáciu. Pôvodné názvy a mapové podklady patria ich autorom.
+
+Webová reimplementácia, dizajn a vývoj: **Adrian Sliacky**. Zdrojový kód: [github.com/adrian-sliacky-gymzv/editor-map-2-web](https://github.com/adrian-sliacky-gymzv/editor-map-2-web).

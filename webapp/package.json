@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "description": "Editor máp 2 — kompletná webová reimplementácia: Vyskúšaj sa!, Traf sa!, Poskladaj!, editor máp, 8 pôvodných máp a atlas 74 slovenských miest. Slovak and English UI.",
+  "author": "Adrian Sliacky",
   "scripts": {
     "start": "node server.mjs",
     "preview": "node server.mjs",

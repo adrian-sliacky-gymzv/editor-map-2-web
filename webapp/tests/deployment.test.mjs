@@ -177,6 +177,27 @@ test('the redesign stays deployment-safe', () => {
   assert.match(html, /id="postup"/);
 });
 
+test('repository link and reimplementation credit are present', () => {
+  const html = read('index.html');
+  assert.match(html, /class="footer-github"/);
+  assert.match(html, /https:\/\/github\.com\/adrian-sliacky-gymzv\/editor-map-2-web/);
+  assert.match(html, /Reimplementácia: <b>Adrian Sliacky<\/b>/);
+  assert.match(html, /<dt>Reimplementácia<\/dt><dd>Adrian Sliacky<\/dd>/);
+  assert.match(html, /rel="noopener noreferrer"/);
+  assert.match(html, /<meta name="author" content="Adrian Sliacky">/);
+});
+
+test('motion is short, purposeful and reduced-motion aware', () => {
+  const css = read('redesign.css');
+  assert.match(css, /@keyframes dialog-in/);
+  assert.match(css, /@keyframes feedback-pop/);
+  assert.match(css, /--motion-fast: 110ms/);
+  assert.match(css, /--motion-base: 160ms/);
+  assert.match(css, /prefers-reduced-motion: reduce/);
+  assert.match(css, /animation-duration: 1ms !important/);
+  assert.ok(!/animation-duration:\s*(?:[3-9]\d{2,}|\d{4,})ms/.test(css));
+});
+
 test('language settings and automatic translation hooks are present', () => {
   const html = read('index.html');
   const css = read('redesign.css');

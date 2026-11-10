@@ -51,6 +51,14 @@ test('dynamic game sentences keep their values', () => {
   assert.equal(translateCore('Hra Aim!', 'en'), 'Game Aim!');
 });
 
+test('repository and reimplementation credit strings translate', () => {
+  assert.equal(translateCore('Reimplementácia:', 'en'), 'Reimplementation:');
+  assert.equal(translateCore('Reimplementácia', 'en'), 'Reimplementation');
+  assert.equal(translateCore('Zdrojový kód', 'en'), 'Source code');
+  assert.equal(translateCore('GitHub repozitár', 'en'), 'GitHub repository');
+  assert.equal(translateCore('GitHub repozitár ↗', 'en'), 'GitHub repository ↗');
+});
+
 test('generic map type words translate without changing proper names', () => {
   assert.equal(translateCore('Vodná nádrž Zemplínska Šírava', 'en'), 'Zemplínska Šírava Reservoir');
   assert.equal(translateCore('jazero Kariba', 'en'), 'Lake Kariba');

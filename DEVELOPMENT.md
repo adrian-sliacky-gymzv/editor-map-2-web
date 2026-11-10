@@ -32,7 +32,7 @@ $env:PORT=8125; npm start
 ```powershell
 cd webapp
 npm run lint:js   # parse every JavaScript module
-npm test          # 88 Node tests
+npm test          # 96 Node tests
 npm run verify    # lint + tests
 ```
 
@@ -62,6 +62,22 @@ Useful checks after a UI change:
 
 Commit in small, atomic steps while working; keep the working tree clean before
 the preview. Never deploy an unapproved change.
+
+## Motion guidelines
+
+The interface motion is intentionally small: 110–180 ms, ease-out, and limited
+to opacity/transform so it never causes layout shift. Simple feedback is around
+100 ms; dialogs and screen changes are around 140–160 ms. This follows common
+guidance from [Nielsen Norman Group](https://www.nngroup.com/articles/animation-duration/)
+and [IBM Carbon](https://www.carbondesignsystem.com/building-blocks/foundations/motion/).
+
+Rules:
+
+- Do not animate for longer than ~200 ms unless there is a strong reason.
+- Prefer opacity and transform; avoid width, height, top and left animations.
+- Do not animate the map during gestures; map motion stays user-driven.
+- Every animation must be disabled by `prefers-reduced-motion: reduce`.
+- Test the result at 320 px width and in mobile landscape before approval.
 
 ## Where changes go
 

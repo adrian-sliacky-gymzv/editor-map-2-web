@@ -453,6 +453,11 @@ export const EN = {
     'Non-commercial educational reimplementation. Original trademarks and copyrights belong to their owners.',
   'Nekomerčná edukatívna webová reimplementácia hry':
     'Non-commercial educational web reimplementation of the game',
+  'Reimplementácia:': 'Reimplementation:',
+  'Reimplementácia': 'Reimplementation',
+  'Zdrojový kód': 'Source code',
+  'GitHub repozitár': 'GitHub repository',
+  'GitHub repozitár ↗': 'GitHub repository ↗',
   '© 2010 RNDr. Štefan Karolčík, PhD · dizajn a programovanie Ing. Juraj Hrabovec – MAX MEDIA · mapové podklady RNDr. Daniel Gurňák, PhD.':
     '© 2010 RNDr. Štefan Karolčík, PhD · design and programming Ing. Juraj Hrabovec – MAX MEDIA · map data RNDr. Daniel Gurňák, PhD.',
   'Nekomerčná edukatívna webová reimplementácia hry Editor máp 2 (2010).':
