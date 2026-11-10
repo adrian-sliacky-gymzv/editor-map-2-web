@@ -82,8 +82,8 @@ test('help pages are mobile-ready and deployment-safe', () => {
 test('GitHub Pages deployment files are present', () => {
   assert.ok(fs.existsSync(path.join(ROOT, '.nojekyll')));
   const fallback = read('404.html');
-  assert.match(fallback, /http-equiv="refresh"/);
-  assert.match(fallback, /url=\.\//);
+  assert.match(fallback, /href="\.\/"/);
+  assert.match(fallback, /Táto adresa neexistuje/);
   const workflow = fs.readFileSync(path.join(REPO, '.github', 'workflows', 'pages.yml'), 'utf8');
   assert.match(workflow, /actions\/configure-pages@/);
   assert.match(workflow, /actions\/upload-pages-artifact@/);
