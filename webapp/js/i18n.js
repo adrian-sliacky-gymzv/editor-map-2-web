@@ -106,6 +106,33 @@ export function translateCore(core, lang = current) {
     return `${translateCore(parenthesisedText[1], lang)} (${translateCore(parenthesisedText[2], lang)})`;
   }
 
+  // Generic geographic type words in map object labels. Proper names are
+  // preserved; only the type word is translated and, where natural, moved.
+  const placePrefixes = [
+    [/^vodná nádrž\s+(.+)$/i, (m) => `${m[1]} Reservoir`],
+    [/^jazero\s+(.+)$/i, (m) => `Lake ${m[1]}`],
+    [/^j\.\s+(.+)$/i, (m) => `Lake ${m[1]}`],
+    [/^rieka\s+(.+)$/i, (m) => `${m[1]} River`],
+    [/^púšť\s+(.+)$/i, (m) => `${m[1]} Desert`],
+    [/^vodopády\s+(.+)$/i, (m) => `${m[1]} Falls`],
+    [/^ostrov\s+(.+)$/i, (m) => `${m[1]} Island`],
+    [/^pohorie\s+(.+)$/i, (m) => `${m[1]} Mountains`],
+    [/^nížina\s+(.+)$/i, (m) => `${m[1]} Lowland`],
+    [/^kotlina\s+(.+)$/i, (m) => `${m[1]} Basin`],
+    [/^vrch\s+(.+)$/i, (m) => `${m[1]} Hill`],
+    [/^priesmyk\s+(.+)$/i, (m) => `${m[1]} Pass`],
+    [/^jaskyňa\s+(.+)$/i, (m) => `${m[1]} Cave`],
+    [/^národný park\s+(.+)$/i, (m) => `${m[1]} National Park`],
+    [/^chránená krajinná oblasť\s+(.+)$/i, (m) => `${m[1]} Protected Landscape Area`],
+    [/^okres\s+(.+)$/i, (m) => `${m[1]} District`],
+    [/^kraj\s+(.+)$/i, (m) => `${m[1]} Region`],
+    [/^obec\s+(.+)$/i, (m) => `${m[1]} Municipality`],
+  ];
+  for (const [pattern, transform] of placePrefixes) {
+    const match = pattern.exec(text);
+    if (match) return transform(match);
+  }
+
   const countedPair = /^([\d][\d\s]*?)\s+(\S+) \+ ([\d][\d\s]*?)\s+(\S+)$/.exec(text);
   if (countedPair) {
     const first = translateCount([null, countedPair[1], countedPair[2]]);

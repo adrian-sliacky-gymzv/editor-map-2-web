@@ -93,8 +93,9 @@ the preview. Never deploy an unapproved change.
 4. Original game messages live in `GAME_MESSAGES_EN` and are read through
    `gameMessage()`.
 
-Original map object names are intentionally not translated; they are part of
-the original `.mef` data.
+Proper geographic names are intentionally not translated; they are part of the
+original `.mef` data. Generic type words in object labels are translated in
+English mode.
 
 ## Data sources
 

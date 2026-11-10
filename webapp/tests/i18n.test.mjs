@@ -51,6 +51,16 @@ test('dynamic game sentences keep their values', () => {
   assert.equal(translateCore('Hra Aim!', 'en'), 'Game Aim!');
 });
 
+test('generic map type words translate without changing proper names', () => {
+  assert.equal(translateCore('Vodná nádrž Zemplínska Šírava', 'en'), 'Zemplínska Šírava Reservoir');
+  assert.equal(translateCore('jazero Kariba', 'en'), 'Lake Kariba');
+  assert.equal(translateCore('j. Erie', 'en'), 'Lake Erie');
+  assert.equal(translateCore('púšť Atacama', 'en'), 'Atacama Desert');
+  assert.equal(translateCore('vodopády Iguaçu', 'en'), 'Iguaçu Falls');
+  assert.equal(translateCore('zemepisná sieť', 'en'), 'Geographic grid');
+  assert.equal(translateCore('Bratislava', 'en'), 'Bratislava');
+});
+
 test('text-node translation preserves surrounding whitespace', () => {
   assert.equal(translateText(' Hrať ', 'en'), ' Play ');
   assert.equal(translateText('Bratislava', 'en'), 'Bratislava');

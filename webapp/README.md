@@ -39,8 +39,9 @@ messages. The result card can be closed and reopened without leaving the game.
   Slovak, every other browser gets English.
 - A language selector is available from the **⚙ Settings** button on the home
   header. The choice is stored locally.
-- Original map object names remain in their original Slovak form; the map data
-  itself is unchanged.
+- Proper geographic names remain in their original form. Generic object types
+  such as `jazero`, `púšť` or `vodná nádrž` are translated in English mode; the
+  original map data is never modified.
 
 ### Map editor
 
@@ -303,7 +304,7 @@ Supported map keys: `slovensko`, `svet`, `europa`, `afrika`, `azia`,
 npm test
 ```
 
-Current status: **92 tests, 92 passing**. Coverage includes:
+Current status: **93 tests, 93 passing**. Coverage includes:
 
 - original scoring, per-map maximum distance and puzzle tolerance;
 - original quiz group cycling, unused targets and candidate sampling;
