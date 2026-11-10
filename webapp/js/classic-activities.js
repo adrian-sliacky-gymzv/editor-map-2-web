@@ -690,13 +690,15 @@ function updateProgress() {
 /* ------------------------------------------------------------------------- */
 
 function prepareTest() {
+  const configGroups = childrenByTag(GAME.testEl, 'group');
   const pools = groupPools(GAME.mapDoc, GAME.testEl, GAME.level.maxLevel, { puzzle: false });
   GAME.testPools = pools
-    .filter((pool) => pool.nodes.length > 0)
-    .map((pool) => ({
+    .map((pool, index) => ({
       ...pool,
+      configGroup: configGroups[index] || configGroups[0],
       used: new Set(),
-    }));
+    }))
+    .filter((pool) => pool.nodes.length > 0);
   const total = GAME.testPools.reduce((sum, pool) => sum + pool.nodes.length, 0);
   GAME.numQ = Math.min(GAME.numQ, Math.max(1, total));
 }
@@ -761,9 +763,7 @@ function nextTestGroup() {
     if (GAME.currentGroup >= GAME.testPools.length) GAME.currentGroup = 0;
     const pool = GAME.testPools[GAME.currentGroup];
     if (pool.nodes.some((node) => !pool.used.has(node))) {
-      const configGroup = childrenByTag(GAME.testEl, 'group').find((g) => g.getAttribute('label') === pool.label)
-        || childrenByTag(GAME.testEl, 'group')[0];
-      return { index: GAME.currentGroup, pool, configGroup };
+      return { index: GAME.currentGroup, pool, configGroup: pool.configGroup };
     }
   }
   return null;
