@@ -266,7 +266,7 @@ test('distance taps defer briefly so one-finger zoom works in Aim!', () => {
   assert.match(activities, /pendingDistanceGuess/);
   assert.match(activities, /pendingGuessMark/);
   assert.match(activities, /map:doubletapstart/);
-  assert.match(mapView, /this\.interaction === 'click' \? 280 : 320/);
+  assert.match(mapView, /this\.interaction === 'click' \? 220 : 320/);
   assert.match(mapView, /map:doubletapstart/);
   assert.match(css, /\.map-mark\.is-pending-guess/);
 });

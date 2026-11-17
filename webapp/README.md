@@ -195,9 +195,9 @@ only after the user zooms in.
   not move it. The fitted view is the button **⌂** and the `0` shortcut.
 - **Zoom in** — wheel, trackpad pinch, two-finger pinch, `+`/`−`, double-tap or
   double-click. Zoom is anchored at the cursor/finger midpoint.
-- **One-finger zoom** — double-tap and keep the finger down, then slide up to
-  zoom in or down to zoom out (the Google Maps gesture). A normal double tap
-  zooms in progressively.
+- **One-finger zoom** - double-tap and keep the finger down, then slide down to
+  zoom in or up to zoom out. This matches Google Maps' published gesture
+  direction. A normal double tap zooms in progressively.
 - **Pan** — one finger or mouse drag after zooming. Inertia and elastic edges
   make the map feel like a map canvas, not a frozen image.
 - **Between questions** - after an answer the camera fits both the guess and
@@ -217,9 +217,10 @@ only after the user zooms in.
 - **Tap safety** - the final touch after a pinch, pan or double-tap never counts
   as an answer. Taps on map controls never answer. Puzzle pieces require a real
   tap; a drag does not submit.
-- **Aim! touch taps** - a touch tap shows a provisional crosshair and commits
-  after 300 ms, so a quick second tap can start one-finger zoom instead of
-  answering. Mouse clicks commit immediately.
+- **Aim! touch taps** - a touch tap shows a provisional crosshair and the
+  points for that spot immediately, then commits after 240 ms so a quick
+  second tap can start one-finger zoom instead of answering. Mouse clicks
+  commit immediately.
 - **New question** — each question starts from the full fitted map. In
   `Traf sa!`, the view zooms out if the guess or correct point is outside the
   viewport.

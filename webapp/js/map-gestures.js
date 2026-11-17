@@ -169,9 +169,10 @@ export function doubleTapTargetZoom(zoom, { zoomIn = 2.4, step = 1.8, threshold 
 }
 
 /**
- * One-finger zoom after double tap and drag. Dragging up (negative deltaY)
- * zooms in and dragging down zooms out, with an exponential feel so the first
- * pixels are precise and a full-screen drag covers a useful range.
+ * One-finger zoom after double tap and drag. Google Maps uses the same
+ * direction as its published gesture guide: drag down to zoom in, drag up to
+ * zoom out. The exponential response keeps the first pixels precise while a
+ * full-screen drag covers a useful range.
  */
 export function oneFingerZoomTarget(
   startZoom,
@@ -180,5 +181,5 @@ export function oneFingerZoomTarget(
 ) {
   const start = clampNumber(startZoom, minZoom, maxZoom);
   const delta = Number(deltaY) || 0;
-  return clampNumber(start * Math.exp(-delta / Math.max(1, sensitivity)), minZoom, maxZoom);
+  return clampNumber(start * Math.exp(delta / Math.max(1, sensitivity)), minZoom, maxZoom);
 }

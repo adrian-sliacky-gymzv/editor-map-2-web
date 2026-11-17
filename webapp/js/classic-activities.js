@@ -51,7 +51,7 @@ import {
 const SETUP_KEY = 'editorMap2.activitySetup.v2';
 // A touch tap in the distance game answers. Hold the commit just long enough
 // for a second tap to turn it into the one-finger zoom gesture instead.
-const DISTANCE_TOUCH_COMMIT_MS = 300;
+const DISTANCE_TOUCH_COMMIT_MS = 240;
 
 /** Original config.xml text, or its English equivalent in English mode. */
 const cfgText = (name) => gameMessage(name, classicData.cfg(name));
@@ -1614,13 +1614,23 @@ function onDistanceClick(point, event) {
   // second tap can become double-tap/drag zoom instead of an answer.
   GAME.pendingDistanceGuess = point;
   if (GAME.mapView) {
+    let preview = '';
+    const target = GAME.targetNode;
+    if (target) {
+      const dist = distanceBetween(point, {
+        x: getNumberAttr(target, 'markX'),
+        y: getNumberAttr(target, 'markY'),
+      });
+      preview = `${scoreForDistance(dist, maxDistanceForMap(GAME.mapView.W, GAME.mapView.H))} b.`;
+    }
     const mark = GAME.mapView.addMark({
       x: point.x,
       y: point.y,
-      label: 'Tvoj tip',
+      label: preview || 'Tvoj tip',
       symbol: 'guess',
       state: 'ask',
-      labelVisible: false,
+      labelPlacement: 'above',
+      labelVisible: true,
     });
     if (mark?.el) {
       mark.el.style.pointerEvents = 'none';

@@ -239,7 +239,7 @@ body.editor-tree-open {
 }
 
 .map-mark.is-pending-guess {
-  opacity: 0.58;
+  opacity: 0.75;
 }
 
 .map-mark .mark-halo {

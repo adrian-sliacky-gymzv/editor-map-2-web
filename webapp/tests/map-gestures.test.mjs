@@ -169,12 +169,12 @@ test('double tap zooms in progressively like a normal map viewer', () => {
   assert.equal(doubleTapTargetZoom(MAX_MAP_ZOOM), MAX_MAP_ZOOM);
 });
 
-test('one-finger double-tap drag zooms around the starting level', () => {
-  assert.ok(oneFingerZoomTarget(2, -100) > 2);
-  assert.ok(oneFingerZoomTarget(2, 100) < 2);
-  assert.equal(oneFingerZoomTarget(1, 100), 1);
-  assert.equal(oneFingerZoomTarget(9, -1000), MAX_MAP_ZOOM);
-  assert.ok(Math.abs(oneFingerZoomTarget(2, -160) - 2 * Math.E) < 1e-9);
+test('one-finger double-tap drag follows the Google Maps direction', () => {
+  assert.ok(oneFingerZoomTarget(2, 100) > 2);
+  assert.ok(oneFingerZoomTarget(2, -100) < 2);
+  assert.equal(oneFingerZoomTarget(1, -100), 1);
+  assert.equal(oneFingerZoomTarget(9, 1000), MAX_MAP_ZOOM);
+  assert.ok(Math.abs(oneFingerZoomTarget(2, 160) - 2 * Math.E) < 1e-9);
 });
 
 test('clientToMap reverses the canvas transform', () => {

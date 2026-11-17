@@ -1046,7 +1046,8 @@ export class MapView {
     // A fresh contact after every finger was lifted is a deliberate new tap;
     // do not make the user wait for the previous gesture's safety window.
     if (this.pointers.size === 0) this.suppressClickUntil = 0;
-    const startedOnMark = Boolean(event.target.closest('.map-mark'));
+    const markTarget = event.target.closest('.map-mark');
+    const startedOnMark = Boolean(markTarget && !markTarget.classList.contains('is-pending-guess'));
     const interactive = this.interactivePointer === event.pointerId;
     this.pointers.set(event.pointerId, {
       x: event.clientX,
@@ -1065,7 +1066,7 @@ export class MapView {
         x: event.clientX,
         y: event.clientY,
         time: performance.now(),
-      }, { maxDelay: this.interaction === 'click' ? 280 : 320, slop: 30 });
+      }, { maxDelay: this.interaction === 'click' ? 220 : 320, slop: 30 });
     if (doubleTap) {
       // A second tap can either become a normal double-tap zoom on release or,
       // as in Google Maps, a continuous one-finger zoom when the finger slides.
