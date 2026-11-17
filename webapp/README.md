@@ -35,6 +35,10 @@ The activity setup keeps the complete map grid visible on phones: a two-column
 picker with wrapped map names, while the form body scrolls and Start/Cancel stay
 fixed. Short landscape layouts show the full map grid and controls side by side.
 
+Long city and geographical-object names in the mission HUD wrap instead of
+being clipped. On portrait phones the target gets its own full-width row above
+the stats, and the map resizes smoothly as the HUD grows.
+
 ### Languages
 
 - Slovak and English UI, including game messages, result cards, editor labels,
@@ -361,7 +365,7 @@ Supported map keys: `slovensko`, `svet`, `europa`, `afrika`, `azia`,
 npm test
 ```
 
-Current status: **118 tests, 118 passing**. Coverage includes:
+Current status: **119 tests, 119 passing**. Coverage includes:
 
 - original scoring, per-map maximum distance, printed scale-bar kilometres and
   puzzle tolerance;
@@ -371,7 +375,7 @@ Current status: **118 tests, 118 passing**. Coverage includes:
 - pinch/zoom/pan mathematics, two-point review framing and the locked fitted map;
 - silent Aim! tap confirmation, full-answer reveal and double-tap/gesture cancellation;
 - the animated next-question reset and its reduced-motion fallback;
-- measured mission-HUD height transitions and docked Next placement;
+- full-length mission names, measured HUD height transitions and docked Next placement;
 - per-question kilometres and average distance in the Aim! result;
 - map dimensions and all eight maps;
 - activity HUD, markers and result flows;

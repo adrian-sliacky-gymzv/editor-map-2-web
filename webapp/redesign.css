@@ -1364,6 +1364,10 @@ kbd {
   font-weight: 600;
   letter-spacing: 0.09em;
   text-transform: uppercase;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: break-word;
 }
 
 .topbar-actions {
@@ -1501,15 +1505,16 @@ kbd {
 }
 
 .mission-name {
-  overflow: hidden;
+  overflow: visible;
   color: var(--ink);
   font-family: var(--display);
   font-size: clamp(21px, 2.2vw, 27px);
   font-weight: 400;
   line-height: 1;
   letter-spacing: -0.025em;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 
 .mission-type {
@@ -1591,6 +1596,30 @@ kbd {
 
 .mission-stat-sep {
   color: var(--line-2);
+}
+
+/* Tablets keep the name and stats on one row; the name wraps when needed. */
+@media (min-width: 701px) {
+  .mission-hud {
+    flex-wrap: nowrap;
+  }
+
+  .mission-object {
+    flex: 0 1 auto;
+  }
+
+  .mission-stats {
+    flex: 0 0 auto;
+    margin-left: auto;
+    padding: 0;
+    border-top: 0;
+  }
+
+  .mission-stat {
+    flex: 0 0 auto;
+    min-width: 58px;
+    padding: 0 16px;
+  }
 }
 
 .game-progress {
@@ -4606,7 +4635,7 @@ kbd {
   }
 
   .mission-hud {
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     align-items: stretch;
     gap: 0;
     margin: 5px 0 6px;
@@ -4614,7 +4643,7 @@ kbd {
   }
 
   .mission-object {
-    flex: 1 1 auto;
+    flex: 1 1 100%;
     min-width: 0;
     gap: 8px;
     padding: 7px 9px;
@@ -4636,13 +4665,12 @@ kbd {
   }
 
   .mission-name {
-    display: -webkit-box;
-    overflow: hidden;
+    display: block;
+    overflow: visible;
     font-size: 19px;
     line-height: 1.03;
     white-space: normal;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: unset;
   }
 
   .mission-type {
@@ -4650,19 +4678,19 @@ kbd {
   }
 
   .mission-stats {
-    flex: 0 0 auto;
+    flex: 1 1 100%;
     align-items: stretch;
     margin-left: 0;
     padding: 0;
-    border-top: 0;
+    border-top: 1px solid var(--line);
   }
 
   .mission-stat {
-    flex: 0 0 auto;
+    flex: 1 1 0;
     min-width: 0;
-    align-items: flex-end;
+    align-items: flex-start;
     justify-content: center;
-    padding: 0 8px;
+    padding: 5px 8px;
   }
 
   .mission-stat-average,
@@ -5008,13 +5036,12 @@ kbd {
   }
 
   .mission-name {
-    display: -webkit-box;
-    overflow: hidden;
+    display: block;
+    overflow: visible;
     font-size: 15px;
     line-height: 1.02;
     white-space: normal;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: unset;
   }
 
   .mission-type {

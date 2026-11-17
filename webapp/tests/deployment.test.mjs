@@ -266,6 +266,23 @@ test('the floating Next action stays docked at the bottom', () => {
   assert.doesNotMatch(styles, /\.map-next-float\.is-top/);
 });
 
+test('long target names wrap fully in the mission HUD', () => {
+  const classic = read('classic.css');
+  const css = read('redesign.css');
+  const styles = read('styles.css');
+  assert.match(classic, /\.mission-name \{[\s\S]*?overflow: visible;[\s\S]*?white-space: normal;[\s\S]*?overflow-wrap: break-word;/);
+  assert.match(css, /\.mission-name \{[\s\S]*?overflow: visible;[\s\S]*?white-space: normal;[\s\S]*?overflow-wrap: break-word;/);
+  assert.match(css, /\.mission-object \{\s*flex: 1 1 100%;/);
+  assert.match(css, /\.mission-stats \{\s*flex: 1 1 100%;[\s\S]*?border-top: 1px solid var\(--line\);/);
+  assert.match(css, /\.mission-stat \{\s*flex: 1 1 0;[\s\S]*?align-items: flex-start;/);
+  assert.match(css, /@media \(min-width: 701px\) \{[\s\S]*?\.mission-hud \{\s*flex-wrap: nowrap;/);
+  assert.doesNotMatch(css, /-webkit-line-clamp: 2/);
+  assert.match(css, /\.mission-name \{[\s\S]*?-webkit-line-clamp: unset;/);
+  assert.match(classic, /\.classic-context \{[\s\S]*?white-space: normal;/);
+  assert.match(styles, /\.distance-legend-item \{[\s\S]*?white-space: normal;/);
+  assert.match(styles, /\.distance-legend-copy b \{[\s\S]*?white-space: normal;[\s\S]*?overflow-wrap: break-word;/);
+});
+
 test('mobile activity setup shows the complete map picker', () => {
   const css = read('redesign.css');
   assert.match(css, /Mobile setup: show the complete map grid/);

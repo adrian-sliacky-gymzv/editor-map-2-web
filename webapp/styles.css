@@ -1992,9 +1992,9 @@ kbd {
 
 .distance-legend-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 7px;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .distance-legend-copy {
@@ -2005,12 +2005,14 @@ kbd {
 }
 
 .distance-legend-copy b {
-  max-width: 146px;
-  overflow: hidden;
+  max-width: none;
+  overflow: visible;
   color: #5b687a;
   font-size: 10px;
   font-weight: 600;
-  text-overflow: ellipsis;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 
 .distance-legend-swatch {
