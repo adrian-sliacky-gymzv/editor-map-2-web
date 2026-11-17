@@ -6,6 +6,7 @@ import {
   canvasPanLimits,
   clientToMap,
   doubleTapTargetZoom,
+  fitBoundsZoom,
   isDoubleTap,
   oneFingerZoomTarget,
   pinchView,
@@ -140,6 +141,25 @@ test('double tap detection honours time and distance windows', () => {
   assert.equal(isDoubleTap(first, { x: 120, y: 110, time: 1400 }), false);
   assert.equal(isDoubleTap(first, { x: 160, y: 100, time: 1200 }), false);
   assert.equal(isDoubleTap(null, { x: 100, y: 100, time: 1200 }), false);
+});
+
+test('review fit keeps both points visible without zooming in past the player', () => {
+  const fit = (bbox, currentZoom, viewport = { width: 1000, height: 800 }) => fitBoundsZoom({
+    bbox,
+    viewport,
+    fitScale: 1,
+    currentZoom,
+    paddingX: 100,
+    paddingY: 100,
+  });
+  const close = fit({ width: 100, height: 100 }, 4);
+  assert.equal(close, 4);
+  const pair = fit({ width: 500, height: 400 }, 6);
+  assert.ok(Math.abs(pair - 1.5) < 1e-9);
+  assert.equal(fit({ width: 500, height: 400 }, 1.2), 1.2);
+  assert.equal(fit({ width: 5000, height: 5000 }, 8), 1);
+  assert.equal(fit({ width: 10, height: 10 }, 0.2), 1);
+  assert.equal(fit({ width: 0, height: 0 }, 3, { width: 200, height: 200 }), 1);
 });
 
 test('double tap zooms in progressively like a normal map viewer', () => {

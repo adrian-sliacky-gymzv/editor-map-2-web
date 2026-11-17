@@ -124,6 +124,32 @@ export function canvasPanLimits({
   };
 }
 
+/**
+ * Zoom that fits a map-space bounding box inside the viewport with padding.
+ * Review cameras never zoom in past the player's current level: if both
+ * points are already visible, this keeps the current zoom.
+ */
+export function fitBoundsZoom({
+  bbox,
+  viewport,
+  fitScale,
+  currentZoom,
+  paddingX = 88,
+  paddingY = 72,
+  minZoom = MIN_MAP_ZOOM,
+  maxZoom = MAX_MAP_ZOOM,
+}) {
+  const boxWidth = Math.max(1, Number(bbox?.width) || 0);
+  const boxHeight = Math.max(1, Number(bbox?.height) || 0);
+  const availableWidth = Math.max(1, (Number(viewport?.width) || 1) - paddingX * 2);
+  const availableHeight = Math.max(1, (Number(viewport?.height) || 1) - paddingY * 2);
+  const scale = Math.max(0.00001, Number(fitScale) || 1);
+  const current = clampNumber(currentZoom, minZoom, maxZoom);
+  const fitX = availableWidth / (boxWidth * scale);
+  const fitY = availableHeight / (boxHeight * scale);
+  return clampNumber(Math.min(current, fitX, fitY), minZoom, maxZoom);
+}
+
 export function isDoubleTap(previous, next, { maxDelay = 320, slop = 28 } = {}) {
   if (!previous || !next) return false;
   const elapsed = Number(next.time) - Number(previous.time);

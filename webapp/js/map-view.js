@@ -11,6 +11,7 @@ import {
   MIN_MAP_ZOOM,
   canvasPanLimits,
   doubleTapTargetZoom,
+  fitBoundsZoom,
   isDoubleTap,
   oneFingerZoomTarget,
   pinchView,
@@ -817,64 +818,100 @@ export class MapView {
   }
 
   /**
-   * Keep the player's zoom while making an answer visible. If the point is
-   * outside the padded viewport, glide the map until it is centred. Unlike a
-   * fit, this leaves a real zoomed view for the next-question reset to animate.
+   * Reveal every important point after an answer. Both the guess and the
+   * correct location must stay on screen, so this zooms out only as much as
+   * the pair requires and centres their bounding box. It never zooms in past
+   * the player's current level, and it keeps that level when both points are
+   * already comfortably visible.
    */
-  revealPoint(point, { padding = 56, duration = 200 } = {}) {
-    if (!point || !this.scene) return false;
+  revealPoints(points, { paddingX = 88, paddingY = 72, duration = 260 } = {}) {
+    if (!Array.isArray(points) || !points.length || !this.scene) return false;
     const rect = this.viewport.getBoundingClientRect();
     if (rect.width < 2 || rect.height < 2) return false;
     if (this.zoom <= 1.001) return false;
-    const screen = this.mapToScreen(point.x, point.y);
-    const visible = (
-      screen.x >= rect.left + padding
-      && screen.x <= rect.right - padding
-      && screen.y >= rect.top + padding
-      && screen.y <= rect.bottom - padding
-    );
+
+    const visible = points.every((point) => {
+      const screen = this.mapToScreen(point.x, point.y);
+      return (
+        screen.x >= rect.left + paddingX
+        && screen.x <= rect.right - paddingX
+        && screen.y >= rect.top + paddingY
+        && screen.y <= rect.bottom - paddingY
+      );
+    });
     if (visible) return false;
-    return this.panToPointAnimated(point.x, point.y, duration);
+
+    const xs = points.map((point) => Number(point.x));
+    const ys = points.map((point) => Number(point.y));
+    const minX = Math.min(...xs);
+    const maxX = Math.max(...xs);
+    const minY = Math.min(...ys);
+    const maxY = Math.max(...ys);
+    const bbox = { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+    const targetZoom = fitBoundsZoom({
+      bbox,
+      viewport: { width: rect.width, height: rect.height },
+      fitScale: this.fitScale,
+      currentZoom: this.zoom,
+      paddingX,
+      paddingY,
+    });
+    return this._animateCameraTo(
+      { zoom: targetZoom, centerX: bbox.x + bbox.width / 2, centerY: bbox.y + bbox.height / 2 },
+      duration
+    );
   }
 
   /**
-   * Short rAF pan at the current zoom. Sharing _fitFrame with fitAnimated means
-   * pressing "Next" cancels the pan cleanly and continues into the reset from
-   * the current position instead of jumping.
+   * Animate a camera move in map space. Interpolating the map centre (rather
+   * than screen-space pan) keeps the shot aimed at the same place while the
+   * zoom changes, which is what makes a review zoom-out feel like one camera
+   * movement instead of a pan and a zoom fighting each other.
    */
-  panToPointAnimated(cx, cy, duration = 200) {
+  _animateCameraTo({ zoom, centerX, centerY }, duration = 260) {
     if (!this.scene) return false;
-    const startX = this.panX;
-    const startY = this.panY;
-    const targetPan = () => {
-      const scale = this.fitScale * this.zoom;
-      const limits = this._panLimits();
-      return {
-        x: clamp((this.W / 2 - cx) * scale, -limits.maxX, limits.maxX),
-        y: clamp((this.H / 2 - cy) * scale, -limits.maxY, limits.maxY),
-      };
-    };
-    const end = targetPan();
-    if (Math.abs(end.x - startX) < 0.5 && Math.abs(end.y - startY) < 0.5) return false;
+    const targetZoom = clamp(Number(zoom) || this.zoom, MIN_MAP_ZOOM, MAX_MAP_ZOOM);
+    const startZoom = this.zoom;
+    const startScale = this.fitScale * startZoom;
+    const startCenterX = this.W / 2 - this.panX / startScale;
+    const startCenterY = this.H / 2 - this.panY / startScale;
+    const targetScale = this.fitScale * targetZoom;
+    const limits = this._panLimits(targetZoom);
+    const targetPanX = clamp((this.W / 2 - centerX) * targetScale, -limits.maxX, limits.maxX);
+    const targetPanY = clamp((this.H / 2 - centerY) * targetScale, -limits.maxY, limits.maxY);
+    const targetCenterX = this.W / 2 - targetPanX / targetScale;
+    const targetCenterY = this.H / 2 - targetPanY / targetScale;
+
+    const moved = Math.abs(targetZoom - startZoom) > 0.001
+      || Math.abs(targetCenterX - startCenterX) > 0.5
+      || Math.abs(targetCenterY - startCenterY) > 0.5;
+    if (!moved) return false;
+
     this._stopMomentum();
     this._clearSettleAnimation();
     const reduced = typeof window !== 'undefined'
       && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     if (reduced) {
-      this.panX = end.x;
-      this.panY = end.y;
+      this.zoom = targetZoom;
+      this.panX = targetPanX;
+      this.panY = targetPanY;
       this._applyTransform();
       this._notifyZoom();
       return false;
     }
+
     const startedAt = performance.now();
     this._beginGesture();
     const step = (now) => {
       const progress = Math.min(1, Math.max(0, (now - startedAt) / duration));
       const eased = 1 - ((1 - progress) ** 3);
-      const target = targetPan();
-      this.panX = startX + (target.x - startX) * eased;
-      this.panY = startY + (target.y - startY) * eased;
+      this.zoom = startZoom + (targetZoom - startZoom) * eased;
+      const centerXNow = startCenterX + (targetCenterX - startCenterX) * eased;
+      const centerYNow = startCenterY + (targetCenterY - startCenterY) * eased;
+      const scale = this.fitScale * this.zoom;
+      this.panX = (this.W / 2 - centerXNow) * scale;
+      this.panY = (this.H / 2 - centerYNow) * scale;
+      this._clampPan();
       this._applyTransform();
       this._notifyZoom();
       if (progress < 1) {
@@ -882,8 +919,10 @@ export class MapView {
         return;
       }
       this._fitFrame = 0;
-      this.panX = target.x;
-      this.panY = target.y;
+      this.zoom = targetZoom;
+      this.panX = targetPanX;
+      this.panY = targetPanY;
+      this._clampPan();
       this._applyTransform();
       this._notifyZoom();
       this._endGestureSoon();
@@ -1563,11 +1602,11 @@ export class MapView {
     return true;
   }
 
-  _panLimits() {
+  _panLimits(zoom = this.zoom) {
     if (!this.lastLayout.w) return { maxX: 0, maxY: 0 };
     // The default fitted view is fixed; panning starts only after zooming in.
-    if (this.zoom <= 1.001) return { maxX: 0, maxY: 0 };
-    const scale = this.fitScale * this.zoom;
+    if (zoom <= 1.001) return { maxX: 0, maxY: 0 };
+    const scale = this.fitScale * zoom;
     const mapW = this.W * scale;
     const mapH = this.H * scale;
     // Keep a generous part of the map reachable in every direction. This is

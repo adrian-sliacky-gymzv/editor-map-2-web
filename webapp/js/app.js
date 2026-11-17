@@ -21,6 +21,7 @@ import {
   mergeStats,
 } from './modes.js';
 import { tapSlop } from './map-gestures.js';
+import { animateHeightChange } from './classic-ui.js';
 import { initI18n, t } from './i18n.js';
 import { dismissTopOverlay, navigate, pushOverlay, registerRoute } from './navigation.js';
 import { initSound, playCorrect, playResult, playScore, playWrong, toggleMuted } from './sound.js';
@@ -670,25 +671,29 @@ function setGameMissionTarget(target) {
     : state.mode === 'puzzle'
       ? 'Umiestni na mapu'
       : 'Nájdi na mape';
-  dom.gameMissionKicker.textContent = instruction;
-  dom.gameMissionKicker.classList.remove('is-correct', 'is-wrong', 'is-partial');
-  dom.gameMissionName.textContent = target?.label || '—';
-  dom.gameMissionName.title = target?.label || '';
-  dom.gameMissionType.textContent = 'Mesto';
-  dom.gameMissionIcon.style.setProperty('--mission-color', '#d97706');
-  dom.gameMissionIcon.innerHTML = LEGACY_CITY_ICON;
-  dom.gameMission.setAttribute('aria-label', t('{instruction}: {type} {name}', {
-    instruction: t(instruction),
-    type: t('Mesto'),
-    name: target?.label || '',
-  }).trim());
+  animateHeightChange(dom.gameMission, () => {
+    dom.gameMissionKicker.textContent = instruction;
+    dom.gameMissionKicker.classList.remove('is-correct', 'is-wrong', 'is-partial');
+    dom.gameMissionName.textContent = target?.label || '-';
+    dom.gameMissionName.title = target?.label || '';
+    dom.gameMissionType.textContent = 'Mesto';
+    dom.gameMissionIcon.style.setProperty('--mission-color', '#d97706');
+    dom.gameMissionIcon.innerHTML = LEGACY_CITY_ICON;
+    dom.gameMission.setAttribute('aria-label', t('{instruction}: {type} {name}', {
+      instruction: t(instruction),
+      type: t('Mesto'),
+      name: target?.label || '',
+    }).trim());
+  });
 }
 
 function setGameMissionFeedback(text, tone = '') {
-  if (!dom.gameMissionKicker) return;
-  dom.gameMissionKicker.textContent = text;
-  dom.gameMissionKicker.classList.remove('is-correct', 'is-wrong', 'is-partial');
-  if (tone) dom.gameMissionKicker.classList.add(`is-${tone}`);
+  if (!dom.gameMissionKicker || !dom.gameMission) return;
+  animateHeightChange(dom.gameMission, () => {
+    dom.gameMissionKicker.textContent = text;
+    dom.gameMissionKicker.classList.remove('is-correct', 'is-wrong', 'is-partial');
+    if (tone) dom.gameMissionKicker.classList.add(`is-${tone}`);
+  });
 }
 
 function gameAverageText() {

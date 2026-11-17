@@ -200,11 +200,14 @@ only after the user zooms in.
   zooms in progressively.
 - **Pan** — one finger or mouse drag after zooming. Inertia and elastic edges
   make the map feel like a map canvas, not a frozen image.
-- **Between questions** - answering keeps the player's zoom for review; moving
-  to the next question animates back to the fitted view over 240 ms with no
-  layout shift. A pan follows an answer that is outside the current crop, so
-  the reset always has a real zoomed state to animate from. Reduced-motion
-  users get the instant reset.
+- **Between questions** - after an answer the camera fits both the guess and
+  the correct location on screen, zooming out only as far as that pair needs.
+  Moving to the next question then animates back to the fitted view over
+  240 ms with no layout shift. Reduced-motion users get the instant reset.
+- **Stable HUD** - on narrow screens a two-line target name expands the mission
+  HUD with a measured height transition instead of jumping. The floating
+  **Next** action waits for that layout and for the review camera to settle, so
+  it appears in the correct place instead of moving or covering a marker.
 - **Guess score and distance** - the distance game shows the 0-100 points and
   the kilometres for the guess instead of raw map units. Kilometres come from
   each original map's printed scale bar. Compact layouts also show a
@@ -348,15 +351,16 @@ Supported map keys: `slovensko`, `svet`, `europa`, `afrika`, `azia`,
 npm test
 ```
 
-Current status: **109 tests, 109 passing**. Coverage includes:
+Current status: **112 tests, 112 passing**. Coverage includes:
 
 - original scoring, per-map maximum distance, printed scale-bar kilometres and
   puzzle tolerance;
 - original quiz group cycling, unused targets and candidate sampling;
 - byte-for-byte `.mef` parity and semantic `config.xml` parity with `software/`;
 - question selection and difficulty pools;
-- pinch/zoom/pan mathematics, answer reveal and the locked fitted map;
+- pinch/zoom/pan mathematics, two-point review framing and the locked fitted map;
 - the animated next-question reset and its reduced-motion fallback;
+- measured mission-HUD height transitions and floating Next placement;
 - map dimensions and all eight maps;
 - activity HUD, markers and result flows;
 - map picker and activity presets;

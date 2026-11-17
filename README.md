@@ -36,6 +36,8 @@ The green button on the homepage starts a recommended game immediately: **Traf s
 - **Subtle sound cues** for answers and results, with a speaker button, a Settings switch and the `M` shortcut to mute them.
 - **What's new** changelog on the homepage with the latest releases and improvements.
 - **Guess score and distance**: the distance game reports 0–100 points and kilometres derived from each original map's printed scale bar.
+- **Full review framing**: after a guess the camera fits both the guess and the correct location on screen, even when the map was zoomed far away.
+- **Smooth HUD and Next action**: wrapped target names expand the mission HUD with a measured transition, and the floating Next action waits for the review camera before it appears.
 - **Mobile-first controls**: pinch zoom, one-finger pan after zooming, double-tap and hold/slide one-finger zoom, inertia, a dedicated recenter button and a locked full-map view.
 - **Portrait and landscape layouts**: in landscape the game controls move to a compact side rail (156–196 px) and the map gets the full height.
 - **Light and dark themes**, keyboard shortcuts, an accessible focus order and fast motion that respects reduced-motion settings.
@@ -111,6 +113,8 @@ Zelené tlačidlo na domovskej stránke hneď spustí odporúčanú hru: **Traf 
 - **Jemné zvukové signály** pri odpovediach a výsledkoch, s tlačidlami reproduktora, prepínačom v nastaveniach a skratkou `M` na stlmenie.
 - **Novinky** na domovskej stránke s prehľadom posledných verzií a vylepšení.
 - **Skóre tipu a vzdialenosť**: hra Traf sa! ukazuje 0–100 bodov a kilometre podľa pôvodnej mierky každej mapy.
+- **Prehľad po odpovedi**: kamera vždy ukáže tip aj správne miesto, aj keď bola mapa predtým priblížená inde.
+- **Plynulé HUD a tlačidlo Ďalej**: dvojriadkový názov rozbalí HUD bez skoku a plávajúce tlačidlo Ďalej sa zobrazí až po ustálení kamery.
 - **Ovládanie na mobil**: pinch zoom, posun po priblížení, dvojité ťuknutie a podržanie s posunom na priblíženie jedným prstom, zotrvačnosť, tlačidlo na vycentrovanie a pevná mapa pri predvolenom oddialení.
 - **Portrait aj landscape**: v landscape sa ovládanie presunie do kompaktného bočného panelu (156–196 px) a mapa dostane celú výšku.
 - **Svetlá a tmavá téma**, klávesové skratky, prístupný fokus a rýchle animácie s rešpektovaním nastavenia zníženého pohybu.

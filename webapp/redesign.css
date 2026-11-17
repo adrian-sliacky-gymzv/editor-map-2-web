@@ -1724,7 +1724,9 @@ kbd {
 }
 
 .map-next-float {
-  bottom: max(16px, env(safe-area-inset-bottom));
+  /* Keep the floating action above the bottom-right zoom controls and the
+     bottom-left map tag, even on narrow phones. */
+  bottom: max(84px, calc(env(safe-area-inset-bottom) + 76px));
   border: 1px solid var(--blue-deep);
   border-radius: 2px;
   background: var(--blue);
@@ -1757,6 +1759,11 @@ kbd {
   border-radius: 2px;
   background: var(--card);
   box-shadow: 4px 4px 0 rgba(23, 33, 27, 0.08);
+}
+
+.distance-legend.is-top-left {
+  right: auto;
+  left: max(10px, env(safe-area-inset-left));
 }
 
 .distance-legend-foot {
@@ -5023,13 +5030,10 @@ kbd {
   }
 
   .map-next-float {
-    top: max(8px, env(safe-area-inset-top)) !important;
-    bottom: auto !important;
-    left: max(8px, env(safe-area-inset-left));
+    bottom: max(52px, calc(env(safe-area-inset-bottom) + 44px));
     min-height: 34px;
     padding: 0 12px;
     font-size: 8px;
-    transform: none;
   }
 
   .distance-legend {

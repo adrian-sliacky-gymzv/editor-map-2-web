@@ -173,6 +173,8 @@ export const EN = {
     'Guess score and distance in kilometres instead of confusing map units.',
   'Plynulý návrat mapy medzi otázkami a nové dotykové ovládanie.':
     'Smooth map reset between questions and new touch gestures.',
+  'Kamera po odpovedi ukáže tip aj správne miesto; HUD a tlačidlo Ďalej sa prispôsobia plynulo.':
+    'The answer camera shows both the guess and the correct spot; the HUD and Next action adapt smoothly.',
   'Angličtina a presná zhoda': 'English and exact parity',
   'Anglické rozhranie s automatickým výberom jazyka.':
     'English interface with automatic language selection.',

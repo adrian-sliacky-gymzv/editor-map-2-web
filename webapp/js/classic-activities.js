@@ -36,6 +36,7 @@ import { navigate } from './navigation.js';
 import { playCorrect, playResult, playScore, playWrong } from './sound.js';
 import {
   $,
+  animateHeightChange,
   announce,
   clamp,
   closeOverlay,
@@ -234,6 +235,11 @@ const GAME = {
   practiceErrorCount: 0,
   entityIndex: null,
   lastPracticeFormat: null,
+  nextFloatObserver: null,
+  nextFloatTimer: null,
+  nextFloatPending: false,
+  legendTimer: null,
+  legendPending: false,
 };
 
 const dom = {};
@@ -245,7 +251,9 @@ export async function initActivities() {
   bindResultEvents();
   watchNextState();
   window.addEventListener('i18n:change', () => {
-    if (dom.distanceLegend && !dom.distanceLegend.hidden) renderDistanceReadout();
+    if (!dom.distanceLegend || dom.distanceLegend.hidden) return;
+    renderDistanceReadout();
+    if (!GAME.legendPending) placeDistanceLegend();
   });
   document.addEventListener('click', (event) => {
     const trigger = event.target.closest('[data-classic-mode]');
@@ -331,6 +339,7 @@ function cacheDom() {
   dom.distanceTarget = $('#classicDistanceTarget');
   dom.distanceValue = $('#classicDistanceValue');
   dom.distanceKm = $('#classicDistanceKm');
+  dom.zoomControls = $('#classicMapViewport .zoom-controls');
   dom.zoomIn = $('#classicZoomIn');
   dom.zoomOut = $('#classicZoomOut');
   dom.zoomCenter = $('#classicZoomCenter');
@@ -914,13 +923,106 @@ function renderDistanceReadout() {
   }
 }
 
+function rectangleOverlapArea(a, b) {
+  const width = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+  const height = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+  return width > 0 && height > 0 ? width * height : 0;
+}
+
+/**
+ * Pick a free corner for the guess card once the review camera has settled.
+ * The card must never sit on top of either marker, the zoom controls, the map
+ * tag or the floating Next action.
+ */
+function placeDistanceLegend() {
+  const legend = dom.distanceLegend;
+  if (!legend || legend.hidden) return;
+  const classes = ['is-top-left'];
+  const obstacles = [];
+  for (const mark of GAME.marks.values()) {
+    if (!mark.labelVisible || !mark.el) continue;
+    const rect = mark.el.getBoundingClientRect();
+    obstacles.push({
+      left: rect.left - 10,
+      right: rect.right + 10,
+      top: rect.top - 10,
+      bottom: rect.bottom + 10,
+      weight: 1,
+    });
+  }
+  for (const element of [dom.zoomControls, dom.mapTag, dom.nextFloat]) {
+    if (!element || element.hidden || element.offsetParent === null) continue;
+    const rect = element.getBoundingClientRect();
+    if (rect.width < 1 || rect.height < 1) continue;
+    obstacles.push({
+      left: rect.left,
+      right: rect.right,
+      top: rect.top,
+      bottom: rect.bottom,
+      weight: element === dom.nextFloat ? 2 : 1,
+    });
+  }
+
+  let best = null;
+  for (const name of ['', ...classes]) {
+    legend.classList.remove(...classes);
+    if (name) legend.classList.add(name);
+    const rect = legend.getBoundingClientRect();
+    let overlap = 0;
+    for (const obstacle of obstacles) {
+      overlap += rectangleOverlapArea(rect, obstacle) * obstacle.weight;
+    }
+    if (!best || overlap < best.overlap) best = { name, overlap };
+    if (overlap === 0) break;
+  }
+  legend.classList.remove(...classes);
+  if (best?.name) legend.classList.add(best.name);
+}
+
+function scheduleDistanceLegend() {
+  if (!GAME.legendPending) return;
+  clearTimeout(GAME.legendTimer);
+  GAME.legendTimer = null;
+  const reveal = () => {
+    GAME.legendTimer = null;
+    if (!GAME.legendPending) return;
+    if (GAME.mapView?._fitFrame) {
+      GAME.legendTimer = setTimeout(reveal, 80);
+      return;
+    }
+    placeDistanceLegend();
+    if (dom.distanceLegend) dom.distanceLegend.style.visibility = '';
+    GAME.legendPending = false;
+    if (GAME.nextFloatPending) syncNextFloat();
+  };
+  if (GAME.mapView?._fitFrame) {
+    GAME.legendTimer = setTimeout(reveal, 80);
+  } else {
+    reveal();
+  }
+}
+
 function showDistanceLegend() {
   renderDistanceReadout();
-  if (dom.distanceLegend) dom.distanceLegend.hidden = false;
+  const legend = dom.distanceLegend;
+  if (!legend) return;
+  legend.hidden = false;
+  // Wait for the review camera, then place the card in a corner that does not
+  // hide either marker. Showing it mid-camera would make it jump afterwards.
+  legend.style.visibility = 'hidden';
+  GAME.legendPending = true;
+  scheduleDistanceLegend();
 }
 
 function hideDistanceLegend() {
-  if (dom.distanceLegend) dom.distanceLegend.hidden = true;
+  clearTimeout(GAME.legendTimer);
+  GAME.legendTimer = null;
+  GAME.legendPending = false;
+  if (dom.distanceLegend) {
+    dom.distanceLegend.hidden = true;
+    dom.distanceLegend.style.visibility = '';
+    dom.distanceLegend.classList.remove('is-top-left');
+  }
 }
 
 function syncNextFloat() {
@@ -934,8 +1036,29 @@ function syncNextFloat() {
   if (labelEl) labelEl.textContent = label;
   dom.nextFloat.setAttribute('aria-label', label);
   dom.nextFloat.classList.toggle('is-result', resultReady);
-  dom.nextFloat.hidden = !visible;
-  if (visible) requestAnimationFrame(positionNextFloat);
+  if (!visible) {
+    clearTimeout(GAME.nextFloatTimer);
+    GAME.nextFloatTimer = null;
+    GAME.nextFloatPending = false;
+    dom.nextFloat.hidden = true;
+    return;
+  }
+  // The review camera moves both markers after an answer. Showing the button
+  // before that camera settles would place it from stale marker positions and
+  // then make it jump. Keep it hidden until the view is stable.
+  if (GAME.mapView?._fitFrame || GAME.legendPending) {
+    GAME.nextFloatPending = true;
+    dom.nextFloat.hidden = true;
+    clearTimeout(GAME.nextFloatTimer);
+    GAME.nextFloatTimer = setTimeout(() => {
+      GAME.nextFloatTimer = null;
+      if (GAME.nextFloatPending) syncNextFloat();
+    }, 80);
+    return;
+  }
+  GAME.nextFloatPending = false;
+  dom.nextFloat.hidden = false;
+  requestAnimationFrame(positionNextFloat);
 }
 
 function positionNextFloat() {
@@ -1075,27 +1198,31 @@ function setMissionTarget(node, fallbackType, mode) {
     : mode === 'puzzle'
       ? 'Umiestni na mapu'
       : 'Nájdi na mape';
-  dom.mission.dataset.mode = mode || '';
-  dom.missionKicker.textContent = instruction;
-  dom.missionKicker.classList.remove('is-correct', 'is-wrong', 'is-partial');
-  dom.missionName.textContent = nodeLabel(node) || '—';
-  dom.missionName.title = nodeLabel(node) || '';
-  dom.missionType.textContent = info.label;
-  dom.missionIcon.dataset.symbol = info.symbol;
-  dom.missionIcon.style.setProperty('--mission-color', info.color);
-  dom.missionIcon.innerHTML = missionIconMarkup(info.symbol);
-  dom.mission.setAttribute('aria-label', t('{instruction}: {type} {name}', {
-    instruction: t(instruction),
-    type: t(info.label),
-    name: nodeLabel(node) || '',
-  }).trim());
+  animateHeightChange(dom.mission, () => {
+    dom.mission.dataset.mode = mode || '';
+    dom.missionKicker.textContent = instruction;
+    dom.missionKicker.classList.remove('is-correct', 'is-wrong', 'is-partial');
+    dom.missionName.textContent = nodeLabel(node) || '—';
+    dom.missionName.title = nodeLabel(node) || '';
+    dom.missionType.textContent = info.label;
+    dom.missionIcon.dataset.symbol = info.symbol;
+    dom.missionIcon.style.setProperty('--mission-color', info.color);
+    dom.missionIcon.innerHTML = missionIconMarkup(info.symbol);
+    dom.mission.setAttribute('aria-label', t('{instruction}: {type} {name}', {
+      instruction: t(instruction),
+      type: t(info.label),
+      name: nodeLabel(node) || '',
+    }).trim());
+  });
 }
 
 function setMissionFeedback(text, tone = '') {
-  if (!dom.missionKicker) return;
-  dom.missionKicker.textContent = text;
-  dom.missionKicker.classList.remove('is-correct', 'is-wrong', 'is-partial');
-  if (tone) dom.missionKicker.classList.add(`is-${tone}`);
+  if (!dom.missionKicker || !dom.mission) return;
+  animateHeightChange(dom.mission, () => {
+    dom.missionKicker.textContent = text;
+    dom.missionKicker.classList.remove('is-correct', 'is-wrong', 'is-partial');
+    if (tone) dom.missionKicker.classList.add(`is-${tone}`);
+  });
 }
 
 function averageText() {
@@ -1500,10 +1627,10 @@ function onDistanceClick(point) {
     className: 'map-guide-underlay',
   });
   GAME.mapView.addGuide({ x1: point.x, y1: point.y, x2: targetX, y2: targetY });
-  // Keep the review at the player's zoom so the next question still has a
-  // meaningful reset to animate. If the answer is outside the current crop,
-  // pan to it instead of snapping the whole map back to the fitted view.
-  GAME.mapView.revealPoint({ x: targetX, y: targetY });
+  // Review both points together. If the answer is outside the current crop,
+  // the camera zooms out only enough to show the guess and the correct spot;
+  // when both already fit, it keeps the player's zoom.
+  GAME.mapView.revealPoints([point, { x: targetX, y: targetY }]);
   showDistanceLegend();
 
   const answer = distanceAnswerFor(score);
@@ -1930,7 +2057,24 @@ function bindGameEvents() {
     if (GAME.finalShown && dom.resultOverlay.hidden) openOverlay(dom.resultOverlay, dom.resultAgain);
     else advanceGame();
   });
-  window.addEventListener('resize', () => requestAnimationFrame(positionNextFloat));
+  window.addEventListener('resize', () => requestAnimationFrame(() => {
+    if (GAME.legendPending) scheduleDistanceLegend();
+    else if (dom.distanceLegend && !dom.distanceLegend.hidden) placeDistanceLegend();
+    positionNextFloat();
+  }));
+  // The mission HUD grows and shrinks when a target name wraps. Keep the
+  // floating Next action clear of it while that height animation runs.
+  if (typeof ResizeObserver !== 'undefined') {
+    GAME.nextFloatObserver?.disconnect();
+    GAME.nextFloatObserver = new ResizeObserver(() => requestAnimationFrame(() => {
+      // Recompute the map fit first: the marker screen positions used by the
+      // Next action depend on the viewport height the HUD just changed.
+      GAME.mapView?.layout();
+      positionNextFloat();
+    }));
+    if (dom.mission) GAME.nextFloatObserver.observe(dom.mission);
+    if (dom.distanceLegend) GAME.nextFloatObserver.observe(dom.distanceLegend);
+  }
   dom.end.addEventListener('click', () => endActivity());
   dom.homeBtn?.addEventListener('click', () => endActivity());
   dom.zoomIn.addEventListener('click', () => GAME.mapView?.zoomIn());
@@ -1988,6 +2132,16 @@ async function endActivity() {
 
 function disposeClassicGame() {
   GAME.loadToken += 1;
+  clearTimeout(GAME.nextFloatTimer);
+  GAME.nextFloatTimer = null;
+  GAME.nextFloatPending = false;
+  clearTimeout(GAME.legendTimer);
+  GAME.legendTimer = null;
+  GAME.legendPending = false;
+  if (dom.distanceLegend) {
+    dom.distanceLegend.style.visibility = '';
+    dom.distanceLegend.classList.remove('is-top-left');
+  }
   stopClock();
   GAME.active = false;
   GAME.finalShown = false;

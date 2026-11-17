@@ -5,6 +5,85 @@ export const $$ = (selector, root = document) => Array.from(root.querySelectorAl
 
 export const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
 
+const heightAnimations = new WeakMap();
+
+/**
+ * Run a DOM mutation that may change an element's natural height and animate
+ * the height change instead of letting the surrounding layout jump. The old
+ * height is locked before the mutation, the new natural height is measured
+ * without painting the intermediate state, and the element then transitions
+ * between the two. Used by the mission HUD when a target name wraps to a
+ * second line. Reduced-motion visitors get the new layout immediately.
+ */
+export function animateHeightChange(element, mutate, {
+  duration = 180,
+  easing = 'cubic-bezier(0.2, 0.7, 0.3, 1)',
+} = {}) {
+  if (!element || typeof element.getBoundingClientRect !== 'function') {
+    mutate();
+    return;
+  }
+
+  // Capture the current painted height first so an interrupted animation
+  // continues from where it is instead of snapping to its target.
+  const before = element.getBoundingClientRect().height;
+  const running = heightAnimations.get(element);
+  if (running) {
+    cancelAnimationFrame(running.frame);
+    clearTimeout(running.timer);
+    heightAnimations.delete(element);
+    element.style.height = '';
+    element.style.transition = '';
+  }
+
+  const reduced = typeof window !== 'undefined'
+    && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  if (reduced || before <= 0 || element.offsetParent === null) {
+    mutate();
+    return;
+  }
+
+  // Lock the starting height so the text mutation cannot make the page jump
+  // before we know how tall the new content is.
+  element.style.transition = 'none';
+  element.style.height = `${before}px`;
+  void element.offsetHeight;
+  mutate();
+
+  // Measure the natural target height. Setting height:auto and putting the
+  // locked height back happens in the same task, so the browser never paints
+  // the intermediate layout.
+  element.style.height = 'auto';
+  const after = element.getBoundingClientRect().height;
+  element.style.height = `${before}px`;
+  void element.offsetHeight;
+
+  if (Math.abs(after - before) < 0.5) {
+    element.style.height = '';
+    element.style.transition = '';
+    return;
+  }
+
+  const state = { frame: 0, timer: 0 };
+  heightAnimations.set(element, state);
+  element.style.transition = `height ${duration}ms ${easing}`;
+  state.frame = requestAnimationFrame(() => {
+    if (heightAnimations.get(element) !== state) return;
+    element.style.height = `${after}px`;
+  });
+
+  const finish = () => {
+    if (heightAnimations.get(element) !== state) return;
+    heightAnimations.delete(element);
+    element.style.height = '';
+    element.style.transition = '';
+  };
+  element.addEventListener('transitionend', (event) => {
+    if (event.target === element && event.propertyName === 'height') finish();
+  }, { once: true });
+  state.timer = setTimeout(finish, duration + 80);
+}
+
 export function escapeHtml(value) {
   return String(value == null ? '' : value).replace(/[&<>"']/g, (ch) => {
     switch (ch) {

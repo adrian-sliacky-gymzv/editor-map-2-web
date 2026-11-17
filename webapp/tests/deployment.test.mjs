@@ -144,7 +144,7 @@ test('every map exposes a recenter control', () => {
   assert.match(read('js/editor.js'), /zoomCenter\?\.addEventListener/);
   const mapView = read('js/map-view.js');
   assert.match(mapView, /center\(\)\s*\{[\s\S]*?this\.zoom = 1;[\s\S]*?this\.panX = 0;/);
-  assert.match(mapView, /this\.zoom <= 1\.001\) return \{ maxX: 0, maxY: 0 \}/);
+  assert.match(mapView, /if \(zoom <= 1\.001\) return \{ maxX: 0, maxY: 0 \}/);
   const app = read('js/app.js');
   assert.match(app, /function recenterView\(\)[\s\S]*?zoom: 1[\s\S]*?panX: 0/);
   assert.match(app, /if \(zoom <= 1\.001\) return \{ zoom, panX: 0, panY: 0 \}/);
@@ -217,11 +217,12 @@ test('distance feedback uses guess points and exposes a last-guess stat', () => 
   assert.match(activities, /columns: \[t\('Objekt'\), t\('Skóre tipu'\)\]/);
   assert.match(activities, /kilometresForDistance\(context\.mapKey, dist\)/);
   assert.match(activities, /formatKilometres\(data\.km, getLanguage\(\)\)/);
-  assert.match(activities, /revealPoint\(/);
+  assert.match(activities, /revealPoints\(\[point, \{ x: targetX, y: targetY \}\]\)/);
   assert.doesNotMatch(activities, /ensurePointsVisible/);
   assert.match(app, /dom\.gameLastValue\.textContent = `\$\{score\} b\.`/);
   assert.match(mapView, /fitAnimated\(/);
-  assert.match(mapView, /panToPointAnimated\(/);
+  assert.match(mapView, /fitBoundsZoom/);
+  assert.match(mapView, /_animateCameraTo\(/);
   assert.match(mapView, /oneFingerZoomTarget/);
   // Answer handlers leave the review at the player's zoom; the reset belongs
   // to the next-question transition so it always has a visible start state.
@@ -232,6 +233,29 @@ test('distance feedback uses guess points and exposes a last-guess stat', () => 
   assert.doesNotMatch(distanceAnswer, /resetViewAnimated/);
   const quizAnswer = app.slice(app.indexOf('function answerQuiz'), app.indexOf('function answerPuzzle'));
   assert.doesNotMatch(quizAnswer, /resetViewAnimated/);
+});
+
+test('mission HUD height changes are animated instead of jumping', () => {
+  const ui = read('js/classic-ui.js');
+  const activities = read('js/classic-activities.js');
+  const app = read('js/app.js');
+  assert.match(ui, /export function animateHeightChange/);
+  assert.match(ui, /element\.style\.transition = `height \$\{duration\}ms \$\{easing\}`/);
+  assert.match(ui, /prefers-reduced-motion: reduce/);
+  assert.match(activities, /animateHeightChange\(dom\.mission/);
+  assert.match(activities, /setMissionTarget/);
+  assert.match(app, /animateHeightChange\(dom\.gameMission/);
+  assert.match(app, /setGameMissionTarget/);
+});
+
+test('the floating Next action waits for the review camera and HUD layout', () => {
+  const activities = read('js/classic-activities.js');
+  assert.match(activities, /GAME\.mapView\?\._fitFrame/);
+  assert.match(activities, /nextFloatPending/);
+  assert.match(activities, /legendPending/);
+  assert.match(activities, /placeDistanceLegend/);
+  assert.match(activities, /new ResizeObserver\([\s\S]*?GAME\.mapView\?\.layout\(\)[\s\S]*?positionNextFloat\(\)/);
+  assert.match(activities, /resize'[\s\S]*?positionNextFloat/);
 });
 
 test('the homepage includes a changelog section', () => {
@@ -245,6 +269,8 @@ test('the homepage includes a changelog section', () => {
   assert.match(html, /href="#novinky">Novinky</);
   assert.match(css, /\.changelog-section/);
   assert.match(css, /\.changelog-entry-current/);
+  assert.match(css, /\.distance-legend\.is-top-left/);
+  assert.match(css, /bottom: max\(84px, calc\(env\(safe-area-inset-bottom\) \+ 76px\)\)/);
 });
 
 test('repository link and reimplementation credit are present', () => {
