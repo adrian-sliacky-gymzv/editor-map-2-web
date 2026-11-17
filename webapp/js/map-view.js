@@ -104,8 +104,6 @@ export class MapView {
     this.suppressClickUntil = 0;
     this.lastTap = null;
     this.doubleTapDrag = null;
-    this.holdZoom = null;
-    this._holdZoomTimer = 0;
     this._fitFrame = 0;
     this._settleTimer = 0;
     this._renderFrame = 0;
@@ -128,8 +126,6 @@ export class MapView {
     this._resizeObserver?.disconnect();
     clearTimeout(this._settleTimer);
     clearTimeout(this._gestureTimer);
-    clearTimeout(this._holdZoomTimer);
-    this.holdZoom = null;
     if (this._renderFrame) cancelAnimationFrame(this._renderFrame);
     if (this._momentumFrame) cancelAnimationFrame(this._momentumFrame);
     if (this._fitFrame) cancelAnimationFrame(this._fitFrame);
@@ -137,8 +133,6 @@ export class MapView {
     this._momentumFrame = 0;
     this._fitFrame = 0;
     this.doubleTapDrag = null;
-    this.holdZoom = null;
-    this._holdZoomTimer = 0;
     if (this._labelEditor) {
       this._labelEditor.remove();
       this._labelEditor = null;
@@ -1042,44 +1036,6 @@ export class MapView {
     this._notifyZoom();
   }
 
-  _clearHoldZoom() {
-    clearTimeout(this._holdZoomTimer);
-    this._holdZoomTimer = 0;
-    this.holdZoom = null;
-  }
-
-  /**
-   * Aim! uses a single tap as the answer. A press-and-hold is an unambiguous
-   * request to zoom, so it can coexist with instant tap answers without the
-   * double-tap discrimination delay. The second phase is a vertical drag.
-   */
-  _startHoldZoom(event) {
-    if (event.pointerType === 'mouse') return;
-    if (this.interaction !== 'click' || this.pointers.size !== 1) return;
-    this._clearHoldZoom();
-    const hold = {
-      pointerId: event.pointerId,
-      startX: event.clientX,
-      startY: event.clientY,
-      startZoom: this.zoom,
-      anchor: { x: event.clientX, y: event.clientY },
-      active: false,
-      moved: false,
-      slop: tapSlop(event.pointerType),
-    };
-    this.holdZoom = hold;
-    this._holdZoomTimer = setTimeout(() => {
-      this._holdZoomTimer = 0;
-      if (this.holdZoom !== hold || this.pointers.size !== 1 || this.pointerDragged) return;
-      hold.active = true;
-      this.panning = null;
-      this.pointerDragged = true;
-      this.suppressClickUntil = performance.now() + 400;
-      this._beginGesture();
-      this.viewport.dispatchEvent(new CustomEvent('map:gesturestart', { bubbles: true }));
-    }, 250);
-  }
-
   _onPointerDown(event) {
     if (event.target.closest('.zoom-controls, button, a, input, select, textarea, label')) return;
     if (event.pointerType === 'mouse' && event.button !== 0) return;
@@ -1091,8 +1047,7 @@ export class MapView {
     // do not make the user wait for the previous gesture's safety window.
     if (this.pointers.size === 0) this.suppressClickUntil = 0;
     const markTarget = event.target.closest('.map-mark');
-    const mark = markTarget ? this.marks.get(markTarget.getAttribute('data-mark-id')) : null;
-    const startedOnMark = Boolean(mark && (mark.onClick || mark.onMove || mark.draggable));
+    const startedOnMark = Boolean(markTarget && !markTarget.classList.contains('is-pending-guess'));
     const interactive = this.interactivePointer === event.pointerId;
     this.pointers.set(event.pointerId, {
       x: event.clientX,
@@ -1101,7 +1056,8 @@ export class MapView {
       startedOnMark,
     });
 
-    const doubleTap = this.interaction === 'pan'
+    const canDoubleTap = this.interaction === 'pan' || this.interaction === 'click';
+    const doubleTap = canDoubleTap
       && event.pointerType !== 'mouse'
       && !startedOnMark
       && !interactive
@@ -1110,7 +1066,7 @@ export class MapView {
         x: event.clientX,
         y: event.clientY,
         time: performance.now(),
-      }, { maxDelay: 320, slop: 30 });
+      }, { maxDelay: this.interaction === 'click' ? 200 : 320, slop: 30 });
     if (doubleTap) {
       // A second tap can either become a normal double-tap zoom on release or,
       // as in Google Maps, a continuous one-finger zoom when the finger slides.
@@ -1155,12 +1111,10 @@ export class MapView {
         this._velocityX = 0;
         this._velocityY = 0;
         this._lastMoveTime = performance.now();
-        if (!startedOnMark && !interactive) this._startHoldZoom(event);
       }
     } else if (this.pointers.size === 2) {
       this.panning = null;
       this.doubleTapDrag = null;
-      this._clearHoldZoom();
       const [a, b] = [...this.pointers.values()];
       const startMidpoint = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
       const anchor = this.toMapPoint(startMidpoint.x, startMidpoint.y);
@@ -1193,20 +1147,6 @@ export class MapView {
       y: event.clientY,
       pointerType: event.pointerType || this.pointers.get(event.pointerId)?.pointerType || 'mouse',
     });
-
-    if (this.holdZoom && this.holdZoom.pointerId === event.pointerId) {
-      const hold = this.holdZoom;
-      if (hold.active) {
-        const dy = event.clientY - hold.startY;
-        if (Math.abs(dy) > hold.slop) hold.moved = true;
-        event.preventDefault();
-        this.setZoom(oneFingerZoomTarget(hold.startZoom, dy), hold.anchor);
-        return;
-      }
-      const dx = event.clientX - hold.startX;
-      const dy = event.clientY - hold.startY;
-      if (Math.hypot(dx, dy) > hold.slop) this._clearHoldZoom();
-    }
 
     if (this.doubleTapDrag && this.doubleTapDrag.pointerId === event.pointerId) {
       const drag = this.doubleTapDrag;
@@ -1387,17 +1327,6 @@ export class MapView {
     this._flushRender();
     if (this.pointers.size === 0) this._endGestureSoon();
 
-    if (this.holdZoom && this.holdZoom.pointerId === event.pointerId) {
-      const hold = this.holdZoom;
-      this._clearHoldZoom();
-      if (hold.active) {
-        this.panning = null;
-        this.pointerDragged = true;
-        this.suppressClickUntil = performance.now() + 260;
-        return;
-      }
-    }
-
     if (this.doubleTapDrag && this.doubleTapDrag.pointerId === event.pointerId) {
       const drag = this.doubleTapDrag;
       this.doubleTapDrag = null;
@@ -1450,6 +1379,11 @@ export class MapView {
             detail: { ...pt, originalEvent: event },
             bubbles: true,
           }));
+          // The distance game commits a tap as an answer. Remember the contact
+          // so a quick second tap can cancel that commit and become a zoom.
+          if (pointerType !== 'mouse') {
+            this.lastTap = { x: event.clientX, y: event.clientY, time: now };
+          }
         } else if (this.interaction === 'pan' && pointerType === 'touch') {
           const tap = { x: event.clientX, y: event.clientY, time: now };
           if (isDoubleTap(this.lastTap, tap, { maxDelay: 320, slop: 30 })) {
@@ -1477,7 +1411,6 @@ export class MapView {
     this.panning = null;
     this.pinch = null;
     this.doubleTapDrag = null;
-    this._clearHoldZoom();
     this.pointerDragged = true;
     this.suppressClickUntil = performance.now() + 220;
     this._flushRender();

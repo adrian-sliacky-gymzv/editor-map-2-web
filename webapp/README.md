@@ -195,10 +195,9 @@ only after the user zooms in.
   not move it. The fitted view is the button **⌂** and the `0` shortcut.
 - **Zoom in** — wheel, trackpad pinch, two-finger pinch, `+`/`−`, double-tap or
   double-click. Zoom is anchored at the cursor/finger midpoint.
-- **One-finger zoom** - in Test/Assemble, the editor and the Aim! review map,
-  double-tap and keep the finger down, then slide down to zoom in or up to zoom
-  out. In Aim! before answering, press and hold, then drag up/down; this keeps
-  single-tap answers instant. Double-tap zooms are animated.
+- **One-finger zoom** - double-tap and keep the finger down, then slide down to
+  zoom in or up to zoom out. This matches Google Maps' published gesture
+  direction. A normal double tap also animates its zoom instead of jumping.
 - **Pan** — one finger or mouse drag after zooming. Inertia and elastic edges
   make the map feel like a map canvas, not a frozen image.
 - **Between questions** - after an answer the camera fits both the guess and
@@ -218,9 +217,9 @@ only after the user zooms in.
 - **Tap safety** - the final touch after a pinch, pan or double-tap never counts
   as an answer. Taps on map controls never answer. Puzzle pieces require a real
   tap; a drag does not submit.
-- **Aim! touch taps** - a single tap answers immediately. Holding the finger
-  and dragging zooms instead of answering; there is no provisional marker and
-  no answer delay.
+- **Aim! touch taps** - a touch tap shows a neutral provisional crosshair,
+  then commits after 210 ms so a quick second tap can start one-finger zoom
+  instead of answering. Mouse clicks commit immediately.
 - **New question** — each question starts from the full fitted map. In
   `Traf sa!`, the view zooms out if the guess or correct point is outside the
   viewport.
@@ -363,7 +362,6 @@ Current status: **115 tests, 115 passing**. Coverage includes:
 - byte-for-byte `.mef` parity and semantic `config.xml` parity with `software/`;
 - question selection and difficulty pools;
 - pinch/zoom/pan mathematics, two-point review framing and the locked fitted map;
-- instant Aim! tap answers, press-and-hold zoom and review double-tap zoom;
 - the animated next-question reset and its reduced-motion fallback;
 - measured mission-HUD height transitions and floating Next placement;
 - map dimensions and all eight maps;
