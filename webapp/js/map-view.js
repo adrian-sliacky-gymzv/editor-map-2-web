@@ -1444,12 +1444,7 @@ export class MapView {
   }
 
   _zoomFromDoubleTap(point) {
-    const targetZoom = doubleTapTargetZoom(this.zoom);
-    if (targetZoom <= 1.001) {
-      this.fit();
-      return;
-    }
-    this.setZoom(targetZoom, point);
+    this.zoomAnimated(doubleTapTargetZoom(this.zoom), point);
   }
 
   layout() {
@@ -1527,6 +1522,63 @@ export class MapView {
     this._clampPan();
     this._applyTransform();
     if (!silent) this._notifyZoom();
+  }
+
+  /**
+   * Smoothly zoom toward a screen anchor for double tap / double click. The
+   * map point under the anchor stays under that anchor every frame, so the
+   * gesture reads as one camera move instead of a one-frame jump.
+   */
+  zoomAnimated(targetZoom, anchorClient, duration = 220) {
+    if (!this.scene) return false;
+    const target = clamp(Number(targetZoom) || this.zoom, MIN_MAP_ZOOM, MAX_MAP_ZOOM);
+    if (Math.abs(target - this.zoom) < 0.0001) return false;
+    const rect = this.viewport.getBoundingClientRect();
+    if (rect.width < 2 || rect.height < 2) return false;
+    const anchor = anchorClient || {
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+    };
+    this._stopMomentum();
+    this._clearSettleAnimation();
+    const reduced = typeof window !== 'undefined'
+      && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) {
+      this.setZoom(target, anchor);
+      return false;
+    }
+
+    const mapPoint = this.toMapPoint(anchor.x, anchor.y);
+    const startZoom = this.zoom;
+    const startedAt = performance.now();
+    const applyZoom = (zoom) => {
+      const w = this.lastLayout.w || rect.width;
+      const h = this.lastLayout.h || rect.height;
+      const scale = this.fitScale * zoom;
+      const originX = (w - this.W * scale) / 2;
+      const originY = (h - this.H * scale) / 2;
+      this.zoom = zoom;
+      this.panX = anchor.x - rect.left - originX - mapPoint.x * scale;
+      this.panY = anchor.y - rect.top - originY - mapPoint.y * scale;
+      this._clampPan();
+      this._applyTransform();
+      this._notifyZoom();
+    };
+    this._beginGesture();
+    const step = (now) => {
+      const progress = Math.min(1, Math.max(0, (now - startedAt) / duration));
+      const eased = 1 - ((1 - progress) ** 3);
+      applyZoom(startZoom + (target - startZoom) * eased);
+      if (progress < 1) {
+        this._fitFrame = requestAnimationFrame(step);
+        return;
+      }
+      this._fitFrame = 0;
+      applyZoom(target);
+      this._endGestureSoon();
+    };
+    this._fitFrame = requestAnimationFrame(step);
+    return true;
   }
 
   zoomIn(anchor = null) {

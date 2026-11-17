@@ -1614,23 +1614,13 @@ function onDistanceClick(point, event) {
   // second tap can become double-tap/drag zoom instead of an answer.
   GAME.pendingDistanceGuess = point;
   if (GAME.mapView) {
-    let preview = '';
-    const target = GAME.targetNode;
-    if (target) {
-      const dist = distanceBetween(point, {
-        x: getNumberAttr(target, 'markX'),
-        y: getNumberAttr(target, 'markY'),
-      });
-      preview = `${scoreForDistance(dist, maxDistanceForMap(GAME.mapView.W, GAME.mapView.H))} b.`;
-    }
     const mark = GAME.mapView.addMark({
       x: point.x,
       y: point.y,
-      label: preview || 'Tvoj tip',
+      label: 'Tvoj tip',
       symbol: 'guess',
       state: 'ask',
-      labelPlacement: 'above',
-      labelVisible: true,
+      labelVisible: false,
     });
     if (mark?.el) {
       mark.el.style.pointerEvents = 'none';

@@ -268,6 +268,8 @@ test('distance taps defer briefly so one-finger zoom works in Aim!', () => {
   assert.match(activities, /map:doubletapstart/);
   assert.match(mapView, /this\.interaction === 'click' \? 220 : 320/);
   assert.match(mapView, /map:doubletapstart/);
+  assert.match(mapView, /zoomAnimated\(/);
+  assert.match(mapView, /_zoomFromDoubleTap[\s\S]*?zoomAnimated/);
   assert.match(css, /\.map-mark\.is-pending-guess/);
 });
 
