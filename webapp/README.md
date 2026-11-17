@@ -354,7 +354,7 @@ Supported map keys: `slovensko`, `svet`, `europa`, `afrika`, `azia`,
 npm test
 ```
 
-Current status: **113 tests, 113 passing**. Coverage includes:
+Current status: **114 tests, 114 passing**. Coverage includes:
 
 - original scoring, per-map maximum distance, printed scale-bar kilometres and
   puzzle tolerance;
@@ -395,6 +395,24 @@ plain static site; no server is required.
 
 Local changes are previewed first and deployed only after approval. The full
 loop is documented in [`../DEVELOPMENT.md`](../DEVELOPMENT.md).
+
+### Search indexing
+
+`robots.txt` and `sitemap.xml` are published with the app. The page declares a
+canonical URL, Open Graph/Twitter metadata and `WebApplication` structured
+data for `https://em.adriansliacky.sk/`.
+
+After deploying:
+
+1. Verify `https://em.adriansliacky.sk/` in Google Search Console (a Domain
+   property with DNS verification is recommended; URL-prefix verification with
+   an HTML meta tag or verification file also works).
+2. Submit `https://em.adriansliacky.sk/sitemap.xml`.
+3. Use **URL Inspection → Request indexing** for the homepage.
+4. Check **Indexing → Pages** until the homepage is reported as indexed.
+
+Indexing is not instant; it normally takes days and depends on Google crawling
+the site and finding links to it.
 
 ---
 

@@ -288,6 +288,23 @@ test('the homepage includes a changelog section', () => {
   assert.match(css, /bottom: max\(84px, calc\(env\(safe-area-inset-bottom\) \+ 76px\)\)/);
 });
 
+test('search engine metadata, robots.txt and sitemap.xml are present', () => {
+  const html = read('index.html');
+  const robots = read('robots.txt');
+  const sitemap = read('sitemap.xml');
+  assert.match(html, /<link rel="canonical" href="https:\/\/em\.adriansliacky\.sk\/">/);
+  assert.match(html, /<meta name="robots" content="index,follow/);
+  assert.match(html, /property="og:title"/);
+  assert.match(html, /name="twitter:card" content="summary_large_image"/);
+  assert.match(robots, /Sitemap: https:\/\/em\.adriansliacky\.sk\/sitemap\.xml/);
+  assert.match(sitemap, /<loc>https:\/\/em\.adriansliacky\.sk\/<\/loc>/);
+  const jsonLd = /<script type="application\/ld\+json">([\s\S]*?)<\/script>/.exec(html);
+  assert.ok(jsonLd, 'missing JSON-LD block');
+  const data = JSON.parse(jsonLd[1]);
+  assert.equal(data['@context'], 'https://schema.org');
+  assert.ok(data['@graph'].some((item) => item['@type'] === 'WebApplication'));
+});
+
 test('repository link and reimplementation credit are present', () => {
   const html = read('index.html');
   assert.match(html, /class="footer-github"/);

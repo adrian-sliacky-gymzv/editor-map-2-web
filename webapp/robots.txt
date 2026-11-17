@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /assets/
+
+Sitemap: https://em.adriansliacky.sk/sitemap.xml
