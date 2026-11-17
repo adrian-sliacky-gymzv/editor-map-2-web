@@ -143,6 +143,27 @@ test('double tap detection honours time and distance windows', () => {
   assert.equal(isDoubleTap(null, { x: 100, y: 100, time: 1200 }), false);
 });
 
+test('review fit can reserve extra room for a docked bottom action', () => {
+  const common = {
+    bbox: { width: 200, height: 420 },
+    viewport: { width: 390, height: 676 },
+    fitScale: 1,
+    currentZoom: 4,
+    paddingX: 88,
+  };
+  const symmetric = fitBoundsZoom({ ...common, paddingY: 72 });
+  const docked = fitBoundsZoom({
+    ...common,
+    paddingTop: 72,
+    paddingBottom: 190,
+  });
+  assert.ok(docked < symmetric);
+  assert.equal(
+    fitBoundsZoom({ ...common, paddingTop: 72, paddingBottom: 72 }),
+    symmetric,
+  );
+});
+
 test('review fit keeps both points visible without zooming in past the player', () => {
   const fit = (bbox, currentZoom, viewport = { width: 1000, height: 800 }) => fitBoundsZoom({
     bbox,

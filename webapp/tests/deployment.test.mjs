@@ -214,10 +214,10 @@ test('distance feedback uses guess points and exposes a last-guess stat', () => 
   assert.match(html, /Vzdialenosť/);
   assert.match(html, /Skóre tipu/);
   assert.match(activities, /dom\.lastValue\.textContent = `\$\{score\} b\.`/);
-  assert.match(activities, /columns: \[t\('Objekt'\), t\('Skóre tipu'\)\]/);
+  assert.match(activities, /columns: \[t\('Objekt'\), t\('Vzdialenosť'\), t\('Skóre tipu'\)\]/);
   assert.match(activities, /kilometresForDistance\(context\.mapKey, dist\)/);
   assert.match(activities, /formatKilometres\(data\.km, getLanguage\(\)\)/);
-  assert.match(activities, /revealPoints\(\[point, \{ x: targetX, y: targetY \}\]\)/);
+  assert.match(activities, /revealPoints\(\[point, \{ x: targetX, y: targetY \}\], \{[\s\S]*?paddingBottom: Math\.max\(72, bottomPadding\)/);
   assert.doesNotMatch(activities, /ensurePointsVisible/);
   assert.match(app, /dom\.gameLastValue\.textContent = `\$\{score\} b\.`/);
   assert.match(mapView, /fitAnimated\(/);
@@ -248,14 +248,40 @@ test('mission HUD height changes are animated instead of jumping', () => {
   assert.match(app, /setGameMissionTarget/);
 });
 
-test('the floating Next action waits for the review camera and HUD layout', () => {
+test('the floating Next action stays docked at the bottom', () => {
   const activities = read('js/classic-activities.js');
+  const app = read('js/app.js');
+  const styles = read('styles.css');
   assert.match(activities, /GAME\.mapView\?\._fitFrame/);
   assert.match(activities, /nextFloatPending/);
   assert.match(activities, /legendPending/);
   assert.match(activities, /placeDistanceLegend/);
-  assert.match(activities, /new ResizeObserver\([\s\S]*?GAME\.mapView\?\.layout\(\)[\s\S]*?positionNextFloat\(\)/);
-  assert.match(activities, /resize'[\s\S]*?positionNextFloat/);
+  assert.match(activities, /new ResizeObserver\([\s\S]*?GAME\.mapView\?\.layout\(\)/);
+  assert.match(activities, /function nextFloatBottomPadding\(\)/);
+  assert.match(activities, /paddingBottom: Math\.max\(72, bottomPadding\)/);
+  assert.doesNotMatch(activities, /positionNextFloat/);
+  assert.doesNotMatch(activities, /['"]is-top['"]/);
+  assert.doesNotMatch(app, /positionNextFloat/);
+  assert.doesNotMatch(app, /['"]is-top['"]/);
+  assert.doesNotMatch(styles, /\.map-next-float\.is-top/);
+});
+
+test('Aim! results include kilometre breakdowns and average distance', () => {
+  const html = read('index.html');
+  const activities = read('js/classic-activities.js');
+  const translations = read('js/translations.js');
+  const css = read('redesign.css');
+  assert.match(html, /id="classicResultDistance"/);
+  assert.match(html, /id="classicResultDistanceLabel"/);
+  assert.match(html, /id="classicResultDistanceValue"/);
+  assert.match(activities, /function averageKilometres\(\)/);
+  assert.match(activities, /averageKm: averageKilometres\(\)/);
+  assert.match(activities, /formatKilometres\(row\.kilometres, getLanguage\(\)\)/);
+  assert.match(activities, /columns: \[t\('Objekt'\), t\('Vzdialenosť'\), t\('Skóre tipu'\)\]/);
+  assert.match(activities, /dom\.resultDistanceValue\.textContent/);
+  assert.match(translations, /'Priemerná vzdialenosť od správnej polohy': 'Average distance from the correct location'/);
+  assert.match(css, /\.result-distance/);
+  assert.match(css, /\.result-list\.is-distance-result/);
 });
 
 test('Aim! holds a touch tap silently so gestures never flash a result', () => {

@@ -1939,11 +1939,6 @@ kbd {
   cursor: pointer;
 }
 
-.map-next-float.is-top {
-  top: 16px;
-  bottom: auto;
-}
-
 .map-next-float.is-result {
   border-color: #b45309;
   background: linear-gradient(180deg, #fbbf24, #d97706);

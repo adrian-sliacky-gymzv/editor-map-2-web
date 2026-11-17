@@ -206,12 +206,13 @@ only after the user zooms in.
   240 ms with no layout shift. Reduced-motion users get the instant reset.
 - **Stable HUD** - on narrow screens a two-line target name expands the mission
   HUD with a measured height transition instead of jumping. The floating
-  **Next** action waits for that layout and for the review camera to settle, so
-  it appears in the correct place instead of moving or covering a marker.
+  **Next** action is always docked above the bottom map controls; the review
+  camera reserves its exact height so both markers and labels stay clear of it.
 - **Guess score and distance** - the distance game shows the 0-100 points and
   the kilometres for the guess instead of raw map units. Kilometres come from
   each original map's printed scale bar. Compact layouts also show a
-  **Last guess** stat.
+  **Last guess** stat. The final result lists each guess's distance in
+  kilometres and the average distance from the correct location.
 - **Recenter** — **◎** returns to the centred full-map view and resets the zoom.
   It is equivalent to **⌂** and `0`.
 - **Tap safety** - the final touch after a pinch, pan or double-tap never counts
@@ -356,7 +357,7 @@ Supported map keys: `slovensko`, `svet`, `europa`, `afrika`, `azia`,
 npm test
 ```
 
-Current status: **115 tests, 115 passing**. Coverage includes:
+Current status: **117 tests, 117 passing**. Coverage includes:
 
 - original scoring, per-map maximum distance, printed scale-bar kilometres and
   puzzle tolerance;
@@ -366,7 +367,8 @@ Current status: **115 tests, 115 passing**. Coverage includes:
 - pinch/zoom/pan mathematics, two-point review framing and the locked fitted map;
 - silent Aim! tap confirmation, full-answer reveal and double-tap/gesture cancellation;
 - the animated next-question reset and its reduced-motion fallback;
-- measured mission-HUD height transitions and floating Next placement;
+- measured mission-HUD height transitions and docked Next placement;
+- per-question kilometres and average distance in the Aim! result;
 - map dimensions and all eight maps;
 - activity HUD, markers and result flows;
 - map picker and activity presets;

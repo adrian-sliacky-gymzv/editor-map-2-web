@@ -569,28 +569,6 @@ function syncNextFloat() {
   dom.nextFloat.setAttribute('aria-label', label);
   dom.nextFloat.classList.toggle('is-result', resultReady);
   dom.nextFloat.hidden = !visible;
-  if (visible) requestAnimationFrame(positionNextFloat);
-}
-
-function positionNextFloat() {
-  if (!dom.nextFloat || dom.nextFloat.hidden) return;
-  if (state.final) {
-    dom.nextFloat.classList.remove('is-top');
-    return;
-  }
-  const viewport = dom.mapViewport.getBoundingClientRect();
-  const markers = [...dom.markers.querySelectorAll('.marker-correct, .marker-guess')]
-    .map((marker) => marker.getBoundingClientRect())
-    .filter((rect) => rect.width || rect.height);
-  if (!markers.length) {
-    dom.nextFloat.classList.remove('is-top');
-    return;
-  }
-  const topZone = viewport.top + Math.min(150, viewport.height * 0.28);
-  const bottomZone = viewport.bottom - Math.min(170, viewport.height * 0.32);
-  const nearTop = markers.filter((rect) => rect.top < topZone).length;
-  const nearBottom = markers.filter((rect) => rect.top > bottomZone).length;
-  dom.nextFloat.classList.toggle('is-top', nearBottom > nearTop);
 }
 
 function resetGameState() {
@@ -1875,7 +1853,6 @@ function bindGameEvents() {
       attributeFilter: ['disabled', 'hidden'],
     });
   }
-  window.addEventListener('resize', () => requestAnimationFrame(positionNextFloat));
   syncNextFloat();
 }
 

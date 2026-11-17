@@ -363,6 +363,9 @@ function cacheDom() {
   dom.resultTime = $('#classicResultTime');
   dom.resultText = $('#classicResultText');
   dom.resultRows = $('#classicResultRows');
+  dom.resultDistance = $('#classicResultDistance');
+  dom.resultDistanceLabel = $('#classicResultDistanceLabel');
+  dom.resultDistanceValue = $('#classicResultDistanceValue');
   dom.resultAgain = $('#classicResultAgain');
   dom.resultSetup = $('#classicResultSetup');
   dom.resultHome = $('#classicResultHome');
@@ -1066,44 +1069,30 @@ function syncNextFloat() {
   }
   GAME.nextFloatPending = false;
   dom.nextFloat.hidden = false;
-  requestAnimationFrame(positionNextFloat);
 }
 
-function positionNextFloat() {
-  if (!dom.nextFloat || dom.nextFloat.hidden || !GAME.mapView) return;
-  if (GAME.finalShown) {
-    // The result action is a stable bottom action; there are no more answers
-    // to dodge, so do not move it to the top based on the last markers.
-    dom.nextFloat.classList.remove('is-top');
-    dom.nextFloat.style.top = '';
-    return;
+/**
+ * The floating Next action is docked above the bottom map controls on phones.
+ * Measure it invisibly so the review camera reserves exactly the space it
+ * needs (including safe-area insets) instead of moving the action afterwards.
+ * The extra 52 px covers the lower marker's label chip and a small gap.
+ */
+function nextFloatBottomPadding() {
+  if (!dom.nextFloat || !GAME.mapView) return 0;
+  const wasHidden = dom.nextFloat.hidden;
+  const previousVisibility = dom.nextFloat.style.visibility;
+  dom.nextFloat.hidden = false;
+  dom.nextFloat.style.visibility = 'hidden';
+  let padding = 0;
+  if (getComputedStyle(dom.nextFloat).display !== 'none') {
+    const button = dom.nextFloat.getBoundingClientRect();
+    const viewport = dom.mapViewportWrap.getBoundingClientRect();
+    const clearance = viewport.bottom - button.top;
+    if (clearance > 0) padding = Math.ceil(clearance) + 52;
   }
-  const points = [...GAME.marks.values()]
-    .filter((mark) => mark.labelVisible)
-    .map((mark) => GAME.mapView.mapToScreen(mark.x, mark.y));
-  if (!points.length) {
-    dom.nextFloat.classList.remove('is-top');
-    return;
-  }
-  const rect = dom.mapViewportWrap.getBoundingClientRect();
-  const topZone = rect.top + Math.min(150, rect.height * 0.28);
-  const bottomZone = rect.bottom - Math.min(170, rect.height * 0.32);
-  const nearTop = points.filter((point) => point.y < topZone).length;
-  const nearBottom = points.filter((point) => point.y > bottomZone).length;
-  const isTop = nearBottom > nearTop;
-  dom.nextFloat.classList.toggle('is-top', isTop);
-  if (isTop) {
-    // Keep the floating action clear of the mission HUD and marker legend.
-    const hudBottom = Math.max(
-      dom.mission ? dom.mission.getBoundingClientRect().bottom : rect.top,
-      dom.distanceLegend && !dom.distanceLegend.hidden
-        ? dom.distanceLegend.getBoundingClientRect().bottom
-        : rect.top
-    );
-    dom.nextFloat.style.top = `${Math.max(16, Math.round(hudBottom - rect.top + 10))}px`;
-  } else {
-    dom.nextFloat.style.top = '';
-  }
+  dom.nextFloat.style.visibility = previousVisibility;
+  dom.nextFloat.hidden = wasHidden;
+  return padding;
 }
 
 function watchNextState() {
@@ -1667,10 +1656,14 @@ function answerDistanceAt(point) {
     className: 'map-guide-underlay',
   });
   GAME.mapView.addGuide({ x1: point.x, y1: point.y, x2: targetX, y2: targetY });
-  // Review both points together. If the answer is outside the current crop,
-  // the camera zooms out only enough to show the guess and the correct spot;
-  // when both already fit, it keeps the player's zoom.
-  GAME.mapView.revealPoints([point, { x: targetX, y: targetY }]);
+  // Review both points together. On phones, reserve the docked Next action at
+  // the bottom so the camera keeps both markers and their labels above it.
+  // When both already fit, the camera keeps the player's zoom.
+  const bottomPadding = nextFloatBottomPadding();
+  GAME.mapView.revealPoints([point, { x: targetX, y: targetY }], {
+    paddingTop: 72,
+    paddingBottom: Math.max(72, bottomPadding),
+  });
   showDistanceLegend();
 
   const answer = distanceAnswerFor(score);
@@ -1718,6 +1711,14 @@ function distanceAnswerFor(score) {
   };
 }
 
+function averageKilometres() {
+  const values = GAME.answers
+    .map((row) => (row.kilometres == null ? null : Number(row.kilometres)))
+    .filter((value) => value != null && Number.isFinite(value));
+  if (!values.length) return null;
+  return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
 function showDistanceFinal() {
   GAME.finalShown = true;
   GAME.active = false;
@@ -1745,11 +1746,15 @@ function showDistanceFinal() {
     primaryLabel: t(GAME.totalScore === 1 ? 'bod' : 'bodov'),
     time: timeText(),
     finalHtml: dom.question.innerHTML,
+    averageKm: averageKilometres(),
     rows: GAME.answers.map((row) => [
       row.label,
+      row.kilometres == null
+        ? '—'
+        : `${formatKilometres(row.kilometres, getLanguage())} km`,
       `${row.points} b.`,
     ]),
-    columns: [t('Objekt'), t('Skóre tipu')],
+    columns: [t('Objekt'), t('Vzdialenosť'), t('Skóre tipu')],
   });
 }
 
@@ -2102,17 +2107,14 @@ function bindGameEvents() {
   window.addEventListener('resize', () => requestAnimationFrame(() => {
     if (GAME.legendPending) scheduleDistanceLegend();
     else if (dom.distanceLegend && !dom.distanceLegend.hidden) placeDistanceLegend();
-    positionNextFloat();
   }));
   // The mission HUD grows and shrinks when a target name wraps. Keep the
   // floating Next action clear of it while that height animation runs.
   if (typeof ResizeObserver !== 'undefined') {
     GAME.nextFloatObserver?.disconnect();
     GAME.nextFloatObserver = new ResizeObserver(() => requestAnimationFrame(() => {
-      // Recompute the map fit first: the marker screen positions used by the
-      // Next action depend on the viewport height the HUD just changed.
+      // Recompute the map fit when the mission HUD changes height.
       GAME.mapView?.layout();
-      positionNextFloat();
     }));
     if (dom.mission) GAME.nextFloatObserver.observe(dom.mission);
     if (dom.distanceLegend) GAME.nextFloatObserver.observe(dom.distanceLegend);
@@ -2293,8 +2295,19 @@ function showResult(result) {
   dom.resultText.innerHTML = result.finalHtml || '';
   dom.resultBadge.hidden = result.percent < 90;
   dom.resultBadge.textContent = result.percent >= 100 ? 'Perfektné' : result.percent >= 90 ? 'Výborné' : '';
+  const averageKm = result.averageKm == null ? null : Number(result.averageKm);
+  const hasAverage = averageKm != null && Number.isFinite(averageKm);
+  if (dom.resultDistance) {
+    dom.resultDistance.hidden = !hasAverage;
+    if (hasAverage) {
+      dom.resultDistanceLabel.textContent = t('Priemerná vzdialenosť od správnej polohy');
+      dom.resultDistanceValue.textContent = `${formatKilometres(averageKm, getLanguage())} km`;
+    }
+  }
   dom.resultRows.replaceChildren();
-  const head = dom.resultRows.closest('table')?.querySelector('thead tr');
+  const table = dom.resultRows.closest('table');
+  table?.classList.toggle('is-distance-result', hasAverage);
+  const head = table?.querySelector('thead tr');
   if (head) {
     head.replaceChildren();
     for (const label of result.columns) {

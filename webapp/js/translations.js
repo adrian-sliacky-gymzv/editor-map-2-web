@@ -282,6 +282,7 @@ export const EN = {
   'Skóre tipu': 'Guess score',
   'Posledný tip': 'Last guess',
   'Vzdialenosť': 'Distance',
+  'Priemerná vzdialenosť od správnej polohy': 'Average distance from the correct location',
   'Načítavam mapu…': 'Loading map…',
   'Načítavam editor…': 'Loading the editor…',
   'Slovensko.mef': 'Slovensko.mef',

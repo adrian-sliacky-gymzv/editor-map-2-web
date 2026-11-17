@@ -824,7 +824,13 @@ export class MapView {
    * the player's current level, and it keeps that level when both points are
    * already comfortably visible.
    */
-  revealPoints(points, { paddingX = 88, paddingY = 72, duration = 260 } = {}) {
+  revealPoints(points, {
+    paddingX = 88,
+    paddingY = 72,
+    paddingTop = paddingY,
+    paddingBottom = paddingY,
+    duration = 260,
+  } = {}) {
     if (!Array.isArray(points) || !points.length || !this.scene) return false;
     const rect = this.viewport.getBoundingClientRect();
     if (rect.width < 2 || rect.height < 2) return false;
@@ -835,8 +841,8 @@ export class MapView {
       return (
         screen.x >= rect.left + paddingX
         && screen.x <= rect.right - paddingX
-        && screen.y >= rect.top + paddingY
-        && screen.y <= rect.bottom - paddingY
+        && screen.y >= rect.top + paddingTop
+        && screen.y <= rect.bottom - paddingBottom
       );
     });
     if (visible) return false;
@@ -854,10 +860,19 @@ export class MapView {
       fitScale: this.fitScale,
       currentZoom: this.zoom,
       paddingX,
-      paddingY,
+      paddingTop,
+      paddingBottom,
     });
+    // Centre the pair inside the usable area, not the raw viewport. This keeps
+    // the answer clear of a docked bottom action without moving that action.
+    const usableTop = rect.top + paddingTop;
+    const usableBottom = rect.bottom - paddingBottom;
+    const safeCenterY = usableTop + Math.max(0, usableBottom - usableTop) / 2;
+    const viewportCenterY = rect.top + rect.height / 2;
+    const scale = Math.max(0.00001, this.fitScale * targetZoom);
+    const centerY = bbox.y + bbox.height / 2 + (viewportCenterY - safeCenterY) / scale;
     return this._animateCameraTo(
-      { zoom: targetZoom, centerX: bbox.x + bbox.width / 2, centerY: bbox.y + bbox.height / 2 },
+      { zoom: targetZoom, centerX: bbox.x + bbox.width / 2, centerY },
       duration
     );
   }

@@ -136,13 +136,18 @@ export function fitBoundsZoom({
   currentZoom,
   paddingX = 88,
   paddingY = 72,
+  paddingTop = paddingY,
+  paddingBottom = paddingY,
   minZoom = MIN_MAP_ZOOM,
   maxZoom = MAX_MAP_ZOOM,
 }) {
   const boxWidth = Math.max(1, Number(bbox?.width) || 0);
   const boxHeight = Math.max(1, Number(bbox?.height) || 0);
   const availableWidth = Math.max(1, (Number(viewport?.width) || 1) - paddingX * 2);
-  const availableHeight = Math.max(1, (Number(viewport?.height) || 1) - paddingY * 2);
+  const availableHeight = Math.max(
+    1,
+    (Number(viewport?.height) || 1) - paddingTop - paddingBottom,
+  );
   const scale = Math.max(0.00001, Number(fitScale) || 1);
   const current = clampNumber(currentZoom, minZoom, maxZoom);
   const fitX = availableWidth / (boxWidth * scale);

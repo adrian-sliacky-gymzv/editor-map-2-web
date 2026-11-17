@@ -2431,6 +2431,33 @@ kbd {
   text-transform: uppercase;
 }
 
+.result-distance {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 16px;
+  margin: 14px 0 12px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.result-distance b {
+  color: var(--ink);
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  text-transform: none;
+  white-space: nowrap;
+}
+
 .result-text {
   color: var(--ink-2);
   font-size: 13px;
@@ -2460,6 +2487,17 @@ kbd {
 .result-list td {
   border-bottom: 1px solid var(--line);
   font-size: 12px;
+}
+
+.result-list.is-distance-result th:nth-child(2),
+.result-list.is-distance-result td:nth-child(2) {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.result-list.is-distance-result td:nth-child(2) {
+  font-family: var(--lcd);
+  font-weight: 700;
 }
 
 .result-list tr:last-child td {
