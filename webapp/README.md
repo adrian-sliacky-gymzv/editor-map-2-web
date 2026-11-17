@@ -214,9 +214,12 @@ only after the user zooms in.
   **Last guess** stat.
 - **Recenter** — **◎** returns to the centred full-map view and resets the zoom.
   It is equivalent to **⌂** and `0`.
-- **Tap safety** — the final touch after a pinch, pan or double-tap never counts
+- **Tap safety** - the final touch after a pinch, pan or double-tap never counts
   as an answer. Taps on map controls never answer. Puzzle pieces require a real
   tap; a drag does not submit.
+- **Aim! touch taps** - a touch tap shows a provisional crosshair and commits
+  after 300 ms, so a quick second tap can start one-finger zoom instead of
+  answering. Mouse clicks commit immediately.
 - **New question** — each question starts from the full fitted map. In
   `Traf sa!`, the view zooms out if the guess or correct point is outside the
   viewport.
@@ -351,7 +354,7 @@ Supported map keys: `slovensko`, `svet`, `europa`, `afrika`, `azia`,
 npm test
 ```
 
-Current status: **112 tests, 112 passing**. Coverage includes:
+Current status: **113 tests, 113 passing**. Coverage includes:
 
 - original scoring, per-map maximum distance, printed scale-bar kilometres and
   puzzle tolerance;

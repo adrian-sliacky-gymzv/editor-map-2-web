@@ -1055,7 +1055,8 @@ export class MapView {
       startedOnMark,
     });
 
-    const doubleTap = this.interaction === 'pan'
+    const canDoubleTap = this.interaction === 'pan' || this.interaction === 'click';
+    const doubleTap = canDoubleTap
       && event.pointerType !== 'mouse'
       && !startedOnMark
       && !interactive
@@ -1064,7 +1065,7 @@ export class MapView {
         x: event.clientX,
         y: event.clientY,
         time: performance.now(),
-      }, { maxDelay: 320, slop: 30 });
+      }, { maxDelay: this.interaction === 'click' ? 280 : 320, slop: 30 });
     if (doubleTap) {
       // A second tap can either become a normal double-tap zoom on release or,
       // as in Google Maps, a continuous one-finger zoom when the finger slides.
@@ -1081,6 +1082,7 @@ export class MapView {
       this.lastTap = null;
       this.pointerDragged = false;
       this.suppressClickUntil = performance.now() + 260;
+      this.viewport.dispatchEvent(new CustomEvent('map:doubletapstart', { bubbles: true }));
       return;
     }
 
@@ -1222,6 +1224,7 @@ export class MapView {
       this.suppressClickUntil = now + 180;
       this.lastTap = null;
       this.panning.lastTime = now;
+      this.viewport.dispatchEvent(new CustomEvent('map:gesturestart', { bubbles: true }));
     }
     if (this.panning.moved && this.interaction !== 'draw') {
       if (this.zoom <= 1.001) {
@@ -1375,6 +1378,11 @@ export class MapView {
             detail: { ...pt, originalEvent: event },
             bubbles: true,
           }));
+          // The distance game commits a tap as an answer. Remember the contact
+          // so a quick second tap can cancel that commit and become a zoom.
+          if (pointerType !== 'mouse') {
+            this.lastTap = { x: event.clientX, y: event.clientY, time: now };
+          }
         } else if (this.interaction === 'pan' && pointerType === 'touch') {
           const tap = { x: event.clientX, y: event.clientY, time: now };
           if (isDoubleTap(this.lastTap, tap, { maxDelay: 320, slop: 30 })) {

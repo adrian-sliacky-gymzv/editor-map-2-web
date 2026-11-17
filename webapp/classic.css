@@ -238,6 +238,10 @@ body.editor-tree-open {
   filter: drop-shadow(0 1px 1.5px rgba(15, 23, 42, 0.22));
 }
 
+.map-mark.is-pending-guess {
+  opacity: 0.58;
+}
+
 .map-mark .mark-halo {
   fill: #fff;
   stroke: currentColor;

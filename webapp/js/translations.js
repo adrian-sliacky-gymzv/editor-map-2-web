@@ -175,6 +175,8 @@ export const EN = {
     'Smooth map reset between questions and new touch gestures.',
   'Kamera po odpovedi ukáže tip aj správne miesto; HUD a tlačidlo Ďalej sa prispôsobia plynulo.':
     'The answer camera shows both the guess and the correct spot; the HUD and Next action adapt smoothly.',
+  'Jednoprstové priblíženie a dvojité ťuknutie funguje vo všetkých hrách vrátane Traf sa!':
+    'One-finger zoom and double tap work in every game, including Aim!',
   'Angličtina a presná zhoda': 'English and exact parity',
   'Anglické rozhranie s automatickým výberom jazyka.':
     'English interface with automatic language selection.',
