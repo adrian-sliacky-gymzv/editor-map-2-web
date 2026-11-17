@@ -258,20 +258,27 @@ test('the floating Next action waits for the review camera and HUD layout', () =
   assert.match(activities, /resize'[\s\S]*?positionNextFloat/);
 });
 
-test('Aim! shows the answer immediately and defers only score bookkeeping', () => {
+test('Aim! holds a touch tap silently so gestures never flash a result', () => {
   const activities = read('js/classic-activities.js');
   const mapView = read('js/map-view.js');
   const css = read('classic.css');
-  assert.match(activities, /DISTANCE_PREVIEW_COMMIT_MS/);
-  assert.match(activities, /function onDistanceClick\(point, event\)[\s\S]*?GAME\.distancePreview = \{/);
-  assert.match(activities, /function commitDistancePreview\(\)/);
-  assert.match(activities, /function cancelDistancePreview\(\)/);
-  assert.match(activities, /map:doubletapstart', cancelDistancePreview/);
-  assert.match(activities, /GAME\.mapView\.interaction = 'pan'/);
-  assert.doesNotMatch(activities, /pendingDistanceGuess/);
+  const answerTimer = /const DISTANCE_TOUCH_COMMIT_MS = (\d+);/.exec(activities);
+  const tapWindow = /this\.interaction === 'click' \? (\d+) : 320/.exec(mapView);
+  assert.ok(answerTimer && tapWindow);
+  assert.ok(
+    Number(tapWindow[1]) < Number(answerTimer[1]),
+    `the ${tapWindow[1]} ms click double-tap window must end before the ${answerTimer[1]} ms answer timer`,
+  );
+  assert.match(activities, /function onDistanceClick\(point, event\)[\s\S]*?GAME\.pendingDistanceGuess = point;[\s\S]*?setTimeout\(commitPendingDistanceGuess, DISTANCE_TOUCH_COMMIT_MS\)/);
+  assert.match(activities, /function commitPendingDistanceGuess\(\)/);
+  assert.match(activities, /function cancelPendingDistanceGuess\(\)/);
+  assert.match(activities, /map:doubletapstart', cancelPendingDistanceGuess/);
+  assert.match(activities, /map:gesturestart', cancelPendingDistanceGuess/);
+  assert.match(activities, /function nextDistanceQuestion\(\)[\s\S]*?cancelPendingDistanceGuess\(\)[\s\S]*?interaction = 'click'[\s\S]*?lastTap = null[\s\S]*?doubleTapDrag = null/);
+  assert.doesNotMatch(activities, /distancePreview/);
   assert.doesNotMatch(activities, /pendingGuessMark/);
-  assert.match(mapView, /this\.interaction === 'click' \? 280 : 320/);
   assert.match(mapView, /map:doubletapstart/);
+  assert.match(mapView, /map:gesturestart/);
   assert.match(mapView, /zoomAnimated\(/);
   assert.match(mapView, /_zoomFromDoubleTap[\s\S]*?zoomAnimated/);
   assert.doesNotMatch(css, /is-pending-guess/);

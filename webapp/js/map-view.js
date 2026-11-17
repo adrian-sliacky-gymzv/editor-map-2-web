@@ -1058,6 +1058,9 @@ export class MapView {
     });
 
     const canDoubleTap = this.interaction === 'pan' || this.interaction === 'click';
+    // In click mode (Aim!) the 200 ms window stays just inside the 210 ms
+    // answer timer in classic-activities.js. The second tap cancels the
+    // pending answer before it can commit.
     const doubleTap = canDoubleTap
       && event.pointerType !== 'mouse'
       && !startedOnMark
@@ -1067,7 +1070,7 @@ export class MapView {
         x: event.clientX,
         y: event.clientY,
         time: performance.now(),
-      }, { maxDelay: this.interaction === 'click' ? 280 : 320, slop: 30 });
+      }, { maxDelay: this.interaction === 'click' ? 200 : 320, slop: 30 });
     if (doubleTap) {
       // A second tap can either become a normal double-tap zoom on release or,
       // as in Google Maps, a continuous one-finger zoom when the finger slides.

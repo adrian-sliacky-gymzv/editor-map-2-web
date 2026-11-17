@@ -217,10 +217,11 @@ only after the user zooms in.
 - **Tap safety** - the final touch after a pinch, pan or double-tap never counts
   as an answer. Taps on map controls never answer. Puzzle pieces require a real
   tap; a drag does not submit.
-- **Aim! touch taps** - the guess, correct location, guide line and score card
-  appear immediately. Only the score totals, Next action and statistics wait
-  300 ms for the double-tap window; a double tap cancels the preview and zooms.
-  Mouse clicks commit immediately.
+- **Aim! touch taps** - a touch tap is held silently for about 210 ms, just
+  longer than the 200 ms double-tap window. If no second tap arrives, the
+  guess, correct location, guide line and score card appear together. Nothing
+  is drawn while waiting, so panning, pinching and double-tap/double-tap-drag
+  zoom never flash a marker or result. Mouse clicks answer immediately.
 - **New question** — each question starts from the full fitted map. In
   `Traf sa!`, the view zooms out if the guess or correct point is outside the
   viewport.
@@ -363,7 +364,7 @@ Current status: **115 tests, 115 passing**. Coverage includes:
 - byte-for-byte `.mef` parity and semantic `config.xml` parity with `software/`;
 - question selection and difficulty pools;
 - pinch/zoom/pan mathematics, two-point review framing and the locked fitted map;
-- immediate Aim! answer previews, deferred score bookkeeping and double-tap cancel/zoom;
+- silent Aim! tap confirmation, full-answer reveal and double-tap/gesture cancellation;
 - the animated next-question reset and its reduced-motion fallback;
 - measured mission-HUD height transitions and floating Next placement;
 - map dimensions and all eight maps;
