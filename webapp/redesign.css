@@ -3313,15 +3313,30 @@ kbd {
     max-height: calc(100dvh - 20px);
   }
 
+  /* Mobile setup: show the complete map grid; only the form body scrolls. */
   .setup-body {
-    grid-template-columns: 1fr;
-    gap: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
     padding: 16px;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .setup-map-column {
+    display: block;
+    flex: 0 0 auto;
+    min-height: 0;
   }
 
   .setup-maps {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     max-height: none;
+    overflow: visible;
+  }
+
+  .setup-options {
+    flex: 0 0 auto;
   }
 
   .setup-map-card {
@@ -3335,7 +3350,16 @@ kbd {
   }
 
   .setup-map-copy strong {
-    font-size: 14px;
+    overflow: visible;
+    white-space: normal;
+    text-overflow: clip;
+    font-size: clamp(11px, 3.4vw, 14px);
+    line-height: 1.05;
+  }
+
+  .setup-map-copy span {
+    font-size: 6px;
+    line-height: 1.15;
   }
 
   .setup-summary {
@@ -3536,7 +3560,18 @@ kbd {
   }
 
   .setup-maps {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .setup-map-card {
+    min-height: 52px;
+    padding: 5px;
+    gap: 7px;
+  }
+
+  .setup-map-thumb {
+    width: 48px;
+    height: 34px;
   }
 
   .setup-levels {
@@ -5124,35 +5159,43 @@ kbd {
   }
 
   .setup-body {
+    display: grid;
     grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
     gap: 14px;
     padding: 10px 14px;
   }
 
+  /* Short landscape: keep the full map grid and controls in view. */
   .setup-maps {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    max-height: 154px;
+    max-height: none;
     min-height: 0;
-    overflow-y: auto;
+    overflow: visible;
   }
 
   .setup-map-card {
-    min-height: 52px;
+    min-height: 46px;
     padding: 5px;
+    gap: 7px;
   }
 
   .setup-map-thumb {
-    width: 50px;
-    height: 32px;
+    width: 46px;
+    height: 30px;
   }
 
   .setup-map-copy strong {
-    font-size: 13px;
+    overflow: visible;
+    white-space: normal;
+    text-overflow: clip;
+    font-size: 12px;
+    line-height: 1.05;
   }
 
   .setup-map-copy span {
-    font-size: 6px;
+    font-size: 5.5px;
+    line-height: 1.15;
   }
 
   .setup-options {

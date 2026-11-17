@@ -31,6 +31,10 @@ database, no backend and no build step.
 All activities support the original question counts, levels, timer and result
 messages. The result card can be closed and reopened without leaving the game.
 
+The activity setup keeps the complete map grid visible on phones: a two-column
+picker with wrapped map names, while the form body scrolls and Start/Cancel stay
+fixed. Short landscape layouts show the full map grid and controls side by side.
+
 ### Languages
 
 - Slovak and English UI, including game messages, result cards, editor labels,
@@ -357,7 +361,7 @@ Supported map keys: `slovensko`, `svet`, `europa`, `afrika`, `azia`,
 npm test
 ```
 
-Current status: **117 tests, 117 passing**. Coverage includes:
+Current status: **118 tests, 118 passing**. Coverage includes:
 
 - original scoring, per-map maximum distance, printed scale-bar kilometres and
   puzzle tolerance;
@@ -371,7 +375,7 @@ Current status: **117 tests, 117 passing**. Coverage includes:
 - per-question kilometres and average distance in the Aim! result;
 - map dimensions and all eight maps;
 - activity HUD, markers and result flows;
-- map picker and activity presets;
+- map picker, full mobile map grid and activity presets;
 - recenter controls;
 - statistics and city training;
 - Slovak/English detection, exact translations, plurals and dynamic sentences;

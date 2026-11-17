@@ -266,6 +266,18 @@ test('the floating Next action stays docked at the bottom', () => {
   assert.doesNotMatch(styles, /\.map-next-float\.is-top/);
 });
 
+test('mobile activity setup shows the complete map picker', () => {
+  const css = read('redesign.css');
+  assert.match(css, /Mobile setup: show the complete map grid/);
+  assert.match(css, /\.setup-body \{\s*display: flex;\s*flex-direction: column;[\s\S]*?overflow-y: auto;/);
+  assert.match(css, /\.setup-map-column \{[\s\S]*?display: block;[\s\S]*?flex: 0 0 auto;[\s\S]*?min-height: 0;/);
+  assert.match(css, /\.setup-maps \{[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*?max-height: none;[\s\S]*?overflow: visible;/);
+  assert.match(css, /\.setup-map-copy strong \{[\s\S]*?white-space: normal;[\s\S]*?text-overflow: clip;/);
+  assert.match(css, /\.setup-map-card \{\s*min-height: 52px;\s*padding: 5px;\s*gap: 7px;/);
+  assert.match(css, /\.setup-map-thumb \{\s*width: 48px;\s*height: 34px;/);
+  assert.match(css, /Short landscape: keep the full map grid and controls in view/);
+});
+
 test('Aim! results include kilometre breakdowns and average distance', () => {
   const html = read('index.html');
   const activities = read('js/classic-activities.js');
