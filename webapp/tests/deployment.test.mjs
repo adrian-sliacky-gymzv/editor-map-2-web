@@ -258,19 +258,23 @@ test('the floating Next action waits for the review camera and HUD layout', () =
   assert.match(activities, /resize'[\s\S]*?positionNextFloat/);
 });
 
-test('distance taps defer briefly so one-finger zoom works in Aim!', () => {
+test('Aim! taps answer immediately and press-hold zoom is available', () => {
   const activities = read('js/classic-activities.js');
   const mapView = read('js/map-view.js');
   const css = read('classic.css');
-  assert.match(activities, /DISTANCE_TOUCH_COMMIT_MS/);
-  assert.match(activities, /pendingDistanceGuess/);
-  assert.match(activities, /pendingGuessMark/);
-  assert.match(activities, /map:doubletapstart/);
-  assert.match(mapView, /this\.interaction === 'click' \? 200 : 320/);
-  assert.match(mapView, /map:doubletapstart/);
+  assert.doesNotMatch(activities, /DISTANCE_TOUCH_COMMIT_MS/);
+  assert.doesNotMatch(activities, /pendingDistanceGuess/);
+  assert.doesNotMatch(activities, /pendingGuessMark/);
+  assert.match(activities, /function onDistanceClick\(point\)[\s\S]*?answerDistanceAt\(point\)/);
+  assert.match(activities, /GAME\.mapView\.interaction = 'pan'/);
+  assert.match(activities, /GAME\.mapView\.interaction = 'click'/);
+  assert.match(mapView, /_startHoldZoom/);
+  assert.match(mapView, /hold\.active/);
+  assert.match(mapView, /oneFingerZoomTarget\(hold\.startZoom, dy\)/);
+  assert.doesNotMatch(mapView, /this\.interaction === 'click' \? 200 : 320/);
   assert.match(mapView, /zoomAnimated\(/);
   assert.match(mapView, /_zoomFromDoubleTap[\s\S]*?zoomAnimated/);
-  assert.match(css, /\.map-mark\.is-pending-guess/);
+  assert.doesNotMatch(css, /is-pending-guess/);
 });
 
 test('the homepage includes a changelog section', () => {

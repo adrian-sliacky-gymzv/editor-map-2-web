@@ -169,6 +169,8 @@ export const EN = {
     'Subtle sounds for answers and results, with quick muting.',
   'História prehliadača funguje medzi hrou, atlasom a editorom.':
     'Browser history works between games, the atlas and the editor.',
+  'Klikni na miesto · podrž a potiahni na priblíženie':
+    'Tap a place · hold and drag to zoom',
   'Skóre tipu a vzdialenosť v kilometroch namiesto neprehľadných mapových jednotiek.':
     'Guess score and distance in kilometres instead of confusing map units.',
   'Plynulý návrat mapy medzi otázkami a nové dotykové ovládanie.':
@@ -685,7 +687,7 @@ export const EN_HTML = {
   helpEditor:
     'New / Open / Save / Save as work with the original <b>.mef</b> files. The tree on the left controls visibility, markers and colors. Drawing offers lines, rectangles, ellipses and freehand. Export creates PNG or JPEG, or you can print the map.',
   helpMapControls:
-    'Zoom the map with the mouse wheel, pinch or the <b>+</b> / <b>−</b> buttons. On a touchscreen you can also double-tap and hold, then slide one finger up or down to zoom. The <b>⌂</b> button restores the whole map. Pan it by dragging empty space.',
+    'Zoom the map with the mouse wheel, pinch or the <b>+</b> / <b>-</b> buttons. In Aim!, press and hold on the map, then drag up or down; after answering, double-tap and drag also works. The <b>⌂</b> button restores the whole map. Pan it by dragging empty space.',
   helpShortcutPan: 'Pan the map; hold <kbd>Shift</kbd> to move faster.',
   helpShortcutAtlas: 'Atlas: jump to search. <kbd>Esc</kbd> clears it.',
   helpShortcutEditor:

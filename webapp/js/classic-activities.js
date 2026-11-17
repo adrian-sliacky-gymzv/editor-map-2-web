@@ -49,9 +49,6 @@ import {
 } from './classic-ui.js';
 
 const SETUP_KEY = 'editorMap2.activitySetup.v2';
-// A touch tap in the distance game answers. Hold the commit just long enough
-// for a second tap to turn it into the one-finger zoom gesture instead.
-const DISTANCE_TOUCH_COMMIT_MS = 210;
 
 /** Original config.xml text, or its English equivalent in English mode. */
 const cfgText = (name) => gameMessage(name, classicData.cfg(name));
@@ -243,9 +240,6 @@ const GAME = {
   nextFloatPending: false,
   legendTimer: null,
   legendPending: false,
-  pendingDistanceGuess: null,
-  distanceGuessTimer: null,
-  pendingGuessMark: null,
 };
 
 const dom = {};
@@ -715,7 +709,6 @@ function changeNumQ(delta) {
 export async function startActivityGame(params) {
   const mode = MODES[params.mode];
   if (!mode) return;
-  cancelPendingDistanceGuess();
   const loadToken = ++GAME.loadToken;
   await classicData.init();
   const list = childrenByTag(classicData.cfgEl(mode.listName), 'map');
@@ -840,7 +833,6 @@ export async function startActivityGame(params) {
         .map((el) => el.getBoundingClientRect()),
       onZoom: () => {
         dom.zoomValue.textContent = `${GAME.mapView ? GAME.mapView.percent() : 100}%`;
-        if (GAME.pendingDistanceGuess) cancelPendingDistanceGuess();
       },
     });
     GAME.mapView.setMarksVisible(true);
@@ -908,7 +900,7 @@ function showMapHint() {
   if (!dom.hint) return;
   dom.hint.hidden = false;
   if (GAME.mode === 'distance' || (GAME.mode === 'practice' && GAME.practiceFormat === 'distance')) {
-    dom.hint.textContent = 'Klikni na miesto na mape';
+    dom.hint.textContent = 'Klikni na miesto · podrž a potiahni na priblíženie';
   } else if (GAME.mode === 'puzzle' || (GAME.mode === 'practice' && GAME.practiceFormat === 'puzzle')) {
     dom.hint.textContent = 'Potiahni žltý objekt na správne miesto';
   } else {
@@ -1570,65 +1562,16 @@ function nextDistanceQuestion() {
   updateProgress();
   dom.next.disabled = true;
   GAME.mapView.options.onMapClick = onDistanceClick;
+  GAME.mapView.interaction = 'click';
+  GAME.mapView.lastTap = null;
+  GAME.mapView.doubleTapDrag = null;
   announce(`Otázka ${GAME.questionIndex}: ${nodeLabel(target)}`);
 }
 
-function removePendingGuessMark() {
-  if (GAME.pendingGuessMark && GAME.mapView) {
-    GAME.mapView.removeMark(GAME.pendingGuessMark);
-  }
-  GAME.pendingGuessMark = null;
-}
-
-function cancelPendingDistanceGuess() {
-  clearTimeout(GAME.distanceGuessTimer);
-  GAME.distanceGuessTimer = null;
-  GAME.pendingDistanceGuess = null;
-  removePendingGuessMark();
-}
-
-function commitPendingDistanceGuess() {
-  const point = GAME.pendingDistanceGuess;
-  clearTimeout(GAME.distanceGuessTimer);
-  GAME.distanceGuessTimer = null;
-  GAME.pendingDistanceGuess = null;
-  removePendingGuessMark();
-  if (point) answerDistanceAt(point);
-}
-
-function onDistanceClick(point, event) {
+function onDistanceClick(point) {
   if (!GAME.active || GAME.answered) return;
   if (GAME.mode !== 'distance' && !(GAME.mode === 'practice' && GAME.practiceFormat === 'distance')) return;
-  if (GAME.pendingDistanceGuess) {
-    // A second tap in a different place: commit the first guess immediately
-    // and ignore this contact.
-    commitPendingDistanceGuess();
-    return;
-  }
-  const pointerType = event?.pointerType || 'mouse';
-  if (pointerType === 'mouse') {
-    answerDistanceAt(point);
-    return;
-  }
-  // Show the tap location at once, but wait briefly before scoring so a quick
-  // second tap can become double-tap/drag zoom instead of an answer.
-  GAME.pendingDistanceGuess = point;
-  if (GAME.mapView) {
-    const mark = GAME.mapView.addMark({
-      x: point.x,
-      y: point.y,
-      label: 'Tvoj tip',
-      symbol: 'guess',
-      state: 'ask',
-      labelVisible: false,
-    });
-    if (mark?.el) {
-      mark.el.style.pointerEvents = 'none';
-      mark.el.classList.add('is-pending-guess');
-    }
-    GAME.pendingGuessMark = mark;
-  }
-  GAME.distanceGuessTimer = setTimeout(commitPendingDistanceGuess, DISTANCE_TOUCH_COMMIT_MS);
+  answerDistanceAt(point);
 }
 
 function answerDistanceAt(point) {
@@ -1722,6 +1665,9 @@ function answerDistanceAt(point) {
   updateScore();
   updateProgress();
   dom.next.disabled = false;
+  // The answer is committed immediately. Once it is scored, the review map
+  // behaves like a normal map: pan, pinch and double-tap zoom are available.
+  GAME.mapView.interaction = 'pan';
   if (isLast) stopClock();
   announce(`Získal si ${score} bodov. Správna poloha je označená.`);
 }
@@ -2122,8 +2068,6 @@ function bindGameEvents() {
     if (GAME.finalShown && dom.resultOverlay.hidden) openOverlay(dom.resultOverlay, dom.resultAgain);
     else advanceGame();
   });
-  dom.mapViewportWrap.addEventListener('map:doubletapstart', cancelPendingDistanceGuess);
-  dom.mapViewportWrap.addEventListener('map:gesturestart', cancelPendingDistanceGuess);
   window.addEventListener('resize', () => requestAnimationFrame(() => {
     if (GAME.legendPending) scheduleDistanceLegend();
     else if (dom.distanceLegend && !dom.distanceLegend.hidden) placeDistanceLegend();
@@ -2180,7 +2124,6 @@ function bindGameEvents() {
 }
 
 async function endActivity() {
-  cancelPendingDistanceGuess();
   if (!GAME.active && !GAME.finalShown) {
     goHome();
     return;
@@ -2200,7 +2143,6 @@ async function endActivity() {
 
 function disposeClassicGame() {
   GAME.loadToken += 1;
-  cancelPendingDistanceGuess();
   clearTimeout(GAME.nextFloatTimer);
   GAME.nextFloatTimer = null;
   GAME.nextFloatPending = false;
