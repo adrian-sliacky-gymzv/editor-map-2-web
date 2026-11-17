@@ -303,6 +303,7 @@ test('search engine metadata, robots.txt and sitemap.xml are present', () => {
   const data = JSON.parse(jsonLd[1]);
   assert.equal(data['@context'], 'https://schema.org');
   assert.ok(data['@graph'].some((item) => item['@type'] === 'WebApplication'));
+  assert.match(read('404.html'), /<meta name="robots" content="noindex">/);
 });
 
 test('IndexNow key and deployment ping are configured', () => {

@@ -5,6 +5,14 @@
   "type": "module",
   "description": "Editor máp 2 — kompletná webová reimplementácia: Vyskúšaj sa!, Traf sa!, Poskladaj!, editor máp, 8 pôvodných máp a atlas 74 slovenských miest. Slovak and English UI.",
   "author": "Adrian Sliacky",
+  "homepage": "https://em.adriansliacky.sk/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adrian-sliacky-gymzv/editor-map-2-web.git"
+  },
+  "bugs": {
+    "url": "https://github.com/adrian-sliacky-gymzv/editor-map-2-web/issues"
+  },
   "scripts": {
     "start": "node server.mjs",
     "preview": "node server.mjs",
