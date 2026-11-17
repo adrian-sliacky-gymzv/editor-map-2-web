@@ -51,7 +51,7 @@ import {
 const SETUP_KEY = 'editorMap2.activitySetup.v2';
 // A touch tap in the distance game answers. Hold the commit just long enough
 // for a second tap to turn it into the one-finger zoom gesture instead.
-const DISTANCE_TOUCH_COMMIT_MS = 240;
+const DISTANCE_TOUCH_COMMIT_MS = 210;
 
 /** Original config.xml text, or its English equivalent in English mode. */
 const cfgText = (name) => gameMessage(name, classicData.cfg(name));

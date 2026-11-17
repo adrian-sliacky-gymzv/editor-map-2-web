@@ -218,7 +218,7 @@ only after the user zooms in.
   as an answer. Taps on map controls never answer. Puzzle pieces require a real
   tap; a drag does not submit.
 - **Aim! touch taps** - a touch tap shows a neutral provisional crosshair,
-  then commits after 240 ms so a quick second tap can start one-finger zoom
+  then commits after 210 ms so a quick second tap can start one-finger zoom
   instead of answering. Mouse clicks commit immediately.
 - **New question** — each question starts from the full fitted map. In
   `Traf sa!`, the view zooms out if the guess or correct point is outside the

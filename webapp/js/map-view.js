@@ -1066,7 +1066,7 @@ export class MapView {
         x: event.clientX,
         y: event.clientY,
         time: performance.now(),
-      }, { maxDelay: this.interaction === 'click' ? 220 : 320, slop: 30 });
+      }, { maxDelay: this.interaction === 'click' ? 200 : 320, slop: 30 });
     if (doubleTap) {
       // A second tap can either become a normal double-tap zoom on release or,
       // as in Google Maps, a continuous one-finger zoom when the finger slides.
