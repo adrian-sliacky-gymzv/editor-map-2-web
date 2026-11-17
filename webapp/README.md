@@ -354,7 +354,7 @@ Supported map keys: `slovensko`, `svet`, `europa`, `afrika`, `azia`,
 npm test
 ```
 
-Current status: **114 tests, 114 passing**. Coverage includes:
+Current status: **115 tests, 115 passing**. Coverage includes:
 
 - original scoring, per-map maximum distance, printed scale-bar kilometres and
   puzzle tolerance;
@@ -402,7 +402,13 @@ loop is documented in [`../DEVELOPMENT.md`](../DEVELOPMENT.md).
 canonical URL, Open Graph/Twitter metadata and `WebApplication` structured
 data for `https://em.adriansliacky.sk/`.
 
-After deploying:
+The GitHub Pages workflow also pings **IndexNow** after each deployment. One
+submission covers Bing, Yandex, Seznam, Naver and other participating engines.
+The public key is in `indexnow.json` and `<key>.txt`; run the same ping locally
+with `npm run indexnow`, or print the payload with
+`node scripts/indexnow.mjs --dry-run`.
+
+For Google, after deploying:
 
 1. Verify `https://em.adriansliacky.sk/` in Google Search Console (a Domain
    property with DNS verification is recommended; URL-prefix verification with
@@ -411,8 +417,18 @@ After deploying:
 3. Use **URL Inspection → Request indexing** for the homepage.
 4. Check **Indexing → Pages** until the homepage is reported as indexed.
 
-Indexing is not instant; it normally takes days and depends on Google crawling
-the site and finding links to it.
+Bing Webmaster Tools (`bing.com/webmasters`), Yandex Webmaster
+(`webmaster.yandex.com`), Seznam Webmaster and Naver Search Advisor
+(`searchadvisor.naver.com`) are useful for diagnostics but are not required for
+discovery once the sitemap and IndexNow ping are live. Bing Webmaster Tools can
+import a site directly from Google Search Console. Google does not use
+IndexNow, so Search Console is required for faster Google discovery.
+
+One IndexNow notification also helps Bing-powered products such as Copilot,
+ChatGPT Search and DuckDuckGo, which draw on the Bing index.
+
+Indexing is not instant; it normally takes days and depends on search engines
+crawling the site and finding links to it.
 
 ---
 

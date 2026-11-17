@@ -305,6 +305,17 @@ test('search engine metadata, robots.txt and sitemap.xml are present', () => {
   assert.ok(data['@graph'].some((item) => item['@type'] === 'WebApplication'));
 });
 
+test('IndexNow key and deployment ping are configured', () => {
+  const config = JSON.parse(read('indexnow.json'));
+  assert.equal(config.host, 'em.adriansliacky.sk');
+  assert.match(config.key, /^[a-f0-9]{32}$/);
+  assert.equal(config.keyLocation, `https://em.adriansliacky.sk/${config.key}.txt`);
+  assert.equal(read(`${config.key}.txt`).trim(), config.key);
+  assert.match(config.urls[0], /^https:\/\/em\.adriansliacky\.sk\/$/);
+  const workflow = fs.readFileSync(path.join(REPO, '.github', 'workflows', 'pages.yml'), 'utf8');
+  assert.match(workflow, /node webapp\/scripts\/indexnow\.mjs/);
+});
+
 test('repository link and reimplementation credit are present', () => {
   const html = read('index.html');
   assert.match(html, /class="footer-github"/);

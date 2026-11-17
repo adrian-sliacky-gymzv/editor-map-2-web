@@ -32,7 +32,7 @@ $env:PORT=8125; npm start
 ```powershell
 cd webapp
 npm run lint:js   # parse every JavaScript module
-npm test          # 114 Node tests
+npm test          # 115 Node tests
 npm run verify    # lint + tests
 ```
 

@@ -11,7 +11,8 @@
     "lint:js": "node scripts/check.mjs",
     "test": "node --test \"tests/*.test.mjs\"",
     "test:watch": "node --test --watch \"tests/*.test.mjs\"",
-    "verify": "npm run lint:js && npm test"
+    "verify": "npm run lint:js && npm test",
+    "indexnow": "node scripts/indexnow.mjs"
   },
   "engines": {
     "node": ">=18"

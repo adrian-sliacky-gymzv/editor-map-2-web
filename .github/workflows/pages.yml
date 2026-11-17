@@ -37,3 +37,9 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      # One IndexNow ping covers Bing, Yandex, Seznam, Naver and other
+      # participating engines. Google uses Search Console instead.
+      - name: Notify search engines (IndexNow)
+        continue-on-error: true
+        run: node webapp/scripts/indexnow.mjs
