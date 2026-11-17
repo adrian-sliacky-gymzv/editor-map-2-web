@@ -210,12 +210,28 @@ test('distance feedback uses guess points and exposes a last-guess stat', () => 
   assert.match(html, /id="classicLastValue"/);
   assert.match(html, /id="gameLastRow"/);
   assert.match(html, /id="gameLastValue"/);
+  assert.match(html, /id="classicDistanceKm"/);
+  assert.match(html, /Vzdialenosť/);
   assert.match(html, /Skóre tipu/);
   assert.match(activities, /dom\.lastValue\.textContent = `\$\{score\} b\.`/);
   assert.match(activities, /columns: \[t\('Objekt'\), t\('Skóre tipu'\)\]/);
+  assert.match(activities, /kilometresForDistance\(context\.mapKey, dist\)/);
+  assert.match(activities, /formatKilometres\(data\.km, getLanguage\(\)\)/);
+  assert.match(activities, /revealPoint\(/);
+  assert.doesNotMatch(activities, /ensurePointsVisible/);
   assert.match(app, /dom\.gameLastValue\.textContent = `\$\{score\} b\.`/);
   assert.match(mapView, /fitAnimated\(/);
+  assert.match(mapView, /panToPointAnimated\(/);
   assert.match(mapView, /oneFingerZoomTarget/);
+  // Answer handlers leave the review at the player's zoom; the reset belongs
+  // to the next-question transition so it always has a visible start state.
+  const distanceAnswer = app.slice(
+    app.indexOf('function answerDistance'),
+    app.indexOf('function renderDistanceFeedback')
+  );
+  assert.doesNotMatch(distanceAnswer, /resetViewAnimated/);
+  const quizAnswer = app.slice(app.indexOf('function answerQuiz'), app.indexOf('function answerPuzzle'));
+  assert.doesNotMatch(quizAnswer, /resetViewAnimated/);
 });
 
 test('the homepage includes a changelog section', () => {
@@ -225,7 +241,7 @@ test('the homepage includes a changelog section', () => {
   assert.match(html, /class="changelog-list"/);
   assert.match(html, /class="changelog-entry changelog-entry-current"/);
   assert.match(html, /class="changelog-version">v2\.1</);
-  assert.match(html, /Skóre tipu namiesto neprehľadných mapových jednotiek/);
+  assert.match(html, /Skóre tipu a vzdialenosť v kilometroch namiesto neprehľadných mapových jednotiek/);
   assert.match(html, /href="#novinky">Novinky</);
   assert.match(css, /\.changelog-section/);
   assert.match(css, /\.changelog-entry-current/);

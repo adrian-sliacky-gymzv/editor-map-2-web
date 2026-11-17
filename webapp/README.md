@@ -200,11 +200,15 @@ only after the user zooms in.
   zooms in progressively.
 - **Pan** — one finger or mouse drag after zooming. Inertia and elastic edges
   make the map feel like a map canvas, not a frozen image.
-- **Between questions** — if the map was zoomed or panned, it animates back to
-  the fitted view over 240 ms with no layout shift. Reduced-motion users get
-  the instant reset.
-- **Guess score** — the distance game shows the 0–100 points for the guess
-  instead of raw map units. Compact layouts also show a **Last guess** stat.
+- **Between questions** - answering keeps the player's zoom for review; moving
+  to the next question animates back to the fitted view over 240 ms with no
+  layout shift. A pan follows an answer that is outside the current crop, so
+  the reset always has a real zoomed state to animate from. Reduced-motion
+  users get the instant reset.
+- **Guess score and distance** - the distance game shows the 0-100 points and
+  the kilometres for the guess instead of raw map units. Kilometres come from
+  each original map's printed scale bar. Compact layouts also show a
+  **Last guess** stat.
 - **Recenter** — **◎** returns to the centred full-map view and resets the zoom.
   It is equivalent to **⌂** and `0`.
 - **Tap safety** — the final touch after a pinch, pan or double-tap never counts
@@ -344,13 +348,15 @@ Supported map keys: `slovensko`, `svet`, `europa`, `afrika`, `azia`,
 npm test
 ```
 
-Current status: **107 tests, 107 passing**. Coverage includes:
+Current status: **109 tests, 109 passing**. Coverage includes:
 
-- original scoring, per-map maximum distance and puzzle tolerance;
+- original scoring, per-map maximum distance, printed scale-bar kilometres and
+  puzzle tolerance;
 - original quiz group cycling, unused targets and candidate sampling;
 - byte-for-byte `.mef` parity and semantic `config.xml` parity with `software/`;
 - question selection and difficulty pools;
-- pinch/zoom/pan mathematics and the locked fitted map;
+- pinch/zoom/pan mathematics, answer reveal and the locked fitted map;
+- the animated next-question reset and its reduced-motion fallback;
 - map dimensions and all eight maps;
 - activity HUD, markers and result flows;
 - map picker and activity presets;

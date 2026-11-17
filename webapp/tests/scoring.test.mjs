@@ -6,6 +6,10 @@ import {
   MAP_WIDTH,
   MAP_HEIGHT,
   maxDistanceForMap,
+  kilometresForDistance,
+  kilometresPerMapUnit,
+  formatKilometres,
+  MAP_KM_PER_UNIT,
   scoreForDistance,
   scoreForGuess,
   distanceBetween,
@@ -35,6 +39,36 @@ test('per-map max distance is rounded from the selected map dimensions', () => {
   assert.equal(maxDistanceForMap(843, 640), 1058);
   assert.equal(maxDistanceForMap(Number.NaN, 10), 10);
   assert.equal(maxDistanceForMap(-3, 4), 5);
+});
+
+test('printed scale bars convert map units to kilometres', () => {
+  const close = (actual, expected) => assert.ok(
+    Math.abs(actual - expected) < 0.002,
+    `${actual} !== ${expected}`
+  );
+  close(kilometresForDistance('slovensko', 100), 43.1034);
+  close(kilometresForDistance('svet', 10), 392.1569);
+  close(kilometresForDistance('europa', 138), 1000);
+  close(kilometresForDistance('afrika', 152), 2000);
+  close(kilometresForDistance('azia', 114), 2000);
+  close(kilometresForDistance('severna_amerika', 78), 1000);
+  close(kilometresForDistance('juzna_amerika', 87), 1000);
+  close(kilometresForDistance('australia', 122), 2000);
+  assert.equal(kilometresForDistance('neznama', 10), null);
+  assert.equal(kilometresForDistance('slovensko', -1), null);
+  assert.equal(kilometresForDistance('slovensko', Number.NaN), null);
+  assert.equal(kilometresPerMapUnit('SLOVENSKO'), MAP_KM_PER_UNIT.slovensko);
+});
+
+test('kilometres are formatted compactly in both languages', () => {
+  assert.equal(formatKilometres(0, 'sk'), '0');
+  assert.equal(formatKilometres(1.26, 'sk'), '1,3');
+  assert.equal(formatKilometres(1.26, 'en'), '1.3');
+  assert.equal(formatKilometres(12.6, 'sk'), '13');
+  assert.equal(formatKilometres(1234, 'sk'), '1\u00a0234');
+  assert.equal(formatKilometres(1234, 'en'), '1,234');
+  assert.equal(formatKilometres(Number.NaN), '—');
+  assert.equal(formatKilometres(-1), '—');
 });
 
 test('original distance formula gives exact known scores', () => {

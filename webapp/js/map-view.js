@@ -817,24 +817,78 @@ export class MapView {
   }
 
   /**
-   * Avoid leaving an important pair of points outside a zoomed viewport.
-   * If both are already comfortably visible, keep the user's current view.
+   * Keep the player's zoom while making an answer visible. If the point is
+   * outside the padded viewport, glide the map until it is centred. Unlike a
+   * fit, this leaves a real zoomed view for the next-question reset to animate.
    */
-  ensurePointsVisible(points, { padding = 64 } = {}) {
-    if (!Array.isArray(points) || !points.length || !this.scene) return false;
+  revealPoint(point, { padding = 56, duration = 200 } = {}) {
+    if (!point || !this.scene) return false;
     const rect = this.viewport.getBoundingClientRect();
     if (rect.width < 2 || rect.height < 2) return false;
-    const visible = points.every((point) => {
-      const screen = this.mapToScreen(point.x, point.y);
-      return (
-        screen.x >= rect.left + padding
-        && screen.x <= rect.right - padding
-        && screen.y >= rect.top + padding
-        && screen.y <= rect.bottom - padding
-      );
-    });
+    if (this.zoom <= 1.001) return false;
+    const screen = this.mapToScreen(point.x, point.y);
+    const visible = (
+      screen.x >= rect.left + padding
+      && screen.x <= rect.right - padding
+      && screen.y >= rect.top + padding
+      && screen.y <= rect.bottom - padding
+    );
     if (visible) return false;
-    this.fitAnimated();
+    return this.panToPointAnimated(point.x, point.y, duration);
+  }
+
+  /**
+   * Short rAF pan at the current zoom. Sharing _fitFrame with fitAnimated means
+   * pressing "Next" cancels the pan cleanly and continues into the reset from
+   * the current position instead of jumping.
+   */
+  panToPointAnimated(cx, cy, duration = 200) {
+    if (!this.scene) return false;
+    const startX = this.panX;
+    const startY = this.panY;
+    const targetPan = () => {
+      const scale = this.fitScale * this.zoom;
+      const limits = this._panLimits();
+      return {
+        x: clamp((this.W / 2 - cx) * scale, -limits.maxX, limits.maxX),
+        y: clamp((this.H / 2 - cy) * scale, -limits.maxY, limits.maxY),
+      };
+    };
+    const end = targetPan();
+    if (Math.abs(end.x - startX) < 0.5 && Math.abs(end.y - startY) < 0.5) return false;
+    this._stopMomentum();
+    this._clearSettleAnimation();
+    const reduced = typeof window !== 'undefined'
+      && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) {
+      this.panX = end.x;
+      this.panY = end.y;
+      this._applyTransform();
+      this._notifyZoom();
+      return false;
+    }
+    const startedAt = performance.now();
+    this._beginGesture();
+    const step = (now) => {
+      const progress = Math.min(1, Math.max(0, (now - startedAt) / duration));
+      const eased = 1 - ((1 - progress) ** 3);
+      const target = targetPan();
+      this.panX = startX + (target.x - startX) * eased;
+      this.panY = startY + (target.y - startY) * eased;
+      this._applyTransform();
+      this._notifyZoom();
+      if (progress < 1) {
+        this._fitFrame = requestAnimationFrame(step);
+        return;
+      }
+      this._fitFrame = 0;
+      this.panX = target.x;
+      this.panY = target.y;
+      this._applyTransform();
+      this._notifyZoom();
+      this._endGestureSoon();
+    };
+    this._fitFrame = requestAnimationFrame(step);
     return true;
   }
 
@@ -1352,12 +1406,9 @@ export class MapView {
 
   layout() {
     if (!this.scene) return;
-    if (this._fitFrame) {
-      this._clearSettleAnimation();
-      this.zoom = 1;
-      this.panX = 0;
-      this.panY = 0;
-    }
+    // A running fit/pan animation keeps its own view values. Recomputing the
+    // fitScale here is enough; cancelling would snap the map to the end state
+    // whenever a HUD change or rotation resized the viewport mid-animation.
     const rect = this.viewport.getBoundingClientRect();
     const w = Math.max(1, rect.width);
     const h = Math.max(1, rect.height);

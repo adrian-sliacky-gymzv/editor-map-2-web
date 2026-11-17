@@ -934,7 +934,6 @@ function answerDistance(guess) {
     updateScorePanel();
   }
   updateProgress();
-  resetViewAnimated();
 }
 
 function renderDistanceFeedback(feedback, score) {
@@ -976,7 +975,6 @@ function answerQuiz(clicked) {
     updateScorePanel();
   }
   updateProgress();
-  resetViewAnimated();
 }
 
 function answerPuzzle(drop) {
@@ -1018,7 +1016,6 @@ function answerPuzzle(drop) {
     updateScorePanel();
   }
   updateProgress();
-  resetViewAnimated();
 }
 
 /* ------------------------------------------------------------------ */

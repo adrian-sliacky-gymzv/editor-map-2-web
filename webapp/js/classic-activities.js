@@ -26,6 +26,8 @@ import { FORMAT_LABELS, answerSuccess } from './practice-stats-core.js';
 import { candidatesFor, nextGroupIndex, pickUnusedIndex, randomSequence } from './quiz-selection.js';
 import {
   distanceBetween,
+  formatKilometres,
+  kilometresForDistance,
   maxDistanceForMap,
   scoreForDistance,
 } from './scoring.js';
@@ -210,6 +212,7 @@ const GAME = {
   marks: [],
   distancePool: [],
   distanceSeq: [],
+  lastDistance: null,
   puzzlePool: [],
   puzzleSeq: [],
   puzzleTarget: null,
@@ -241,6 +244,9 @@ export async function initActivities() {
   bindGameEvents();
   bindResultEvents();
   watchNextState();
+  window.addEventListener('i18n:change', () => {
+    if (dom.distanceLegend && !dom.distanceLegend.hidden) renderDistanceReadout();
+  });
   document.addEventListener('click', (event) => {
     const trigger = event.target.closest('[data-classic-mode]');
     if (trigger) {
@@ -324,6 +330,7 @@ function cacheDom() {
   dom.distanceLegend = $('#classicDistanceLegend');
   dom.distanceTarget = $('#classicDistanceTarget');
   dom.distanceValue = $('#classicDistanceValue');
+  dom.distanceKm = $('#classicDistanceKm');
   dom.zoomIn = $('#classicZoomIn');
   dom.zoomOut = $('#classicZoomOut');
   dom.zoomCenter = $('#classicZoomCenter');
@@ -774,7 +781,9 @@ export async function startActivityGame(params) {
   dom.timeValue.textContent = '00:00';
   dom.averageValue.textContent = '—';
   dom.questionCounter.textContent = `0/${GAME.numQ}`;
+  GAME.lastDistance = null;
   if (dom.distanceValue) dom.distanceValue.textContent = '—';
+  if (dom.distanceKm) dom.distanceKm.textContent = '—';
   dom.scoreDistance.hidden = params.mode !== 'distance';
   dom.scoreCounts.hidden = params.mode === 'distance';
   if (dom.lastRow) dom.lastRow.hidden = params.mode !== 'distance';
@@ -894,7 +903,19 @@ function hideMapHint() {
   if (dom.hint) dom.hint.hidden = true;
 }
 
+function renderDistanceReadout() {
+  const data = GAME.lastDistance;
+  if (!data) return;
+  if (dom.distanceValue) dom.distanceValue.textContent = `${data.score} b.`;
+  if (dom.distanceKm) {
+    dom.distanceKm.textContent = data.km == null
+      ? '—'
+      : `${formatKilometres(data.km, getLanguage())} km`;
+  }
+}
+
 function showDistanceLegend() {
+  renderDistanceReadout();
   if (dom.distanceLegend) dom.distanceLegend.hidden = false;
 }
 
@@ -1431,6 +1452,8 @@ function onDistanceClick(point) {
   const dist = distanceBetween(point, { x: targetX, y: targetY });
   const maxDist = maxDistanceForMap(GAME.mapView.W, GAME.mapView.H);
   const score = scoreForDistance(dist, maxDist);
+  const context = attemptContext();
+  const km = kilometresForDistance(context.mapKey, dist);
   playScore(score);
   GAME.totalScore += score;
   const success = score >= 70;
@@ -1466,7 +1489,8 @@ function onDistanceClick(point) {
   if (dom.distanceTarget) {
     dom.distanceTarget.textContent = target.getAttribute('markLabel') || nodeLabel(target);
   }
-  if (dom.distanceValue) dom.distanceValue.textContent = `${score} b.`;
+  GAME.lastDistance = { score, km };
+  renderDistanceReadout();
   if (dom.lastValue) dom.lastValue.textContent = `${score} b.`;
   GAME.mapView.addGuide({
     x1: point.x,
@@ -1476,7 +1500,10 @@ function onDistanceClick(point) {
     className: 'map-guide-underlay',
   });
   GAME.mapView.addGuide({ x1: point.x, y1: point.y, x2: targetX, y2: targetY });
-  GAME.mapView.ensurePointsVisible([point, { x: targetX, y: targetY }]);
+  // Keep the review at the player's zoom so the next question still has a
+  // meaningful reset to animate. If the answer is outside the current crop,
+  // pan to it instead of snapping the whole map back to the fitted view.
+  GAME.mapView.revealPoint({ x: targetX, y: targetY });
   showDistanceLegend();
 
   const answer = distanceAnswerFor(score);
@@ -1487,7 +1514,6 @@ function onDistanceClick(point) {
   const isLast = GAME.questionIndex >= GAME.numQ;
   const suffix = isLast ? cfgText('lastTestQuestion') : cfgText('nextTestQuestion');
   dom.question.innerHTML += ` ${suffix}`;
-  const context = attemptContext();
   GAME.answers.push({
     label: nodeLabel(target),
     correct: success,
@@ -1495,6 +1521,7 @@ function onDistanceClick(point) {
     maxPoints: 100,
     mode: 'distance',
     distance: Math.round(dist),
+    kilometres: km,
     mapKey: context.mapKey,
     mapLabel: context.mapLabel,
     markSymbol: target.getAttribute('markSymbol') || '',

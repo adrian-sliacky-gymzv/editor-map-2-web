@@ -169,8 +169,8 @@ export const EN = {
     'Subtle sounds for answers and results, with quick muting.',
   'História prehliadača funguje medzi hrou, atlasom a editorom.':
     'Browser history works between games, the atlas and the editor.',
-  'Skóre tipu namiesto neprehľadných mapových jednotiek.':
-    'Guess scores instead of confusing map units.',
+  'Skóre tipu a vzdialenosť v kilometroch namiesto neprehľadných mapových jednotiek.':
+    'Guess score and distance in kilometres instead of confusing map units.',
   'Plynulý návrat mapy medzi otázkami a nové dotykové ovládanie.':
     'Smooth map reset between questions and new touch gestures.',
   'Angličtina a presná zhoda': 'English and exact parity',
