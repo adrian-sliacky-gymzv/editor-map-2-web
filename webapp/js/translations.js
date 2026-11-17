@@ -157,6 +157,33 @@ export const EN = {
 
   /* Progress */
   'Váš postup': 'Your progress',
+  'Novinky': 'What’s new',
+  'Čo je nové': 'What’s new',
+  'Krátky prehľad posledných zmien. Staršie verzie zostávajú v histórii projektu.':
+    'A short overview of recent changes. Older versions remain in the project history.',
+  '17. 11. 2026': '17 Nov 2026',
+  '10. 11. 2026': '10 Nov 2026',
+  '1. 1. 2026': '1 Jan 2026',
+  'Zvuk, navigácia a plynulejšie hry': 'Sound, navigation and smoother games',
+  'Jemné zvuky pri odpovediach a výsledkoch, s rýchlym stlmením.':
+    'Subtle sounds for answers and results, with quick muting.',
+  'História prehliadača funguje medzi hrou, atlasom a editorom.':
+    'Browser history works between games, the atlas and the editor.',
+  'Skóre tipu namiesto neprehľadných mapových jednotiek.':
+    'Guess scores instead of confusing map units.',
+  'Plynulý návrat mapy medzi otázkami a nové dotykové ovládanie.':
+    'Smooth map reset between questions and new touch gestures.',
+  'Angličtina a presná zhoda': 'English and exact parity',
+  'Anglické rozhranie s automatickým výberom jazyka.':
+    'English interface with automatic language selection.',
+  'Presná zhoda bodovania, výberu otázok a pôvodných dát.':
+    'Exact parity for scoring, question selection and original data.',
+  'Kompaktnejší HUD na mobilnom displeji.': 'A more compact HUD on mobile.',
+  'Pôvodná webová verzia': 'Original web version',
+  'Všetkých 8 máp, 3 hry a plnohodnotný editor.':
+    'All 8 maps, 3 games and the full editor.',
+  'Atlas 74 slovenských miest.': 'An atlas of 74 Slovak cities.',
+  'Tmavá téma a responzívne ovládanie.': 'Dark theme and responsive controls.',
   'Štatistiky doplnkového tréningu 74 slovenských miest. Plné aktivity vyššie si vedú vlastné výsledky.':
     'Statistics for the extra training with 74 Slovak cities. The full activities above keep their own results.',
   'Skóre sa ukladá len v tomto prehliadači.': 'Scores are stored only in this browser.',
@@ -248,6 +275,8 @@ export const EN = {
   'Vysvetlenie značiek': 'Marker legend',
   'Správna poloha': 'Correct location',
   'Tvoj tip': 'Your guess',
+  'Skóre tipu': 'Guess score',
+  'Posledný tip': 'Last guess',
   'Vzdialenosť': 'Distance',
   'Načítavam mapu…': 'Loading map…',
   'Načítavam editor…': 'Loading the editor…',
@@ -356,6 +385,8 @@ export const EN = {
   'V každej otázke': 'In each question',
   'Skóre podľa vzdialenosti od správneho bodu.':
     'Score based on the distance from the correct point.',
+  'Skóre tipu 0–100 podľa vzdialenosti od správneho bodu.':
+    'Guess score 0–100 based on the distance from the correct point.',
   'Tolerancia uloženia je 15 mapových jednotiek.':
     'The placement tolerance is 15 map units.',
   'Prázdne skupiny sa preskočia': 'Empty groups are skipped',
@@ -650,7 +681,7 @@ export const EN_HTML = {
   helpEditor:
     'New / Open / Save / Save as work with the original <b>.mef</b> files. The tree on the left controls visibility, markers and colors. Drawing offers lines, rectangles, ellipses and freehand. Export creates PNG or JPEG, or you can print the map.',
   helpMapControls:
-    'Zoom the map with the mouse wheel, pinch or the <b>+</b> / <b>−</b> buttons. The <b>⌂</b> button restores the whole map. Pan it by dragging empty space.',
+    'Zoom the map with the mouse wheel, pinch or the <b>+</b> / <b>−</b> buttons. On a touchscreen you can also double-tap and hold, then slide one finger up or down to zoom. The <b>⌂</b> button restores the whole map. Pan it by dragging empty space.',
   helpShortcutPan: 'Pan the map; hold <kbd>Shift</kbd> to move faster.',
   helpShortcutAtlas: 'Atlas: jump to search. <kbd>Esc</kbd> clears it.',
   helpShortcutEditor:

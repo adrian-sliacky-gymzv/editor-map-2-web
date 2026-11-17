@@ -201,6 +201,36 @@ test('screens participate in browser history and expose visible back navigation'
   assert.match(css, /\.nav-back\b/);
 });
 
+test('distance feedback uses guess points and exposes a last-guess stat', () => {
+  const html = read('index.html');
+  const activities = read('js/classic-activities.js');
+  const app = read('js/app.js');
+  const mapView = read('js/map-view.js');
+  assert.match(html, /id="classicLastRow"/);
+  assert.match(html, /id="classicLastValue"/);
+  assert.match(html, /id="gameLastRow"/);
+  assert.match(html, /id="gameLastValue"/);
+  assert.match(html, /Skóre tipu/);
+  assert.match(activities, /dom\.lastValue\.textContent = `\$\{score\} b\.`/);
+  assert.match(activities, /columns: \[t\('Objekt'\), t\('Skóre tipu'\)\]/);
+  assert.match(app, /dom\.gameLastValue\.textContent = `\$\{score\} b\.`/);
+  assert.match(mapView, /fitAnimated\(/);
+  assert.match(mapView, /oneFingerZoomTarget/);
+});
+
+test('the homepage includes a changelog section', () => {
+  const html = read('index.html');
+  const css = read('redesign.css');
+  assert.match(html, /id="novinky"/);
+  assert.match(html, /class="changelog-list"/);
+  assert.match(html, /class="changelog-entry changelog-entry-current"/);
+  assert.match(html, /class="changelog-version">v2\.1</);
+  assert.match(html, /Skóre tipu namiesto neprehľadných mapových jednotiek/);
+  assert.match(html, /href="#novinky">Novinky</);
+  assert.match(css, /\.changelog-section/);
+  assert.match(css, /\.changelog-entry-current/);
+});
+
 test('repository link and reimplementation credit are present', () => {
   const html = read('index.html');
   assert.match(html, /class="footer-github"/);
@@ -272,7 +302,7 @@ test('mission HUDs, legend and marker callouts stay explicit', () => {
   assert.match(html, /id="classicDistanceLegend"/);
   assert.match(html, /class="distance-legend-foot"/);
   assert.match(html, /id="classicDistanceValue"/);
-  assert.match(html, /Vzdialenosť/);
+  assert.match(html, /Skóre tipu/);
 
   const classic = read('js/classic-activities.js');
   assert.match(classic, /setMissionTarget\(/);

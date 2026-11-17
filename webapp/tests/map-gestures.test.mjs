@@ -7,6 +7,7 @@ import {
   clientToMap,
   doubleTapTargetZoom,
   isDoubleTap,
+  oneFingerZoomTarget,
   pinchView,
   tapSlop,
   wheelZoomFactor,
@@ -141,11 +142,19 @@ test('double tap detection honours time and distance windows', () => {
   assert.equal(isDoubleTap(null, { x: 100, y: 100, time: 1200 }), false);
 });
 
-test('double tap toggles between fit and a readable zoom level', () => {
+test('double tap zooms in progressively like a normal map viewer', () => {
   assert.equal(doubleTapTargetZoom(1), 2.4);
   assert.equal(doubleTapTargetZoom(1.1), 2.4);
-  assert.equal(doubleTapTargetZoom(2.4), 1);
-  assert.equal(doubleTapTargetZoom(5), 1);
+  assert.ok(doubleTapTargetZoom(2.4) > 2.4);
+  assert.equal(doubleTapTargetZoom(MAX_MAP_ZOOM), MAX_MAP_ZOOM);
+});
+
+test('one-finger double-tap drag zooms around the starting level', () => {
+  assert.ok(oneFingerZoomTarget(2, -100) > 2);
+  assert.ok(oneFingerZoomTarget(2, 100) < 2);
+  assert.equal(oneFingerZoomTarget(1, 100), 1);
+  assert.equal(oneFingerZoomTarget(9, -1000), MAX_MAP_ZOOM);
+  assert.ok(Math.abs(oneFingerZoomTarget(2, -160) - 2 * Math.E) < 1e-9);
 });
 
 test('clientToMap reverses the canvas transform', () => {

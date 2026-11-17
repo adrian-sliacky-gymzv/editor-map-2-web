@@ -1540,6 +1540,10 @@ kbd {
   border-left: 1px solid var(--line);
 }
 
+.mission-stat-last {
+  display: none;
+}
+
 .mission-stat:first-child {
   border-left: 0;
 }
@@ -4586,6 +4590,10 @@ kbd {
     display: none;
   }
 
+  .mission-stat-last {
+    display: flex;
+  }
+
   .mission-stat-label {
     font-size: 6.2px;
     letter-spacing: 0.06em;
@@ -4956,6 +4964,10 @@ kbd {
   .mission-stat-average,
   .mission-stat-time {
     display: none;
+  }
+
+  .mission-stat-last {
+    display: flex;
   }
 
   .mission-stat-label {
@@ -5567,5 +5579,96 @@ body {
 
   .setup-summary {
     font-size: 9px;
+  }
+}
+
+/* ---------------------------------------------------------- */
+/* changelog                                                  */
+/* ---------------------------------------------------------- */
+
+.changelog-section {
+  padding: 26px 0 30px;
+  border-top: 1px solid var(--line);
+}
+
+.changelog-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.changelog-entry {
+  padding: 16px;
+  border: 1px solid var(--line);
+  background: var(--card);
+}
+
+.changelog-entry-current {
+  border-color: var(--blue);
+  box-shadow: 3px 4px 0 rgba(30, 74, 54, 0.12);
+}
+
+.changelog-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.changelog-version {
+  padding: 2px 6px;
+  background: var(--blue);
+  color: var(--paper);
+  font-weight: 700;
+}
+
+.changelog-entry h3 {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+
+.changelog-entry ul {
+  margin: 12px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.changelog-entry li + li {
+  margin-top: 6px;
+}
+
+#aktivity,
+#mapy,
+#postup,
+#novinky {
+  scroll-margin-top: 84px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@media (max-width: 980px) {
+  .changelog-list {
+    grid-template-columns: 1fr;
+  }
+
+  .changelog-entry {
+    padding: 14px;
   }
 }

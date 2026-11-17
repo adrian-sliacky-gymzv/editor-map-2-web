@@ -34,7 +34,8 @@ The green button on the homepage starts a recommended game immediately: **Traf s
 - **City atlas** of all 74 Slovak cities with search, filters, statistics and quick training.
 - **Bilingual interface**: Slovak and English, automatic browser-language detection on the first visit and a language selector in Settings.
 - **Subtle sound cues** for answers and results, with a speaker button, a Settings switch and the `M` shortcut to mute them.
-- **Mobile-first controls**: pinch zoom, one-finger pan after zooming, double-tap zoom, inertia, a dedicated recenter button and a locked full-map view.
+- **What’s new** changelog on the homepage with the latest releases and improvements.
+- **Mobile-first controls**: pinch zoom, one-finger pan after zooming, double-tap and hold/slide one-finger zoom, inertia, a dedicated recenter button and a locked full-map view.
 - **Portrait and landscape layouts**: in landscape the game controls move to a compact side rail (156–196 px) and the map gets the full height.
 - **Light and dark themes**, keyboard shortcuts, an accessible focus order and fast motion that respects reduced-motion settings.
 - **Static site** — no backend, database, tracking or build server.
@@ -107,7 +108,8 @@ Zelené tlačidlo na domovskej stránke hneď spustí odporúčanú hru: **Traf 
 - **Atlas 74 slovenských miest** s hľadaním, filtrami, štatistikami a rýchlym tréningom.
 - **Dvojjazyčné rozhranie**: slovenčina a angličtina, automatické rozpoznanie jazyka prehliadača pri prvej návšteve a výber jazyka v nastaveniach.
 - **Jemné zvukové signály** pri odpovediach a výsledkoch, s tlačidlami reproduktora, prepínačom v nastaveniach a skratkou `M` na stlmenie.
-- **Ovládanie na mobil**: pinch zoom, posun po priblížení, dvojité ťuknutie, zotrvačnosť, tlačidlo na vycentrovanie a pevná mapa pri predvolenom oddialení.
+- **Novinky** na domovskej stránke s prehľadom posledných verzií a vylepšení.
+- **Ovládanie na mobil**: pinch zoom, posun po priblížení, dvojité ťuknutie a podržanie s posunom na priblíženie jedným prstom, zotrvačnosť, tlačidlo na vycentrovanie a pevná mapa pri predvolenom oddialení.
 - **Portrait aj landscape**: v landscape sa ovládanie presunie do kompaktného bočného panelu (156–196 px) a mapa dostane celú výšku.
 - **Svetlá a tmavá téma**, klávesové skratky, prístupný fokus a rýchle animácie s rešpektovaním nastavenia zníženého pohybu.
 - **Statická stránka** — bez servera, databázy, sledovania a bez build kroku.

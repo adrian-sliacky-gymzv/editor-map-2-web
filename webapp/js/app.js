@@ -54,6 +54,7 @@ const LEGACY_MAP_SOURCES = {
 };
 const legacyMapText = new Map();
 let legacyMapLoadPromise = null;
+let viewResetFrame = 0;
 
 const dom = {
   homeScreen: $('#homeScreen'),
@@ -105,6 +106,8 @@ const dom = {
   gameMissionName: $('#gameMissionName'),
   gameMissionType: $('#gameMissionType'),
   gameAverageValue: $('#gameAverageValue'),
+  gameLastRow: $('#gameLastRow'),
+  gameLastValue: $('#gameLastValue'),
   gameQuestionCounter: $('#gameQuestionCounter'),
   qnum: $('#qnum'),
   questionText: $('#questionText'),
@@ -704,6 +707,8 @@ function syncGameModeUI() {
   const isDistance = state.mode === 'distance';
   dom.scoreDistanceRow.hidden = !isDistance;
   dom.scoreCountsRow.hidden = isDistance;
+  if (dom.gameLastRow) dom.gameLastRow.hidden = !isDistance;
+  if (dom.gameLastValue) dom.gameLastValue.textContent = '—';
   if (dom.gameMission) dom.gameMission.dataset.mode = state.mode;
 }
 
@@ -831,7 +836,7 @@ function showQuestion() {
   updateScorePanel();
   updateProgress();
   updateMapTag();
-  setView({ zoom: 1, panX: 0, panY: 0 });
+  resetViewAnimated();
 
   if (state.mode === 'distance') {
     dom.questionText.innerHTML = t(
@@ -905,6 +910,7 @@ function answerDistance(guess) {
   const distance = distanceBetween(guess, target);
   const score = scoreForDistance(distance);
   playScore(score);
+  if (dom.gameLastValue) dom.gameLastValue.textContent = `${score} b.`;
 
   state.answered = true;
   state.total += score;
@@ -928,7 +934,7 @@ function answerDistance(guess) {
     updateScorePanel();
   }
   updateProgress();
-  setView({ zoom: 1, panX: 0, panY: 0 });
+  resetViewAnimated();
 }
 
 function renderDistanceFeedback(feedback, score) {
@@ -970,7 +976,7 @@ function answerQuiz(clicked) {
     updateScorePanel();
   }
   updateProgress();
-  setView({ zoom: 1, panX: 0, panY: 0 });
+  resetViewAnimated();
 }
 
 function answerPuzzle(drop) {
@@ -1012,7 +1018,7 @@ function answerPuzzle(drop) {
     updateScorePanel();
   }
   updateProgress();
-  setView({ zoom: 1, panX: 0, panY: 0 });
+  resetViewAnimated();
 }
 
 /* ------------------------------------------------------------------ */
@@ -1286,6 +1292,8 @@ function elasticView(view) {
 function clearViewSettle() {
   clearTimeout(state.viewSettleTimer);
   state.viewSettleTimer = 0;
+  if (viewResetFrame) cancelAnimationFrame(viewResetFrame);
+  viewResetFrame = 0;
   dom.mapStage.style.transition = '';
 }
 
@@ -1315,6 +1323,41 @@ function setView(view) {
   clearViewSettle();
   state.view = clampView(view);
   applyView();
+}
+
+function resetViewAnimated(duration = 240) {
+  const fits = state.view.zoom <= 1.001
+    && Math.abs(state.view.panX) <= 0.5
+    && Math.abs(state.view.panY) <= 0.5;
+  if (fits) return false;
+  const reduced = typeof window !== 'undefined'
+    && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  if (reduced) {
+    setView({ zoom: 1, panX: 0, panY: 0 });
+    return false;
+  }
+  clearViewSettle();
+  const start = { ...state.view };
+  const startedAt = performance.now();
+  const step = (now) => {
+    const progress = Math.min(1, Math.max(0, (now - startedAt) / duration));
+    const eased = 1 - ((1 - progress) ** 3);
+    state.view = {
+      zoom: start.zoom + (1 - start.zoom) * eased,
+      panX: start.panX * (1 - eased),
+      panY: start.panY * (1 - eased),
+    };
+    applyView();
+    if (progress < 1) {
+      viewResetFrame = requestAnimationFrame(step);
+      return;
+    }
+    viewResetFrame = 0;
+    state.view = { zoom: 1, panX: 0, panY: 0 };
+    applyView();
+  };
+  viewResetFrame = requestAnimationFrame(step);
+  return true;
 }
 
 function recenterView() {

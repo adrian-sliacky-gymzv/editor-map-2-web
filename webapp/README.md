@@ -195,8 +195,16 @@ only after the user zooms in.
   not move it. The fitted view is the button **⌂** and the `0` shortcut.
 - **Zoom in** — wheel, trackpad pinch, two-finger pinch, `+`/`−`, double-tap or
   double-click. Zoom is anchored at the cursor/finger midpoint.
+- **One-finger zoom** — double-tap and keep the finger down, then slide up to
+  zoom in or down to zoom out (the Google Maps gesture). A normal double tap
+  zooms in progressively.
 - **Pan** — one finger or mouse drag after zooming. Inertia and elastic edges
   make the map feel like a map canvas, not a frozen image.
+- **Between questions** — if the map was zoomed or panned, it animates back to
+  the fitted view over 240 ms with no layout shift. Reduced-motion users get
+  the instant reset.
+- **Guess score** — the distance game shows the 0–100 points for the guess
+  instead of raw map units. Compact layouts also show a **Last guess** stat.
 - **Recenter** — **◎** returns to the centred full-map view and resets the zoom.
   It is equivalent to **⌂** and `0`.
 - **Tap safety** — the final touch after a pinch, pan or double-tap never counts
@@ -336,7 +344,7 @@ Supported map keys: `slovensko`, `svet`, `europa`, `afrika`, `azia`,
 npm test
 ```
 
-Current status: **104 tests, 104 passing**. Coverage includes:
+Current status: **107 tests, 107 passing**. Coverage includes:
 
 - original scoring, per-map maximum distance and puzzle tolerance;
 - original quiz group cycling, unused targets and candidate sampling;

@@ -300,6 +300,8 @@ function cacheDom() {
   dom.missionName = $('#classicMissionName');
   dom.missionType = $('#classicMissionType');
   dom.averageValue = $('#classicAverageValue');
+  dom.lastRow = $('#classicLastRow');
+  dom.lastValue = $('#classicLastValue');
   dom.questionCounter = $('#classicQuestionCounter');
   dom.feedback = $('#classicFeedback');
   dom.homeBtn = $('#classicHomeBtn');
@@ -594,7 +596,7 @@ function updateSetupSummary() {
       noun: t(targetWord),
     })
     : mode.key === 'distance'
-      ? t('Skóre podľa vzdialenosti od správneho bodu.')
+      ? t('Skóre tipu 0–100 podľa vzdialenosti od správneho bodu.')
       : t('Tolerancia uloženia je 15 mapových jednotiek.');
   const noun = mode.key === 'puzzle'
     ? pluralSk(SETUP.totalNodes, 'objekt', 'objekty', 'objektov')
@@ -775,6 +777,8 @@ export async function startActivityGame(params) {
   if (dom.distanceValue) dom.distanceValue.textContent = '—';
   dom.scoreDistance.hidden = params.mode !== 'distance';
   dom.scoreCounts.hidden = params.mode === 'distance';
+  if (dom.lastRow) dom.lastRow.hidden = params.mode !== 'distance';
+  if (dom.lastValue) dom.lastValue.textContent = '—';
   dom.zoomValue.textContent = '100%';
   dom.mapViewportWrap.classList.remove('is-answered');
   hideDistanceLegend();
@@ -1218,7 +1222,7 @@ function nextTestQuestion() {
   dom.mapViewportWrap.classList.remove('is-answered');
   hideDistanceLegend();
   showMapHint();
-  GAME.mapView.fit();
+  GAME.mapView.fitAnimated();
 
   const groupIndex = nextGroupIndex(GAME.currentGroup, GAME.testPools);
   if (groupIndex < 0) {
@@ -1395,7 +1399,7 @@ function nextDistanceQuestion() {
   dom.mapViewportWrap.classList.remove('is-answered');
   hideDistanceLegend();
   showMapHint();
-  GAME.mapView.fit();
+  GAME.mapView.fitAnimated();
   const targetIndex = GAME.distanceSeq[GAME.questionIndex - 1];
   const target = GAME.distancePool[targetIndex];
   GAME.targetNode = target;
@@ -1462,7 +1466,8 @@ function onDistanceClick(point) {
   if (dom.distanceTarget) {
     dom.distanceTarget.textContent = target.getAttribute('markLabel') || nodeLabel(target);
   }
-  if (dom.distanceValue) dom.distanceValue.textContent = `${Math.round(dist)} j.`;
+  if (dom.distanceValue) dom.distanceValue.textContent = `${score} b.`;
+  if (dom.lastValue) dom.lastValue.textContent = `${score} b.`;
   GAME.mapView.addGuide({
     x1: point.x,
     y1: point.y,
@@ -1548,10 +1553,9 @@ function showDistanceFinal() {
     finalHtml: dom.question.innerHTML,
     rows: GAME.answers.map((row) => [
       row.label,
-      t(`${row.distance} j.`),
-      String(row.points),
+      `${row.points} b.`,
     ]),
-    columns: [t('Objekt'), t('Vzdialenosť'), t('Body')],
+    columns: [t('Objekt'), t('Skóre tipu')],
   });
 }
 
@@ -1578,7 +1582,7 @@ function nextPuzzleQuestion() {
   dom.mapViewportWrap.classList.remove('is-answered');
   hideDistanceLegend();
   showMapHint();
-  GAME.mapView.fit();
+  GAME.mapView.fitAnimated();
 
   if (GAME.puzzlePrevious && GAME.puzzlePrevious.wasIncorrect) {
     GAME.mapView.setEntityColor(GAME.puzzlePrevious.entity, '#ff7777');

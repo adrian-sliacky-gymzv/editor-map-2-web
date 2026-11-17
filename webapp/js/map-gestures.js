@@ -131,6 +131,28 @@ export function isDoubleTap(previous, next, { maxDelay = 320, slop = 28 } = {}) 
   return Math.hypot(Number(next.x) - Number(previous.x), Number(next.y) - Number(previous.y)) <= slop;
 }
 
-export function doubleTapTargetZoom(zoom, { zoomIn = 2.4, threshold = 1.15 } = {}) {
-  return Number(zoom) > threshold ? 1 : zoomIn;
+/**
+ * A normal double tap zooms in. At the fitted view it jumps to a comfortable
+ * readable level; after that each double tap multiplies the current zoom.
+ * This follows the common map convention instead of toggling back to fit.
+ */
+export function doubleTapTargetZoom(zoom, { zoomIn = 2.4, step = 1.8, threshold = 1.15 } = {}) {
+  const start = clampNumber(zoom, MIN_MAP_ZOOM, MAX_MAP_ZOOM);
+  if (start <= threshold) return Math.min(MAX_MAP_ZOOM, Math.max(MIN_MAP_ZOOM, zoomIn));
+  return clampNumber(start * step, MIN_MAP_ZOOM, MAX_MAP_ZOOM);
+}
+
+/**
+ * One-finger zoom after double tap and drag. Dragging up (negative deltaY)
+ * zooms in and dragging down zooms out, with an exponential feel so the first
+ * pixels are precise and a full-screen drag covers a useful range.
+ */
+export function oneFingerZoomTarget(
+  startZoom,
+  deltaY,
+  { sensitivity = 160, minZoom = MIN_MAP_ZOOM, maxZoom = MAX_MAP_ZOOM } = {}
+) {
+  const start = clampNumber(startZoom, minZoom, maxZoom);
+  const delta = Number(deltaY) || 0;
+  return clampNumber(start * Math.exp(-delta / Math.max(1, sensitivity)), minZoom, maxZoom);
 }

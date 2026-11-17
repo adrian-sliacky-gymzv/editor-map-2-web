@@ -12,6 +12,7 @@ import {
   canvasPanLimits,
   doubleTapTargetZoom,
   isDoubleTap,
+  oneFingerZoomTarget,
   pinchView,
   tapSlop,
   wheelZoomFactor,
@@ -101,6 +102,8 @@ export class MapView {
     this.pointerDragged = false;
     this.suppressClickUntil = 0;
     this.lastTap = null;
+    this.doubleTapDrag = null;
+    this._fitFrame = 0;
     this._settleTimer = 0;
     this._renderFrame = 0;
     this._gestureTimer = 0;
@@ -124,8 +127,11 @@ export class MapView {
     clearTimeout(this._gestureTimer);
     if (this._renderFrame) cancelAnimationFrame(this._renderFrame);
     if (this._momentumFrame) cancelAnimationFrame(this._momentumFrame);
+    if (this._fitFrame) cancelAnimationFrame(this._fitFrame);
     this._renderFrame = 0;
     this._momentumFrame = 0;
+    this._fitFrame = 0;
+    this.doubleTapDrag = null;
     if (this._labelEditor) {
       this._labelEditor.remove();
       this._labelEditor = null;
@@ -828,7 +834,7 @@ export class MapView {
       );
     });
     if (visible) return false;
-    this.fit();
+    this.fitAnimated();
     return true;
   }
 
@@ -955,6 +961,36 @@ export class MapView {
       pointerType: event.pointerType || 'mouse',
       startedOnMark,
     });
+
+    const doubleTap = this.interaction === 'pan'
+      && event.pointerType !== 'mouse'
+      && !startedOnMark
+      && !interactive
+      && this.pointers.size === 1
+      && isDoubleTap(this.lastTap, {
+        x: event.clientX,
+        y: event.clientY,
+        time: performance.now(),
+      }, { maxDelay: 320, slop: 30 });
+    if (doubleTap) {
+      // A second tap can either become a normal double-tap zoom on release or,
+      // as in Google Maps, a continuous one-finger zoom when the finger slides.
+      this.panning = null;
+      this.doubleTapDrag = {
+        startX: event.clientX,
+        startY: event.clientY,
+        startZoom: this.zoom,
+        anchor: { x: event.clientX, y: event.clientY },
+        pointerId: event.pointerId,
+        moved: false,
+        slop: tapSlop(event.pointerType),
+      };
+      this.lastTap = null;
+      this.pointerDragged = false;
+      this.suppressClickUntil = performance.now() + 260;
+      return;
+    }
+
     if (this.pointers.size === 1) {
       if (interactive) {
         // A drag handle owns the single finger, but the same pointer still
@@ -982,6 +1018,7 @@ export class MapView {
       }
     } else if (this.pointers.size === 2) {
       this.panning = null;
+      this.doubleTapDrag = null;
       const [a, b] = [...this.pointers.values()];
       const startMidpoint = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
       const anchor = this.toMapPoint(startMidpoint.x, startMidpoint.y);
@@ -1014,6 +1051,22 @@ export class MapView {
       y: event.clientY,
       pointerType: event.pointerType || this.pointers.get(event.pointerId)?.pointerType || 'mouse',
     });
+
+    if (this.doubleTapDrag && this.doubleTapDrag.pointerId === event.pointerId) {
+      const drag = this.doubleTapDrag;
+      const dx = event.clientX - drag.startX;
+      const dy = event.clientY - drag.startY;
+      if (!drag.moved && Math.hypot(dx, dy) > drag.slop) {
+        drag.moved = true;
+        this.pointerDragged = true;
+        this.suppressClickUntil = performance.now() + 260;
+      }
+      if (!drag.moved) return;
+      event.preventDefault();
+      this.setZoom(oneFingerZoomTarget(drag.startZoom, dy), drag.anchor);
+      return;
+    }
+
     if (this.pinch && this.pointers.size >= 2) {
       const [a, b] = [...this.pointers.values()];
       const distance = Math.hypot(a.x - b.x, a.y - b.y);
@@ -1176,6 +1229,21 @@ export class MapView {
     this.endInteractiveDrag(event.pointerId);
     this._flushRender();
     if (this.pointers.size === 0) this._endGestureSoon();
+
+    if (this.doubleTapDrag && this.doubleTapDrag.pointerId === event.pointerId) {
+      const drag = this.doubleTapDrag;
+      this.doubleTapDrag = null;
+      this.lastTap = null;
+      if (!drag.moved) {
+        this._lastTouchDoubleTapAt = performance.now();
+        this._zoomFromDoubleTap({ x: event.clientX, y: event.clientY });
+      } else {
+        this.pointerDragged = true;
+        this.suppressClickUntil = performance.now() + 260;
+      }
+      return;
+    }
+
     if (this.pinch && this.pointers.size < 2) {
       this.pinch = null;
       this.pointerDragged = true;
@@ -1240,6 +1308,7 @@ export class MapView {
     this._stopMomentum();
     this.panning = null;
     this.pinch = null;
+    this.doubleTapDrag = null;
     this.pointerDragged = true;
     this.suppressClickUntil = performance.now() + 220;
     this._flushRender();
@@ -1283,6 +1352,12 @@ export class MapView {
 
   layout() {
     if (!this.scene) return;
+    if (this._fitFrame) {
+      this._clearSettleAnimation();
+      this.zoom = 1;
+      this.panX = 0;
+      this.panY = 0;
+    }
     const rect = this.viewport.getBoundingClientRect();
     const w = Math.max(1, rect.width);
     const h = Math.max(1, rect.height);
@@ -1391,6 +1466,52 @@ export class MapView {
     this._notifyZoom();
   }
 
+  /**
+   * Smoothly return to the fitted view. Uses a short rAF animation rather than
+   * a CSS transition so inverse-scaled markers stay anchored while zooming.
+   * Reduced-motion users get the instant fit.
+   */
+  fitAnimated(duration = 240) {
+    if (!this.scene) return false;
+    this._stopMomentum();
+    this._clearSettleAnimation();
+    const fits = this.zoom <= 1.001 && Math.abs(this.panX) <= 0.5 && Math.abs(this.panY) <= 0.5;
+    if (fits) return false;
+    const reduced = typeof window !== 'undefined'
+      && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) {
+      this.fit();
+      return false;
+    }
+    const startZoom = this.zoom;
+    const startX = this.panX;
+    const startY = this.panY;
+    const startedAt = performance.now();
+    this._beginGesture();
+    const step = (now) => {
+      const progress = Math.min(1, Math.max(0, (now - startedAt) / duration));
+      const eased = 1 - ((1 - progress) ** 3);
+      this.zoom = startZoom + (1 - startZoom) * eased;
+      this.panX = startX * (1 - eased);
+      this.panY = startY * (1 - eased);
+      this._applyTransform();
+      this._notifyZoom();
+      if (progress < 1) {
+        this._fitFrame = requestAnimationFrame(step);
+        return;
+      }
+      this._fitFrame = 0;
+      this.zoom = 1;
+      this.panX = 0;
+      this.panY = 0;
+      this._applyTransform();
+      this._notifyZoom();
+      this._endGestureSoon();
+    };
+    this._fitFrame = requestAnimationFrame(step);
+    return true;
+  }
+
   _panLimits() {
     if (!this.lastLayout.w) return { maxX: 0, maxY: 0 };
     // The default fitted view is fixed; panning starts only after zooming in.
@@ -1420,6 +1541,8 @@ export class MapView {
   _clearSettleAnimation() {
     clearTimeout(this._settleTimer);
     this._settleTimer = 0;
+    if (this._fitFrame) cancelAnimationFrame(this._fitFrame);
+    this._fitFrame = 0;
     this.canvas.style.transition = '';
   }
 

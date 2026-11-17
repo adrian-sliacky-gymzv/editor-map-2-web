@@ -39,6 +39,7 @@
             <a href="?view=atlas" data-nav-atlas>Atlas</a>
             <a href="?editor=1" data-editor-open>Editor</a>
             <a href="#postup">Postup</a>
+            <a href="#novinky">Novinky</a>
           </nav>
           <div class="home-header-actions">
             <button type="button" class="home-header-play" data-classic-mode="distance" data-classic-preset="hero" aria-label="Hrať Traf sa! — ťažká, 10 otázok">
@@ -245,6 +246,55 @@
           </div>
         </section>
 
+        <section class="changelog-section" id="novinky" aria-labelledby="changelogTitle">
+          <header class="section-head section-head-compact">
+            <div>
+              <p class="section-index">Novinky</p>
+              <h2 id="changelogTitle">Čo je nové</h2>
+            </div>
+            <p class="section-lead">Krátky prehľad posledných zmien. Staršie verzie zostávajú v histórii projektu.</p>
+          </header>
+          <div class="changelog-list">
+            <article class="changelog-entry changelog-entry-current">
+              <div class="changelog-meta">
+                <span class="changelog-version">v2.1</span>
+                <time datetime="2026-11-17">17. 11. 2026</time>
+              </div>
+              <h3>Zvuk, navigácia a plynulejšie hry</h3>
+              <ul>
+                <li>Jemné zvuky pri odpovediach a výsledkoch, s rýchlym stlmením.</li>
+                <li>História prehliadača funguje medzi hrou, atlasom a editorom.</li>
+                <li>Skóre tipu namiesto neprehľadných mapových jednotiek.</li>
+                <li>Plynulý návrat mapy medzi otázkami a nové dotykové ovládanie.</li>
+              </ul>
+            </article>
+            <article class="changelog-entry">
+              <div class="changelog-meta">
+                <span class="changelog-version">v2.0</span>
+                <time datetime="2026-11-10">10. 11. 2026</time>
+              </div>
+              <h3>Angličtina a presná zhoda</h3>
+              <ul>
+                <li>Anglické rozhranie s automatickým výberom jazyka.</li>
+                <li>Presná zhoda bodovania, výberu otázok a pôvodných dát.</li>
+                <li>Kompaktnejší HUD na mobilnom displeji.</li>
+              </ul>
+            </article>
+            <article class="changelog-entry">
+              <div class="changelog-meta">
+                <span class="changelog-version">v1.0</span>
+                <time datetime="2026-01-01">1. 1. 2026</time>
+              </div>
+              <h3>Pôvodná webová verzia</h3>
+              <ul>
+                <li>Všetkých 8 máp, 3 hry a plnohodnotný editor.</li>
+                <li>Atlas 74 slovenských miest.</li>
+                <li>Tmavá téma a responzívne ovládanie.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
         <footer class="home-footer">
           <div class="footer-brand">
             <img src="assets/editormap-logo.png" alt="" width="28" height="28">
@@ -401,6 +451,10 @@
               <span class="mission-stat-label">Priemer</span>
               <b class="mission-stat-value" id="gameAverageValue">—</b>
             </div>
+            <div class="mission-stat mission-stat-last" id="gameLastRow" hidden>
+              <span class="mission-stat-label">Posledný tip</span>
+              <b class="mission-stat-value" id="gameLastValue">—</b>
+            </div>
             <div class="mission-stat">
               <span class="mission-stat-label">Otázka</span>
               <b class="mission-stat-value" id="gameQuestionCounter">1/3</b>
@@ -514,6 +568,10 @@
               <span class="mission-stat-label">Priemer</span>
               <b class="mission-stat-value" id="classicAverageValue">—</b>
             </div>
+            <div class="mission-stat mission-stat-last" id="classicLastRow" hidden>
+              <span class="mission-stat-label">Posledný tip</span>
+              <b class="mission-stat-value" id="classicLastValue">—</b>
+            </div>
             <div class="mission-stat">
               <span class="mission-stat-label">Otázka</span>
               <b class="mission-stat-value" id="classicQuestionCounter">1/3</b>
@@ -549,7 +607,7 @@
               <span>Tvoj tip</span>
             </span>
             <span class="distance-legend-foot">
-              <span>Vzdialenosť</span>
+              <span>Skóre tipu</span>
               <b id="classicDistanceValue">—</b>
             </span>
           </div>
@@ -891,7 +949,7 @@
         <p data-i18n-html="helpEditor">Nová/Otvoriť/Ulož/Ulož ako pracujú s pôvodnými <b>.mef</b> súbormi. Strom vľavo ovláda viditeľnosť, značky a farby. Kreslenie ponúka čiary, obdĺžniky, elipsy a voľnú kresbu. Export vytvorí PNG alebo JPEG, prípadne môžeš mapu vytlačiť.</p>
 
         <h3 class="help-heading">Ovládanie mapy</h3>
-        <p data-i18n-html="helpMapControls">Mapu priblížiš kolieskom myši, štipcom alebo tlačidlami <b>+</b> / <b>−</b>. Tlačidlom <b>⌂</b> obnovíš celú mapu. Posúvaš ju ťahaním prázdneho miesta.</p>
+        <p data-i18n-html="helpMapControls">Mapu priblížiš kolieskom myši, štipcom alebo tlačidlami <b>+</b> / <b>−</b>. Na dotykovej obrazovke ju priblížiš aj dvojitým ťuknutím a potiahnutím jedným prstom nahor alebo nadol. Tlačidlom <b>⌂</b> obnovíš celú mapu. Posúvaš ju ťahaním prázdneho miesta.</p>
 
         <h3 class="help-heading">Atlas miest SR</h3>
         <p>Doplnkový atlas všetkých 74 slovenských miest s hľadaním, filtrami a rýchlym tréningom. Neovplyvňuje pôvodné aktivity.</p>
